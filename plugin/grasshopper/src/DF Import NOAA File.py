@@ -57,7 +57,7 @@ https://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly
 
 ghenv.Component.Name = "DF Import NOAA File"
 ghenv.Component.NickName = 'importNOAA'
-ghenv.Component.Message = 'VER 0.0.04\nAPR_04_2019'
+ghenv.Component.Message = 'VER 0.0.04\nAPR_09_2019'
 ghenv.Component.Category = "DragonflyPlus"
 ghenv.Component.SubCategory = '03 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "3"
@@ -98,9 +98,12 @@ sky_codes_dict = {
 def build_collection(values, dates, data_type, unit):
     """Build a data collection from raw noaa data and process it to the timestep."""
     
+    if values == []:
+        return None
+    
     # convert date codes into datetimes.
-    datetimes = [DateTime(int(dat[4:6]), int(dat[6:8]), int(dat[8:10]), int(dat[10:12]))
-                 for dat in dates]
+    datetimes = [DateTime(int(dat[4:6]), int(dat[6:8]), int(dat[8:10]),
+                 int(dat[10:12])) for dat in dates]
     
     # make a discontinuous cata collection
     data_header = Header(data_type, unit, AnalysisPeriod())
@@ -135,6 +138,8 @@ if _noaa_file and _run is True:
     sc_dates = []
     ap = []
     ap_dates = []
+    slp = []
+    slp_dates = []
     vis = []
     vis_dates = []
     ceil = []
@@ -170,6 +175,9 @@ if _noaa_file and _run is True:
             if row[25] != '******':
                 ap.append(float(row[25]))
                 ap_dates.append(row[2])
+            if row[23] != '******':
+                slp.append(float(row[23]))
+                slp_dates.append(row[2])
     
     # check that all years in the file are the same.
     yr1 = all_years[0]
@@ -181,7 +189,6 @@ if _noaa_file and _run is True:
     
     # perform conversions
     sc = [sky_codes_dict[cov] for cov in sc]  # sky cover codes to values
-    ap = [press / 1000 for press in ap]  # pressure mbar to bar
     ceil = [c * 100 for c in ceil]  # hundreds of feet to feet
     
     # build data collections from the imported values
@@ -190,14 +197,27 @@ if _noaa_file and _run is True:
     wind_speed = build_collection(ws, ws_dates, WindSpeed(), 'mph')
     wind_direction = build_collection(wd, wd_dates, WindDirection(), 'degrees')
     total_sky_cover = build_collection(sc, sc_dates, TotalSkyCover(), 'tenths')
-    atmos_pressure = build_collection(ap, ap_dates, AtmosphericStationPressure(), 'bar')
     visibility = build_collection(vis, vis_dates, Visibility(), 'mi')
     ceiling_height = build_collection(ceil, ceil_dates, CeilingHeight(), 'ft')
     
-    # convert everything to SI.
-    dry_bulb_temp.convert_to_unit('C')
-    dew_point_temp.convert_to_unit('C')
-    wind_speed.convert_to_unit('m/s')
-    atmos_pressure.convert_to_unit('Pa')
-    visibility.convert_to_unit('km')
-    ceiling_height.convert_to_unit('m')
+    # deal with available atmospheric pressure data
+    if ap != []:
+        ap = [press / 1000 for press in ap]  # pressure mbar to bar
+        atmos_pressure = build_collection(ap, ap_dates, AtmosphericStationPressure(), 'bar')
+    else:
+        slp = [press / 1000 for press in slp]  # pressure mbar to bar
+        atmos_pressure = build_collection(slp, slp_dates, AtmosphericStationPressure(), 'bar')
+    
+    # convert all units to SI.
+    if dry_bulb_temp is not None:
+        dry_bulb_temp.convert_to_unit('C')
+    if dew_point_temp is not None:
+        dew_point_temp.convert_to_unit('C')
+    if wind_speed is not None:
+        wind_speed.convert_to_unit('m/s')
+    if visibility is not None:
+        visibility.convert_to_unit('km')
+    if ceiling_height is not None:
+        ceiling_height.convert_to_unit('m')
+    if atmos_pressure is not None:
+        atmos_pressure.convert_to_unit('Pa')
