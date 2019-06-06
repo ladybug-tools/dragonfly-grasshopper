@@ -7,13 +7,14 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 
 """
-Calculate relative humidity from Dry Buld Tempreature and Dew Point Temperature.
+Calculate downwelling horizontal infrared radiation intensity from sky cover,
+dry bulb temperature, and dew point temperature.
 -
 
     Args:
         _sky_cover: A value or data collection representing sky cover [tenths]
         _dry_bulb: A value or data collection representing  dry bulb temperature [C]
-        _dew_point: A value or data collection representing relative humidity [%]
+        _dew_point: A value or data collection representing dew point temperature [C]
     
     Returns:
         horiz_infrared: A data collection or value indicating the downwelling
@@ -22,7 +23,7 @@ Calculate relative humidity from Dry Buld Tempreature and Dew Point Temperature.
 
 ghenv.Component.Name = "DF Horizontal Infrared"
 ghenv.Component.NickName = 'horizInfr'
-ghenv.Component.Message = 'VER 0.0.04\nAPR_04_2019'
+ghenv.Component.Message = 'VER 0.0.04\nJUN_05_2019'
 ghenv.Component.Category = "DragonflyPlus"
 ghenv.Component.SubCategory = '03 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
