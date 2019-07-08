@@ -48,7 +48,7 @@ hourly data.
 
 ghenv.Component.Name = "DF Create EPW"
 ghenv.Component.NickName = 'createEPW'
-ghenv.Component.Message = 'VER 0.0.04\nAPR_04_2019'
+ghenv.Component.Message = 'VER 0.0.04\nJUL_08_2019'
 ghenv.Component.Category = "DragonflyPlus"
 ghenv.Component.SubCategory = '03 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -57,6 +57,7 @@ try:
     from ladybug.epw import EPW
     from ladybug.wea import Wea
     from ladybug.datacollection import HourlyContinuousCollection
+    from ladybug.sunpath import Sunpath
     from ladybug.datatype.temperature import Temperature
     from ladybug.datatype.fraction import Fraction, RelativeHumidity
     from ladybug.datatype.speed import Speed
@@ -68,6 +69,8 @@ try:
     from ladybug.psychrometrics import rel_humid_from_db_dpt
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
+
+import math
 
 def check_data(name, data_coll, data_type, unit, is_leap_year):
     assert isinstance(data_coll, HourlyContinuousCollection), \
@@ -151,7 +154,7 @@ if _location and _run is True:
     if _direct_normal_ill_ and _diffuse_horiz_ill_:
         glob_horiz = []
         sp = Sunpath.from_location(_location)
-        sp.is_leap_year = self.is_leap_year
+        sp.is_leap_year = leap_yr
         for dt, dni, dhi in zip(_direct_normal_ill_.datetimes,
                 _direct_normal_ill_, _diffuse_horiz_ill_):
             sun = sp.calculate_sun_from_date_time(dt)
