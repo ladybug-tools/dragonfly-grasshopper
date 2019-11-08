@@ -60,7 +60,7 @@ ghenv.Component.Name = "DF Import NOAA File"
 ghenv.Component.NickName = 'ImportNOAA'
 ghenv.Component.Message = '0.1.0'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '03 :: AlternativeWeather'
+ghenv.Component.SubCategory = '3 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "3"
 
 
