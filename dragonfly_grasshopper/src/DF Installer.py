@@ -24,7 +24,7 @@ C:\Users\%USERNAME%\AppData\Roaming\Grasshopper\UserObjects
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.2.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -34,7 +34,7 @@ import System.Net
 import sys
 import zipfile
 import shutil
-import distutils
+from distutils import dir_util
 from Grasshopper.Folders import UserObjectFolders
 
 
@@ -86,7 +86,7 @@ def nukedir(target_dir, rmdir=False):
             os.rmdir(d)
         except Exception:
             try:
-                distutils.dir_util.remove_tree(d)
+                dir_util.remove_tree(d)
             except Exception:
                 print("Failed to remove %s" % d)
 
@@ -166,47 +166,6 @@ def unzip_file(source_file, dest_dir=None, mkdir=False):
             zf.extract(member, dest_dir)
 
 
-def copy_file_tree(source_folder, dest_folder, overwrite=True):
-    """Copy an entire file tree from a source_folder to a dest_folder.
-
-    Args:
-        source_folder: The source folder containing the files and folders to
-            be copied.
-        dest_folder: The destination folder into which all the files and folders
-            of the source_folder will be copied.
-        overwrite: Boolean to note whether an existing folder with the same
-            name as the source_folder in the dest_folder directory should be
-            overwritten. Default: True.
-    """
-    # make the dest_folder if it does not exist
-    if not os.path.isdir(dest_folder):
-        os.mkdir(dest_folder)
-
-    # recursively copy each sub-folder and file
-    for f in os.listdir(source_folder):
-        # get the source and destination file paths
-        src_file_path = os.path.join(source_folder, f)
-        dst_file_path = os.path.join(dest_folder, f)
-
-        # if overwrite is True, delete any existing files
-        if overwrite:
-            if os.path.isfile(dst_file_path):
-                try:
-                    os.remove(dst_file_path)
-                except Exception:
-                    raise IOError("Failed to remove %s" % f)
-            elif os.path.isdir(dst_file_path):
-                nukedir(dst_file_path, True)
-
-        # copy the files and folders to their correct location
-        if os.path.isfile(src_file_path):
-            shutil.copyfile(src_file_path, dst_file_path)
-        elif os.path.isdir(src_file_path):
-            if not os.path.isdir(dst_file_path):
-                os.mkdir(dst_file_path)
-            copy_file_tree(src_file_path, dst_file_path, overwrite)
-
-
 def get_library_directory():
     """Get the Rhino directory into which the Python libraries will be installed."""
     try:
@@ -270,7 +229,7 @@ def update_libraries(repos):
         source_folder = os.path.join(target_directory, r"{}-master".format(f), p)
         lib_folder = os.path.join(target_directory, p)
         print 'Copying {} library source code to {}'.format(f, lib_folder)
-        copy_file_tree(source_folder, lib_folder)
+        dir_util.copy_tree(source_folder, lib_folder)
 
     # try to clean up
     for r in repos:
@@ -327,7 +286,7 @@ def update_components(repos):
             source_folder = os.path.join(target_directory, r"{}-master".format(f), p)
         lib_folder = os.path.join(target_directory, p)
         print 'Copying {} user objects to {}'.format(f, lib_folder)
-        copy_file_tree(source_folder, lib_folder)
+        dir_util.copy_tree(source_folder, lib_folder)
 
     # try to clean up
     for r in repos:
