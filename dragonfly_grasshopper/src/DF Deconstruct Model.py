@@ -8,19 +8,20 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 
 """
-Separate a Dragonfly Model object into all of its constituent Dragonfly objects.
+Deconstruct a Dragonfly Model object into all of its constituent Dragonfly objects.
 -
 
     Args:
-        _model: A Dragonfly Model to be separated into into its constituent objects.
+        _model: A Dragonfly Model to be deconstructed into into its constituent
+            objects (Buildings, ContextShades).
     
     Returns:
         buildings: All of the Building objects contained within the input Model.
         context: All of the ContextShade objects within the input Model.
 """
 
-ghenv.Component.Name = "DF Separate Model"
-ghenv.Component.NickName = 'SeparateModel'
+ghenv.Component.Name = "DF Deconstruct Model"
+ghenv.Component.NickName = 'DeconstructModel'
 ghenv.Component.Message = '0.1.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
