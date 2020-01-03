@@ -24,7 +24,7 @@ C:\Users\%USERNAME%\AppData\Roaming\Grasshopper\UserObjects
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.2.0'
+ghenv.Component.Message = '0.3.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -296,6 +296,61 @@ def update_components(repos):
             print 'Failed to clean up downloaded components: {}'.format(r)
 
 
+def update_gems(repos):
+    """Download Ladybug Tools Ruby gems from github.
+    
+    Args:
+        repos: An array of all repo names to be installed.
+            (eg. ['energy-model-measure']).
+        """
+
+    # derive the gem name from the repo name
+    packages = []
+    for f in repos:
+        packages.append(f.replace('-', '_'))
+
+    # get the directory where the measure should be copied
+    target_directory = get_library_directory()
+
+    # delete currently-installed packages if they exist 
+    for pkg in packages:
+        lib_folder = os.path.join(target_directory, pkg)
+        if os.path.isdir(lib_folder):
+            print 'Removing {}'.format(lib_folder)
+            nukedir(lib_folder)
+
+    # download and unzip files
+    for repo in repos:
+        # download files
+        url = "https://github.com/ladybug-tools-in2/%s/archive/master.zip" % repo
+        zip_file = os.path.join(target_directory, '%s.zip' % repo)
+        print "Downloading {} the github repository to {}".format(repo, target_directory)
+        download_file_by_name(url, target_directory, zip_file)
+
+        #unzip the file
+        unzip_file(zip_file, target_directory)
+
+        # try to clean up the downloaded zip file
+        try:
+            os.remove(zip_file)
+        except:
+            print 'Failed to remove downloaded zip file: {}.'.format(zip_file)
+
+    # rename the folder
+    for f, p in zip(repos, packages):
+        source_folder = os.path.join(target_directory, r"{}-master".format(f), 'lib')
+        lib_folder = os.path.join(target_directory, p, 'lib')
+        print 'Copying {} library source code to {}'.format(f, lib_folder)
+        dir_util.copy_tree(source_folder, lib_folder)
+    
+    # try to clean up
+    for r in repos:
+        try:
+            nukedir(os.path.join(target_directory, '{}-master'.format(r)), True)
+        except:
+            print 'Failed to clean up downloaded library: {}'.format(r)
+
+
 if _update:
     # update the core libraries
     libraries = \
@@ -309,6 +364,10 @@ if _update:
         ('ladybug-grasshopper', 'honeybee-grasshopper-core',
          'honeybee-grasshopper-energy', 'dragonfly-grasshopper')
     update_components(components)
+    
+    # update the ruby gems
+    gems = ('energy-model-measure',)
+    update_gems(gems)
     
     # check to be sure that the new libraries can be imported
     try:
