@@ -37,7 +37,7 @@ to such stories.
 
 ghenv.Component.Name = "DF Reassign Energy Properties"
 ghenv.Component.NickName = 'ReassignProp'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '1 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -56,7 +56,6 @@ except ImportError as e:
 try:  # import the honeybee-energy extension
     from honeybee_energy.lib.programtypes import program_type_by_name
     from honeybee_energy.lib.constructionsets import construction_set_by_name
-    from honeybee_energy.idealair import IdealAirSystem
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy energy:\n\t{}'.format(e))
 
@@ -88,10 +87,7 @@ if all_required_inputs(ghenv.Component):
     # assign an ideal air system
     if conditioned_ is not None:
         if conditioned_:
-            if isinstance(df_obj, (Building, Story)):
-                df_obj.properties.energy.set_all_room_2d_hvac(IdealAirSystem())
-            else:  # it's a Room2D
-                df_obj.properties.energy.hvac = IdealAirSystem()
+            df_obj.properties.energy.add_default_ideal_air()
         else:
             if isinstance(df_obj, Building):
                 for room in df_obj.unique_room_2ds:
