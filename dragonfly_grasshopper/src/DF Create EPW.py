@@ -49,10 +49,12 @@ hourly data.
 
 ghenv.Component.Name = "DF Create EPW"
 ghenv.Component.NickName = 'CreateEPW'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '3 :: AlternativeWeather'
+ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
+
+import math
 
 try:
     from ladybug.epw import EPW
@@ -71,7 +73,11 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
-import math
+try:
+    from ladybug_rhino.grasshopper import all_required_inputs
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
 
 def check_data(name, data_coll, data_type, unit, is_leap_year):
     assert isinstance(data_coll, HourlyContinuousCollection), \
@@ -87,8 +93,8 @@ def check_data(name, data_coll, data_type, unit, is_leap_year):
         'Got {}.'.format(name, unit, data_coll.header.unit)
     return data_coll.values
 
-if _location and _run is True:
-    
+
+if all_required_inputs(ghenv.Component) and _run:
     # initialize the EPW
     if base_epw_ is not None:
         epw_obj = EPW(base_epw_)

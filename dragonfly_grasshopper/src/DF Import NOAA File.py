@@ -58,11 +58,13 @@ https://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly
 
 ghenv.Component.Name = "DF Import NOAA File"
 ghenv.Component.NickName = 'ImportNOAA'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '3 :: AlternativeWeather'
+ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "3"
 
+import os
+import csv
 
 try:
     from ladybug.dt import DateTime
@@ -80,10 +82,10 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
 try:
-    import os
-    import csv
+    from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
-    raise ImportError('\nFailed to import Python module:\n\t{}'.format(e))
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
 
 # dictionary that converts from sky cover codes to tenths of sky cover.
 sky_codes_dict = {
@@ -120,7 +122,7 @@ def build_collection(values, dates, data_type, unit):
     return data_final
 
 
-if _noaa_file and _run is True:
+if all_required_inputs(ghenv.Component) and _run:
     # check that the file exists.
     assert os.path.isfile(_noaa_file), 'Cannot find file at {}.'.format(_noaa_file)
     

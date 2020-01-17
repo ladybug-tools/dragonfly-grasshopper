@@ -22,12 +22,6 @@ Create a Dragonfly Story from individual Dragonfly Room2D objects.
             name will be assigned.
         multiplier_: An integer with that denotes the number of times that this
             Story is repeated over the height of the building. Default: 1.
-        ground_flr_: A boolean to note whether this Story is a ground floor,
-            in which case the floor Faces of the resulting Rooms will have a Ground
-            boundary condition instead of an Adiabatic one. Default: False.
-        top_flr_: A boolean to note whether this Story is a top floor, in which
-            case the ceiling Faces of the resulting Rooms will have an Outdoor
-            boundary condition instead of an Adiabatic one. Default: False.
         _constr_set_: Text for the construction set of the Story, which is used
             to assign all default energy constructions needed to create an energy
             model. Text should refer to a ConstructionSet within the library such
@@ -43,7 +37,7 @@ Create a Dragonfly Story from individual Dragonfly Room2D objects.
 
 ghenv.Component.Name = "DF Story"
 ghenv.Component.NickName = 'Story'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "3"
@@ -85,12 +79,9 @@ if all_required_inputs(ghenv.Component):
     
     # set other defaults
     multiplier_ = multiplier_ if multiplier_ is not None else 1
-    ground_flr_ = ground_flr_ if ground_flr_ is not None else False
-    top_flr_ = top_flr_ if top_flr_ is not None else False
     
     # create the Story
-    story = Story(_name_, room2ds, _flr_to_flr_, multiplier_,
-                  ground_flr_, top_flr_)
+    story = Story(_name_, room2ds, _flr_to_flr_, multiplier_)
     
     # assign the construction set
     if _constr_set_ is not None:

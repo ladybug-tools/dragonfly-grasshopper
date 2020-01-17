@@ -27,11 +27,12 @@ https://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly
 
 ghenv.Component.Name = "DF Import NOAA Staion Location"
 ghenv.Component.NickName = 'ImportStaion'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '3 :: AlternativeWeather'
+ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "3"
 
+import os
 
 try:
     from ladybug.datatype.distance import Distance
@@ -40,11 +41,12 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
 try:
-    import os
+    from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
-    raise ImportError('\nFailed to import Python module:\n\t{}'.format(e))
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-if _station_file:
+
+if all_required_inputs(ghenv.Component):
     # check that the file exists.
     assert os.path.isfile(_station_file), 'Cannot find file at {}.'.format(_station_file)
     
