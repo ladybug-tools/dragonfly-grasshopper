@@ -24,9 +24,9 @@ dry bulb temperature, and dew point temperature.
 
 ghenv.Component.Name = "DF Horizontal Infrared"
 ghenv.Component.NickName = 'HorizInfr'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '3 :: AlternativeWeather'
+ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
 
 try:
@@ -36,7 +36,13 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
-if _sky_cover and _dry_bulb and _dew_point:
+try:
+    from ladybug_rhino.grasshopper import all_required_inputs
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
+
+if all_required_inputs(ghenv.Component):
     horiz_infrared = HourlyContinuousCollection.compute_function_aligned(
         calc_horizontal_infrared, [_sky_cover, _dry_bulb, _dew_point],
         HorizontalInfraredRadiationIntensity(), 'W/m2')

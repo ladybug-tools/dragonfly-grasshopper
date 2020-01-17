@@ -27,19 +27,25 @@ Write Ladybug DesignDays a standard .ddy file.
 
 ghenv.Component.Name = "DF Write DDY"
 ghenv.Component.NickName = 'WriteDDY'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '3 :: AlternativeWeather'
+ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
 
 import os
+
 try:
-    from ladybug.designday import DDY
+    from ladybug.ddy import DDY
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
+try:
+    from ladybug_rhino.grasshopper import all_required_inputs
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-if _location and _design_days != [] and _run == True:
+
+if all_required_inputs(ghenv.Component) and _run:
     # default folder and file name
     if _folder_ is None:
         _folder_ = os.path.join(os.environ['USERPROFILE'], 'ladybug')

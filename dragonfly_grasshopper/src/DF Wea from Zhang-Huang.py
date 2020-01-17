@@ -29,9 +29,9 @@ Construct a WEA from hourly data collections and the Zhang-Huang Solar Model.
 
 ghenv.Component.Name = "DF Wea from Zhang-Huang"
 ghenv.Component.NickName = 'Zhang-Huang'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '3 :: AlternativeWeather'
+ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
 
 try:
@@ -42,9 +42,15 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
-if _location and _cloud_cover and _relative_humidity and _dry_bulb_temp and _wind_speed:
+try:
+    from ladybug_rhino.grasshopper import all_required_inputs
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
+
+if all_required_inputs(ghenv.Component):
     # perform checks.
-    assert hasattr(_cloud_cover, 'isHourly') and hasattr(_cloud_cover, 'isContinuous'), \
+    assert isinstnace(_cloud_cover, HourlyContinuousCollection), \
         'Data Collections must be Continuous Hourly.'
     if _atmos_pressure_ is None:
         header = Header(AtmosphericStationPressure(), 'Pa',
@@ -55,6 +61,6 @@ if _location and _cloud_cover and _relative_humidity and _dry_bulb_temp and _win
         [_cloud_cover, _relative_humidity, _dry_bulb_temp, _wind_speed]), \
         'Data Collections must be aligned.'
     
-    # build the WEA.
+    # build the Wea.
     wea = Wea.from_zhang_huang_solar(_location, _cloud_cover, _relative_humidity,
         _dry_bulb_temp, _wind_speed, _atmos_pressure_)

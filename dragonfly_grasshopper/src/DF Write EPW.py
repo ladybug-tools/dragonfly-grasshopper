@@ -27,19 +27,25 @@ Write an EPW object into a .epw file.
 
 ghenv.Component.Name = "DF Write EPW"
 ghenv.Component.NickName = 'WriteEPW'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '3 :: AlternativeWeather'
+ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
 
 import os
+
 try:
     from ladybug.epw import EPW
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
+try:
+    from ladybug_rhino.grasshopper import all_required_inputs
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-if _epw_obj and _run is True:
+
+if all_required_inputs(ghenv.Component) and _run:
     assert isinstance(_epw_obj, EPW), '_epw_obj must be an EPW object from the ' \
         'Create EPW component. Got {}.'.format(type(_epw_obj))
     

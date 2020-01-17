@@ -27,13 +27,22 @@ Esimtate sky illuminance from the irradiance contained within a WEA object.
 
 ghenv.Component.Name = "DF Luminous Efficacy"
 ghenv.Component.NickName = 'LumEff'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '3 :: AlternativeWeather'
+ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
 
-from ladybug.wea import Wea
+try:
+    from ladybug.wea import Wea
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
-if _wea is not None and isinstance(_wea, Wea) and _dew_point is not None:
+try:
+    from ladybug_rhino.grasshopper import all_required_inputs
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
+
+if all_required_inputs(ghenv.Component):
     glob_ill, dir_ill, diff_ill, zen_lum = \
         _wea.estimate_illuminance_components(_dew_point)

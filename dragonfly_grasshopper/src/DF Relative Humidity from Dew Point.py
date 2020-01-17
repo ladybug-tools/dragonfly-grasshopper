@@ -21,9 +21,9 @@ Calculate relative humidity from Dry Bulb Temperature and Dew Point Temperature.
 
 ghenv.Component.Name = "DF Relative Humidity from Dew Point"
 ghenv.Component.NickName = 'RelHumid'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '3 :: AlternativeWeather'
+ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
 
 try:
@@ -33,6 +33,12 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
-if _dry_bulb and _dew_point:
+try:
+    from ladybug_rhino.grasshopper import all_required_inputs
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
+
+if all_required_inputs(ghenv.Component):
     rel_humid = HourlyContinuousCollection.compute_function_aligned(
         rel_humid_from_db_dpt, [_dry_bulb, _dew_point], RelativeHumidity(), '%')
