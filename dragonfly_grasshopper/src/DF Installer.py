@@ -24,7 +24,7 @@ C:\Users\%USERNAME%\AppData\Roaming\Grasshopper\UserObjects
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.3.0'
+ghenv.Component.Message = '0.4.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -183,6 +183,15 @@ def get_library_directory():
     return target_directory
 
 
+def get_measure_directory():
+    """Get the directory where OpenStudio BCL measures are installed."""
+    home_folder = os.getenv('HOME') or os.path.expanduser('~')
+    bcl_folder = os.path.join(home_folder, 'OpenStudio', 'Measures')
+    if not os.path.isdir(bcl_folder):
+        os.mkdir(bcl_folder)
+    return bcl_folder
+
+
 def update_libraries(repos):
     """Download Ladybug Tools libraries from github.
     
@@ -310,7 +319,7 @@ def update_gems(repos):
         packages.append(f.replace('-', '_'))
 
     # get the directory where the measure should be copied
-    target_directory = get_library_directory()
+    target_directory = get_measure_directory()
 
     # delete currently-installed packages if they exist 
     for pkg in packages:
