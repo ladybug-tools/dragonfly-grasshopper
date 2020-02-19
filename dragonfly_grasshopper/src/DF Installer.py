@@ -13,18 +13,27 @@ C:\Users\%USERNAME%\AppData\Roaming\McNeel\Rhinoceros\6.0\scripts
 _
 It also installs all of the grasshopper components from github to:
 C:\Users\%USERNAME%\AppData\Roaming\Grasshopper\UserObjects
+_
+It also installs the energy_model_measure from github to:
+C:\Users\%USERNAME%\OpenStudio\Measures
+_
+If keep_standards is not True, it also installs standards from github to:
+C:\Users\%USERNAME%\honeybee
 -
 
     Args:
         _update: Set to True to install dragonfly, honeybee and ladybug to your
             machine from the Ladybug Tools github.
+        keep_standards_: Set to False to ensure that user libraries of standards
+            are not overwritten by this component. If True or None, the libraries
+            will be overwritten.
     Returns:
-        Vviiiiiiiiiizzz!: !!!
+        Vviiiiiz!: !!!
 """
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.4.0'
+ghenv.Component.Message = '0.5.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -192,12 +201,23 @@ def get_measure_directory():
     return bcl_folder
 
 
-def update_libraries(repos):
+def get_standards_directory():
+    """Get the directory where Honeybee standards are installed."""
+    home_folder = os.getenv('HOME') or os.path.expanduser('~')
+    hb_folder = os.path.join(home_folder, 'honeybee')
+    if not os.path.isdir(hb_folder):
+        os.mkdir(hb_folder)
+    return hb_folder
+
+
+def update_libraries(repos, target_directory):
     """Download Ladybug Tools libraries from github.
     
     Args:
         repos: An array of all repo names to be installed.
             (eg. ['ladybug', 'ladybug-geometry']).
+        target_directory: the directory where the Python libraries should
+            be copied.
         """
 
     # derive the distribution package name from the repo name
@@ -205,9 +225,6 @@ def update_libraries(repos):
     for f in repos:
         pkg_name = f.replace('-core', '') if f.endswith('-core') else f
         packages.append(pkg_name.replace('-', '_'))
-
-    # get the directory where the Python libraries should be copied
-    target_directory = get_library_directory()
 
     # delete currently-installed packages if they exist 
     for pkg in packages:
@@ -364,9 +381,13 @@ if _update:
     # update the core libraries
     libraries = \
         ('ladybug', 'ladybug-geometry', 'ladybug-rhino', 'ladybug-dotnet', 'ladybug-comfort',
-         'honeybee-core', 'honeybee-energy', 'honeybee-energy-standards',
-         'dragonfly-core', 'dragonfly-energy')
-    update_libraries(libraries)
+         'honeybee-core', 'honeybee-energy', 'dragonfly-core', 'dragonfly-energy')
+    update_libraries(libraries, get_library_directory())
+    
+    # update the standards files
+    if not keep_standards_:
+        standards = ('honeybee-standards', 'honeybee-energy-standards')
+        update_libraries(standards, get_standards_directory())
     
     # update the grasshopper components
     components = \
