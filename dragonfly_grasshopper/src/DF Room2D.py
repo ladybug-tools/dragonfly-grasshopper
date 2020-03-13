@@ -41,7 +41,7 @@ Create Dragonfly Room2Ds from floor plate geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = "DF Room2D"
 ghenv.Component.NickName = 'Room2D'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '0.1.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
@@ -114,7 +114,7 @@ if all_required_inputs(ghenv.Component) and _run:
         # assign an ideal air system
         if conditioned_ or conditioned_ is None:  # conditioned by default
             try:
-                room.properties.energy.set_default_ideal_air()
+                room.properties.energy.add_default_ideal_air()
             except (NameError, AttributeError):
                 pass  # honeybee-energy is not installed
         
