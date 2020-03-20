@@ -33,7 +33,7 @@ C:\Users\%USERNAME%\honeybee
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.5.0'
+ghenv.Component.Message = '0.6.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -305,11 +305,7 @@ def update_components(repos):
 
     # copy the user object package to the folder
     for f, p in zip(repos, packages):
-        if f.startswith('ladybug'):
-            # TODO: Remove this once ladybug-grasshopper is a Python package
-            source_folder = os.path.join(target_directory, '{}-master'.format(f), 'plugin', 'grasshopper')
-        else:
-            source_folder = os.path.join(target_directory, r"{}-master".format(f), p)
+        source_folder = os.path.join(target_directory, r"{}-master".format(f), p)
         lib_folder = os.path.join(target_directory, p)
         print 'Copying {} user objects to {}'.format(f, lib_folder)
         dir_util.copy_tree(source_folder, lib_folder)
