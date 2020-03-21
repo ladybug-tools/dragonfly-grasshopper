@@ -19,6 +19,9 @@ Convert a Dragonfly Model into an URBANopt-compatible geoJSON.
         _point_: A Point for where the location object exists within the space of
             the Rhino scene. This is used to posistion the geoJSON file on the
             globe. (Default: (0, 0)).
+        _cpus_: A positive integer for the number of CPUs to use in the simulation.
+            This should be changed based on the machine on which the simulation
+            is being run in order to yield the fastest simulation (Default: 2).
         _folder_: Text for the full path to the folder where the OpenStudio
             model files for each building are written. This is also the location
             where the geojson will be written along with all of the urbanopt files
@@ -59,7 +62,7 @@ Convert a Dragonfly Model into an URBANopt-compatible geoJSON.
 
 ghenv.Component.Name = "DF Model To URBANopt"
 ghenv.Component.NickName = 'ToURBANopt'
-ghenv.Component.Message = '0.2.0'
+ghenv.Component.Message = '0.3.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '1 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -103,6 +106,7 @@ import os
 if all_required_inputs(ghenv.Component) and _write:
     # set default inputs if not specified
     point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)
+    _cpus_ = 2 if _cpus_ is None else _cpus_
 
     # check the _model and _location input
     assert isinstance(_model, Model), \
@@ -116,7 +120,8 @@ if all_required_inputs(ghenv.Component) and _write:
         geojson_dict = _model.to_geojson_dict(_location, point, _folder_, tolerance)
         uo_folder = os.path.join(_folder_, _model.name) if _folder_ is not None \
             else os.path.join(folders.default_simulation_folder, _model.name)
-        geojson, scenario = prepare_urbanopt_folder(uo_folder, geojson_dict, _epw_file)
+        geojson, scenario = prepare_urbanopt_folder(
+            uo_folder, geojson_dict, _epw_file, _cpus_)
 
         if run_ == 1:
             sql, zsz, rdd, html, err = run_urbanopt(geojson, scenario)
