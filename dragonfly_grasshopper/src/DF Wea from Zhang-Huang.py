@@ -29,7 +29,7 @@ Construct a WEA from hourly data collections and the Zhang-Huang Solar Model.
 
 ghenv.Component.Name = "DF Wea from Zhang-Huang"
 ghenv.Component.NickName = 'Zhang-Huang'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '0.1.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
@@ -50,7 +50,7 @@ except ImportError as e:
 
 if all_required_inputs(ghenv.Component):
     # perform checks.
-    assert isinstnace(_cloud_cover, HourlyContinuousCollection), \
+    assert isinstance(_cloud_cover, HourlyContinuousCollection), \
         'Data Collections must be Continuous Hourly.'
     if _atmos_pressure_ is None:
         header = Header(AtmosphericStationPressure(), 'Pa',
