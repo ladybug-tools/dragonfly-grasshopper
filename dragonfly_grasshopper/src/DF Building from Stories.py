@@ -19,8 +19,9 @@ Create a Dragonfly Building from individual Dragonfly Story objects.
             that each Story is repeated over the height of the building. If
             nothing is input here, the multipliers on the existing Story objects
             will remain.
-        _name_:  A name for the Building. If the name is not provided a random
-            name will be assigned
+        _name_: Text to set the name for the Building, which will also be incorporated
+            into unique Building identifier. If the name is not provided a random
+            one will be assigned.
         _constr_set_: Text for the construction set of the Building, which is used
             to assign all default energy constructions needed to create an energy
             model. Text should refer to a ConstructionSet within the library such
@@ -36,7 +37,7 @@ Create a Dragonfly Building from individual Dragonfly Story objects.
 
 ghenv.Component.Name = "DF Building from Stories"
 ghenv.Component.NickName = 'BuildingStories'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
@@ -47,6 +48,11 @@ try:
     scriptcontext.sticky["bldg_count"]
 except KeyError:  # first time that the component is running
     scriptcontext.sticky["bldg_count"] = 1
+
+try:  # import the core honeybee dependencies
+    from honeybee.typing import clean_and_id_string
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
     from dragonfly.building import Building
@@ -60,7 +66,7 @@ except ImportError as e:
 
 try:  # import the dragonfly-energy extension
     import dragonfly_energy
-    from honeybee_energy.lib.constructionsets import construction_set_by_name
+    from honeybee_energy.lib.constructionsets import construction_set_by_identifier
 except ImportError as e:
     if _constr_set_ is not None:
         raise ValueError('_constr_set_ has been specified but dragonfly-energy '
@@ -70,7 +76,7 @@ except ImportError as e:
 if all_required_inputs(ghenv.Component):
     # duplicate the initial objects
     stories = [story.duplicate() for story in _stories]
-    
+
     # if there are multipliers, use them to reassign the story multipliers
     if len(multipliers_) != 0:
         assert len(multipliers_) == len(stories), 'Length of input multipliers_ ' \
@@ -78,17 +84,22 @@ if all_required_inputs(ghenv.Component):
                 len(multipliers_), len(_stories))
         for mult, story in zip(multipliers_, stories):
             story.multiplier = mult
-    
-    # generate a default name
+
+    # generate a default identifier
     if _name_ is None:  # get a default Building name
-        _name_ = "Building_{}".format(scriptcontext.sticky["bldg_count"])
+        name = "Building_{}".format(scriptcontext.sticky["bldg_count"],
+                                    str(uuid.uuid4())[:8])
         scriptcontext.sticky["bldg_count"] += 1
-    
+    else:
+        name = clean_and_id_string(_name_)
+
     # create the Building
-    building = Building(_name_, stories)
-    
+    building = Building(name, stories)
+    if _name_ is not None:
+        building.display_name = _name_
+
     # assign the construction set
     if _constr_set_ is not None:
         if isinstance(_constr_set_, str):
-            _constr_set_ = construction_set_by_name(_constr_set_)
+            _constr_set_ = construction_set_by_identifier(_constr_set_)
         building.properties.energy.construction_set = _constr_set_

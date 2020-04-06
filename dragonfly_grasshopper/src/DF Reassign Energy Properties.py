@@ -37,7 +37,7 @@ to such stories.
 
 ghenv.Component.Name = "DF Reassign Energy Properties"
 ghenv.Component.NickName = 'ReassignProp'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '0.1.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '1 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -54,8 +54,8 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 try:  # import the honeybee-energy extension
-    from honeybee_energy.lib.programtypes import program_type_by_name
-    from honeybee_energy.lib.constructionsets import construction_set_by_name
+    from honeybee_energy.lib.programtypes import program_type_by_identifier
+    from honeybee_energy.lib.constructionsets import construction_set_by_identifier
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy energy:\n\t{}'.format(e))
 
@@ -72,7 +72,7 @@ if all_required_inputs(ghenv.Component):
     # try to assign the program
     if program_ is not None:
         if isinstance(program_, str):
-            program_ = program_type_by_name(program_)
+            program_ = program_type_by_identifier(program_)
         if isinstance(df_obj, (Building, Story)):
             df_obj.properties.energy.set_all_room_2d_program_type(program_)
         else:  # it's a Room2D
@@ -81,7 +81,7 @@ if all_required_inputs(ghenv.Component):
     # try to assign the construction set
     if constr_set_ is not None:
         if isinstance(constr_set_, str):
-            constr_set_ = construction_set_by_name(constr_set_)
+            constr_set_ = construction_set_by_identifier(constr_set_)
         df_obj.properties.energy.construction_set = constr_set_
     
     # assign an ideal air system

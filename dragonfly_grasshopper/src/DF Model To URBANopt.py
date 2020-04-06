@@ -25,7 +25,7 @@ Convert a Dragonfly Model into an URBANopt-compatible geoJSON.
         _folder_: Text for the full path to the folder where the OpenStudio
             model files for each building are written. This is also the location
             where the geojson will be written along with all of the urbanopt files
-            (under a folder with the same name as the dragonfly model). If None,
+            (under a folder with the same identifier as the dragonfly model). If None,
             the honeybee default simulation folder is used.
         _write: Set to "True" to have the Dragonfly Model translated to an
             URBANopt-compatible geoJSON.
@@ -62,7 +62,7 @@ Convert a Dragonfly Model into an URBANopt-compatible geoJSON.
 
 ghenv.Component.Name = "DF Model To URBANopt"
 ghenv.Component.NickName = 'ToURBANopt'
-ghenv.Component.Message = '0.3.0'
+ghenv.Component.Message = '0.3.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '1 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -118,8 +118,8 @@ if all_required_inputs(ghenv.Component) and _write:
         geojson = _model.to_geojson(_location, point, _folder_, tolerance)
     else:  # create the geosjon and folder using URBANopt SDK
         geojson_dict = _model.to_geojson_dict(_location, point, _folder_, tolerance)
-        uo_folder = os.path.join(_folder_, _model.name) if _folder_ is not None \
-            else os.path.join(folders.default_simulation_folder, _model.name)
+        uo_folder = os.path.join(_folder_, _model.identifier) if _folder_ is not None \
+            else os.path.join(folders.default_simulation_folder, _model.identifier)
         geojson, scenario = prepare_urbanopt_folder(
             uo_folder, geojson_dict, _epw_file, _cpus_)
 
