@@ -34,7 +34,7 @@ ladybug_tools\resources\standards
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.7.0'
+ghenv.Component.Message = '0.7.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -237,7 +237,7 @@ def get_library_directory():
 def get_measure_directory():
     """Get the directory where OpenStudio BCL measures are installed."""
     home_folder = os.getenv('HOME') or os.path.expanduser('~')
-    meas_folder = os.path.join(home_folder, 'ladybug_tools')
+    meas_folder = os.path.join(home_folder, 'ladybug_tools', 'openstudio')
     if not os.path.isdir(meas_folder):
         os.makedirs(meas_folder)
     return meas_folder
