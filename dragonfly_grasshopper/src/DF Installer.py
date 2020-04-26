@@ -34,7 +34,7 @@ ladybug_tools\resources\standards
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.7.1'
+ghenv.Component.Message = '0.8.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -425,7 +425,8 @@ if _update:
     # update the core libraries
     libraries = \
         ('ladybug', 'ladybug-geometry', 'ladybug-rhino', 'ladybug-dotnet', 'ladybug-comfort',
-         'honeybee-core', 'honeybee-energy', 'dragonfly-core', 'dragonfly-energy')
+         'honeybee-core', 'honeybee-energy', 'honeybee-radiance', 'honeybee-radiance-folder',
+         'honeybee-radiance-command', 'dragonfly-core', 'dragonfly-energy')
     update_libraries(libraries, get_library_directory())
     
     # update the standards files
