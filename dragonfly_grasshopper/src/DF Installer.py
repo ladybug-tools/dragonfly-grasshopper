@@ -34,7 +34,7 @@ ladybug_tools\resources\standards
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.8.0'
+ghenv.Component.Message = '0.9.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -437,7 +437,8 @@ if _update:
     # update the grasshopper components
     components = \
         ('ladybug-grasshopper', 'honeybee-grasshopper-core',
-         'honeybee-grasshopper-energy', 'dragonfly-grasshopper')
+         'honeybee-grasshopper-radiance', 'honeybee-grasshopper-energy',
+         'dragonfly-grasshopper')
     update_components(components)
     
     # update the ruby gems
