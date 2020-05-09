@@ -51,7 +51,7 @@ Create Dragonfly Buildings from solid geometry (closed Rhino polysurfaces).
 
 ghenv.Component.Name = "DF Building from Solid"
 ghenv.Component.NickName = 'BuildingSolid'
-ghenv.Component.Message = '0.1.2'
+ghenv.Component.Message = '0.1.3'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
@@ -78,6 +78,7 @@ try:  # import the core ladybug_rhino dependencies
     from ladybug_rhino.config import tolerance
     from ladybug_rhino.intersect import split_solid_to_floors, geo_min_max_height
     from ladybug_rhino.togeometry import to_face3d
+    from ladybug_rhino.fromgeometry import from_face3d
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -120,7 +121,12 @@ if all_required_inputs(ghenv.Component) and _run:
 
         # get the floor geometries of the building
         floor_breps = split_solid_to_floors(geo, floor_heights)
-        floor_faces = [to_face3d(flr) for flr in floor_breps]
+        floor_faces = []
+        for flr in floor_breps:
+            story_faces = []
+            for rm_face in flr:
+                story_faces.extend(to_face3d(rm_face))
+            floor_faces.append(story_faces)
 
         # create the Building
         building = Building.from_all_story_geometry(

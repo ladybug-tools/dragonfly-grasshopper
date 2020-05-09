@@ -62,9 +62,9 @@ Convert a Dragonfly Model into an URBANopt-compatible geoJSON.
 
 ghenv.Component.Name = "DF Model To URBANopt"
 ghenv.Component.NickName = 'ToURBANopt'
-ghenv.Component.Message = '0.3.1'
+ghenv.Component.Message = '0.3.2'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '1 :: Energy'
+ghenv.Component.SubCategory = '3 :: Extensions'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
 
 

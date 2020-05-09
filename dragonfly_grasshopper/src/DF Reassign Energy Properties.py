@@ -37,9 +37,9 @@ to such stories.
 
 ghenv.Component.Name = "DF Reassign Energy Properties"
 ghenv.Component.NickName = 'ReassignProp'
-ghenv.Component.Message = '0.1.2'
+ghenv.Component.Message = '0.1.3'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '1 :: Energy'
+ghenv.Component.SubCategory = '3 :: Extensions'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
 
 try:  # import the core dragonfly dependencies
