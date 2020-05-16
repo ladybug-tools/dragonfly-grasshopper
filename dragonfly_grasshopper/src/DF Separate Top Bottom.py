@@ -25,7 +25,7 @@ or bottom floors with the gound or outdoors.
         buildings: The Building objects with their top and bottom floors separated.
 """
 
-ghenv.Component.Name = "DF SeparateTopBottom"
+ghenv.Component.Name = "DF Separate Top Bottom"
 ghenv.Component.NickName = 'TopBottom'
 ghenv.Component.Message = '0.1.0'
 ghenv.Component.Category = "Dragonfly"

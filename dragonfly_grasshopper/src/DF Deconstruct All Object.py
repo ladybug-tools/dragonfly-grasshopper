@@ -33,10 +33,10 @@ into a new Building.
 
 ghenv.Component.Name = "DF Deconstruct All Object"
 ghenv.Component.NickName = 'DecnstrAllDF'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '0.1.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = "0"
+ghenv.Component.AdditionalHelpFromDocStrings = '1'
 
 try:  # import the core dragonfly dependencies
     from dragonfly.building import Building
