@@ -34,7 +34,7 @@ ladybug_tools\resources\standards
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.9.0'
+ghenv.Component.Message = '0.9.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -392,7 +392,7 @@ def update_gems(repos):
     # download and unzip files
     for repo in repos:
         # download files
-        url = "https://github.com/ladybug-tools-in2/%s/archive/master.zip" % repo
+        url = "https://github.com/ladybug-tools/%s/archive/master.zip" % repo
         zip_file = os.path.join(target_directory, '%s.zip' % repo)
         print "Downloading {} the github repository to {}".format(repo, target_directory)
         download_file_by_name(url, target_directory, zip_file)
