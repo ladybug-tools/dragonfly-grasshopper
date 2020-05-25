@@ -27,7 +27,7 @@ Convert a Dragonfly Model into a series of Honeybee Models.
             passed along to the generated Honeybee Room objects, indicating the
             simulation will be run once for each unique room and then results
             will be multiplied. If False, full geometry objects will be written
-            for each and every story in the building that and all resulting
+            for each and every story in the building such that all resulting
             multipliers will be 1. Default: True.
         shade_dist_: An optional number to note the distance beyond which other
             buildings' shade should not be exported into a given Model. This is
@@ -47,12 +47,12 @@ Convert a Dragonfly Model into a series of Honeybee Models.
             components.
 """
 
-ghenv.Component.Name = "DF Model To Honeybee"
+ghenv.Component.Name = 'DF Model To Honeybee'
 ghenv.Component.NickName = 'ToHoneybee'
-ghenv.Component.Message = '0.1.0'
-ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = "1"
+ghenv.Component.Message = '0.1.2'
+ghenv.Component.Category = 'Dragonfly'
+ghenv.Component.SubCategory = '2 :: Serialize'
+ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
 
 try:  # import the core dragonfly dependencies
@@ -72,11 +72,11 @@ if all_required_inputs(ghenv.Component) and _run:
     # set default inputs if not specified
     use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True
     _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_
-    
+
     # check the _model input
     assert isinstance(_model, Model), \
         'Expected Dragonfly Model object. Got {}.'.format(type(_model))
-    
+
     # create the model objects
     hb_models = _model.to_honeybee(_obj_per_model_, shade_dist_,
                                    use_multiplier_, tolerance)
