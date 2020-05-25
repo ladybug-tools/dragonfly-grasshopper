@@ -29,12 +29,12 @@ Create Dragonfly ContextShade.
         context: Dragonfly ContextShades.
 """
 
-ghenv.Component.Name = "DF ContextShade"
+ghenv.Component.Name = 'DF ContextShade'
 ghenv.Component.NickName = 'Context'
-ghenv.Component.Message = '0.1.0'
-ghenv.Component.Category = "Dragonfly"
+ghenv.Component.Message = '0.1.1'
+ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = "1"
+ghenv.Component.AdditionalHelpFromDocStrings = '7'
 
 import uuid
 
