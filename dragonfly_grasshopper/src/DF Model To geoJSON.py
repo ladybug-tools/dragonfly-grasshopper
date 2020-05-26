@@ -37,7 +37,10 @@ key in the geoJSON.
             written along with all of the Honeybee Model JSONs. If None, the
             honeybee default simulation folder is used.
         _write: Set to "True" to have the Dragonfly Model translated to an
-            URBANopt-compatible geoJSON.
+            URBANopt-compatible geoJSON. This input can also be the integer "2",
+            which will only create the geojson file but not create any honeybee
+            Model json files that are linked to it (note that a geojson produced
+            this way is not compatible with URBANopt).
     
     Returns:
         report: Reports, errors, warnings, etc.
@@ -56,7 +59,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -96,7 +99,10 @@ if all_required_inputs(ghenv.Component) and _write:
     assert isinstance(_location, Location), \
         'Expected Ladybug Location object. Got {}.'.format(type(_location))
 
-    # create the geoJSON and honeybee Model JSONs
-    geojson, hb_jsons, hb_models = _model.to.urbanopt(
-        _model, _location, point, shade_dist_, use_multiplier_, _folder_,
-        tolerance)
+    if _write == 2:
+        geojson = _model.to_geojson(_location, point, _folder_, tolerance)
+    else:
+        # create the geoJSON and honeybee Model JSONs
+        geojson, hb_jsons, hb_models = _model.to.urbanopt(
+            _model, _location, point, shade_dist_, use_multiplier_, _folder_,
+            tolerance)
