@@ -14,8 +14,8 @@ _
 It also installs all of the grasshopper components from github to:
 C:\Users\%USERNAME%\AppData\Roaming\Grasshopper\UserObjects
 _
-It also installs the energy_model_measure from github to:
-ladybug_tools\energy_model_measure
+It also installs the honeybee_openstudio_gem from github to:
+ladybug_tools\openstudio\honeybee_openstudio_gem
 _
 If keep_standards is not True, it also installs standards from github to:
 ladybug_tools\resources\standards
@@ -34,7 +34,7 @@ ladybug_tools\resources\standards
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.9.1'
+ghenv.Component.Message = '0.9.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -371,7 +371,7 @@ def update_gems(repos):
     
     Args:
         repos: An array of all repo names to be installed.
-            (eg. ['energy-model-measure']).
+            (eg. ['honeybee-openstudio-gem']).
         """
 
     # derive the gem name from the repo name
@@ -442,7 +442,7 @@ if _update:
     update_components(components)
     
     # update the ruby gems
-    gems = ('energy-model-measure',)
+    gems = ('honeybee-openstudio-gem',)
     update_gems(gems)
     
     # check to be sure that the new libraries can be imported
