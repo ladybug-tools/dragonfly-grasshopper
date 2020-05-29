@@ -30,7 +30,7 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Load Objects'
 ghenv.Component.NickName = 'LoadObjects'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -73,12 +73,8 @@ def model_units_tolerance_check(model):
             'to the Rhino doc units.'.format(model.units, units_system()))
         model.convert_to_units(units_system())
 
-    # convert the model tolerance
-    scale_fac1 = hb_model.Model.conversion_factor_to_meters(model.units)
-    scale_fac2 = hb_model.Model.conversion_factor_to_meters(units_system())
-    scale_fac = scale_fac1 / scale_fac2
-    new_tol = model.tolerance * scale_fac
-    if new_tol / tolerance >= 100:
+    # check that the model tolerance is not too far from the Rhino tolerance
+    if model.tolerance / tolerance >= 100:
         msg = 'Imported Model tolerance "{}" is significantly coarser than the ' \
             'current Rhino model tolerance "{}".\nIt is recommended that the ' \
             'Rhino document tolerance be changed to be coarser and this ' \
