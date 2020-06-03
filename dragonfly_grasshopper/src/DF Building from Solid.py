@@ -24,6 +24,10 @@ Create Dragonfly Buildings from solid geometry (closed Rhino polysurfaces).
             of these text strings will divide up floors accordingly.  For example,
             the list ["1@5", "2@4", "@3"]  will make a ground floor of 5 units,
             two floors above that at 4 units and all remaining floors at 3 units.
+         perim_offset_: An optional positive number that will be used to offset
+             the perimeter of the footprint to create core/perimeter Rooms.
+             If this value is None or 0, no offset will occur and each floor
+             plate will be represented with a single Room2D.
          _name_: Text to set the base name for the Building, which will also be
             incorporated into unique Building identifier. This will be combined
             with the index of each input _bldg_geo to yield a unique name
@@ -51,7 +55,7 @@ Create Dragonfly Buildings from solid geometry (closed Rhino polysurfaces).
 
 ghenv.Component.Name = "DF Building from Solid"
 ghenv.Component.NickName = 'BuildingSolid'
-ghenv.Component.Message = '0.1.3'
+ghenv.Component.Message = '0.2.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
@@ -102,6 +106,7 @@ import uuid
 
 
 if all_required_inputs(ghenv.Component) and _run:
+    perim_offset_ = 0 if perim_offset_ is None else perim_offset_
     buildings = []  # list of buildings that will be returned
 
     for i, geo in enumerate(_bldg_geo):
@@ -130,7 +135,8 @@ if all_required_inputs(ghenv.Component) and _run:
 
         # create the Building
         building = Building.from_all_story_geometry(
-            name, floor_faces, interpreted_f2f, tolerance)
+            name, floor_faces, floor_to_floor_heights=interpreted_f2f,
+            perimeter_offset=perim_offset_, tolerance=tolerance)
         if _name_ is not None:
             building.display_name = display_name
 
