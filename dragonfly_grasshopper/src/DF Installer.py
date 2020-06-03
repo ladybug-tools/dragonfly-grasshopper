@@ -34,7 +34,7 @@ ladybug_tools\resources\standards
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.9.2'
+ghenv.Component.Message = '0.9.3'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -424,8 +424,9 @@ def update_gems(repos):
 if _update:
     # update the core libraries
     libraries = \
-        ('ladybug', 'ladybug-geometry', 'ladybug-rhino', 'ladybug-dotnet', 'ladybug-comfort',
-         'honeybee-core', 'honeybee-energy', 'honeybee-radiance', 'honeybee-radiance-folder',
+        ('ladybug-geometry', 'ladybug-geometry-polyskel', 'ladybug', 'ladybug-comfort',
+         'ladybug-rhino', 'ladybug-dotnet',  'honeybee-core', 'honeybee-energy',
+         'honeybee-radiance', 'honeybee-radiance-folder',
          'honeybee-radiance-command', 'dragonfly-core', 'dragonfly-energy')
     update_libraries(libraries, get_library_directory())
     

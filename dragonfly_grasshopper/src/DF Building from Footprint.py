@@ -18,6 +18,10 @@ Create Dragonfly Buildings from footprint geometry (horizontal Rhino surfaces).
             stories in each Building. Each value in the list represents the
             floor_to_floor height of the Story starting from the first floor and
             then moving to the top floor.
+        perim_offset_: An optional positive number that will be used to offset
+            the perimeter of the footprint to create core/perimeter Rooms.
+            If this value is None or 0, no offset will occur and each floor
+            plate will be represented with a single Room2D.
         _name_: Text to set the base name for the Building, which will also be
             incorporated into unique Building identifier. This will be combined
             with the index of each input _footprint_geo to yield a unique name
@@ -45,7 +49,7 @@ Create Dragonfly Buildings from footprint geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = "DF Building from Footprint"
 ghenv.Component.NickName = 'BuildingFootprint'
-ghenv.Component.Message = '0.1.2'
+ghenv.Component.Message = '0.2.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
@@ -94,7 +98,9 @@ import uuid
 
 
 if all_required_inputs(ghenv.Component) and _run:
+    perim_offset_ = 0 if perim_offset_ is None else perim_offset_
     buildings = []  # list of buildings that will be returned
+
     for i, geo in enumerate(_footprint_geo):
         # get the name for the Building
         if _name_ is None:  # make a default Building name
@@ -106,8 +112,9 @@ if all_required_inputs(ghenv.Component) and _run:
             name = clean_and_id_string(display_name)
 
         # create the Building
-        building = Building.from_footprint(name, to_face3d(geo), _floor_to_floor,
-                                           tolerance)
+        building = Building.from_footprint(
+            name, footprint=to_face3d(geo), floor_to_floor_heights=_floor_to_floor,
+            perimeter_offset=perim_offset_, tolerance=tolerance)
         if _name_ is not None:
             building.display_name = display_name
 
