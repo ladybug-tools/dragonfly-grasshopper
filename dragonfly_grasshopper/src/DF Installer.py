@@ -34,7 +34,7 @@ ladybug_tools\resources\standards
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.9.3'
+ghenv.Component.Message = '0.9.4'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -145,7 +145,7 @@ def copy_file_tree(source_folder, dest_folder, overwrite=True):
 def download_file_by_name(url, target_folder, file_name, mkdir=False):
     """Download a file to a directory.
 
-    This function has been copied from ladybug_dotnet.download.
+    This function has been copied from ladybug_rhino.download.
 
     Args:
         url: A string to a valid URL.
@@ -424,28 +424,29 @@ def update_gems(repos):
 if _update:
     # update the core libraries
     libraries = \
-        ('ladybug-geometry', 'ladybug-geometry-polyskel', 'ladybug', 'ladybug-comfort',
-         'ladybug-rhino', 'ladybug-dotnet',  'honeybee-core', 'honeybee-energy',
-         'honeybee-radiance', 'honeybee-radiance-folder',
-         'honeybee-radiance-command', 'dragonfly-core', 'dragonfly-energy')
+        ('ladybug-rhino', 'ladybug-geometry', 'ladybug-geometry-polyskel',
+         'ladybug', 'ladybug-comfort',
+         'honeybee-core', 'honeybee-energy',
+         'honeybee-radiance', 'honeybee-radiance-folder', 'honeybee-radiance-command',
+         'dragonfly-core', 'dragonfly-energy')
     update_libraries(libraries, get_library_directory())
-    
+
     # update the standards files
     if not keep_standards_:
         standards = ('honeybee-standards', 'honeybee-energy-standards')
         update_libraries(standards, get_standards_directory())
-    
+
     # update the grasshopper components
     components = \
         ('ladybug-grasshopper', 'honeybee-grasshopper-core',
          'honeybee-grasshopper-radiance', 'honeybee-grasshopper-energy',
          'dragonfly-grasshopper')
     update_components(components)
-    
+
     # update the ruby gems
     gems = ('honeybee-openstudio-gem',)
     update_gems(gems)
-    
+
     # check to be sure that the new libraries can be imported
     try:
         import ladybug
