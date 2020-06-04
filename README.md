@@ -9,8 +9,8 @@
 This repository contains all Grasshopper components for the dragonfly plugin.
 The package includes both the userobjects (`.ghuser`) and the Python source (`.py`).
 Note that this library only possesses the Grasshopper components and, in order to
-run the plugin, the core libraries must be installed to the Rhino `scripts` folder
-(see dependencies).
+run the plugin, the core libraries must be installed in a way that they can be
+discovered by Rhino (see dependencies).
 
 ## Dependencies
 
@@ -26,7 +26,8 @@ The dragonfly-grasshopper plugin has the following dependencies (other than Rhin
 * [dragonfly-core](https://github.com/ladybug-tools/dragonfly-core)
 * [dragonfly-energy](https://github.com/ladybug-tools/dragonfly-energy)
 
-# Oher Required Components
+## Other Required Components
+
 The dragonfly-grasshopper plugin also requires the Grasshopper components within the
 following repositories to be installed in order to work correctly:
 
