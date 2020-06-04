@@ -18,7 +18,7 @@ The dragonfly-grasshopper plugin has the following dependencies (other than Rhin
 
 * [ladybug-core](https://github.com/ladybug-tools/ladybug)
 * [ladybug-geometry](https://github.com/ladybug-tools/ladybug-geometry)
-* [ladybug-dotnet](https://github.com/ladybug-tools/ladybug-dotnet)
+* [ladybug-comfort](https://github.com/ladybug-tools/ladybug-comfort)
 * [ladybug-rhino](https://github.com/ladybug-tools/ladybug-rhino)
 * [honeybee-core](https://github.com/ladybug-tools/honeybee-core)
 * [honeybee-energy](https://github.com/ladybug-tools/honeybee-energy)
@@ -34,6 +34,7 @@ following repositories to be installed in order to work correctly:
 * [ladybug-grasshopper](https://github.com/ladybug-tools/ladybug-grasshopper)
 * [honeybee-grasshopper-core](https://github.com/ladybug-tools/honeybee-grasshopper-core)
 * [honeybee-grasshopper-energy](https://github.com/ladybug-tools/honeybee-grasshopper-energy)
+* [honeybee-grasshopper-radiance](https://github.com/ladybug-tools/honeybee-grasshopper-radiance)
 
 ## Installation
 
