@@ -24,9 +24,11 @@ ladybug_tools\resources\standards
     Args:
         _update: Set to True to install dragonfly, honeybee and ladybug to your
             machine from the Ladybug Tools github.
-        keep_standards_: Set to False to ensure that user libraries of standards
-            are not overwritten by this component. If True or None, the libraries
-            will be overwritten.
+        clean_standards_: Set to True to have any user libraries of standards
+            overwritten with the latest version from Ladybug Tools. If False
+            or None, any existing standards will be left alone and new
+            standards will only be downloaded if there aren't any found on
+            this machine.
     
     Returns:
         Vviiiiiz!: !!!
@@ -34,12 +36,15 @@ ladybug_tools\resources\standards
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.9.4'
+ghenv.Component.Message = '0.10.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
 
 import os
+import io
+import xml.etree.ElementTree
+import subprocess
 import System.Net
 import sys
 import zipfile
@@ -217,7 +222,53 @@ def unzip_file(source_file, dest_dir=None, mkdir=False):
             zf.extract(member, dest_dir)
 
 
-def get_library_directory():
+def get_python_exe():
+    """Get the path to the Python installed in the ladybug_tools folder.
+
+    Will be None if Python is not installed.
+    """
+    home_folder = os.getenv('HOME') or os.path.expanduser('~')
+    py_install = os.path.join(home_folder, 'ladybug_tools', 'python')
+    py_exe_file = os.path.join(py_install, 'python.exe') if os.name == 'nt' else \
+        os.path.join(py_install, 'bin', 'python3')
+    if os.path.isfile(py_exe_file):
+        return py_exe_file
+    return None
+
+
+def get_python_package_dir():
+    """Get the path to where Python packages are installed in the ladybug_tools folder.
+
+    If the folder is not found, this method will create the folder.
+    """
+    home_folder = os.getenv('HOME') or os.path.expanduser('~')
+    py_install = os.path.join(home_folder, 'ladybug_tools', 'python')
+    py_path = os.path.join(py_install, 'Lib', 'site-packages') if os.name == 'nt' \
+        else os.path.join(py_install, 'lib', 'python3.8', 'site-packages')
+    if not os.path.isdir(py_path):
+        return os.makedirs(py_path)
+    return py_path
+
+
+def get_measure_directory():
+    """Get the directory where OpenStudio BCL measures are installed."""
+    home_folder = os.getenv('HOME') or os.path.expanduser('~')
+    measure_folder = os.path.join(home_folder, 'ladybug_tools', 'openstudio')
+    if not os.path.isdir(measure_folder):
+        os.makedirs(measure_folder)
+    return measure_folder
+
+
+def get_standards_directory():
+    """Get the directory where Honeybee standards are installed."""
+    home_folder = os.getenv('HOME') or os.path.expanduser('~')
+    hb_folder = os.path.join(home_folder, 'ladybug_tools', 'resources', 'standards')
+    if not os.path.isdir(hb_folder):
+        os.makedirs(hb_folder)
+    return hb_folder
+
+
+def get_old_library_directory():
     """Get the Rhino directory into which the Python libraries will be installed."""
     try:
         target_directory = [p for p in sys.path if p.find('scripts')!= -1][0]
@@ -234,30 +285,96 @@ def get_library_directory():
     return target_directory
 
 
-def get_measure_directory():
-    """Get the directory where OpenStudio BCL measures are installed."""
+def clean_old_library_directory(repos, target_directory):
+    """Remove installed packages from the old library directory.
+
+    This will avoid namespace conflicts.
+
+    Args:
+        repos: An array of all repo names to be cleaned.
+            (eg. ['honeybee-energy', 'ladybug-geometry']).
+        target_directory: The directory to be cleaned.
+     """
+
+    # derive the distribution package name from the repo name
+    packages = []
+    for f in repos:
+        pkg_name = f.replace('-core', '') if f.endswith('-core') else f
+        packages.append(pkg_name.replace('-', '_'))
+
+    # delete currently-installed packages if they exist 
+    for pkg in packages:
+        lib_folder = os.path.join(target_directory, pkg)
+        if os.path.isdir(lib_folder):
+            print 'Removing {}'.format(lib_folder)
+            nukedir(lib_folder)
+
+
+def set_iron_python_search_path(python_package_dir):
+    """Set Rhino's to search for libraries in a given directory.
+
+    Args:
+        python_package_dir: The path to a directory that contains the Ladybug
+            Tools core libraries.
+    """
+    # find the path to the IronPython plugin
     home_folder = os.getenv('HOME') or os.path.expanduser('~')
-    meas_folder = os.path.join(home_folder, 'ladybug_tools', 'openstudio')
-    if not os.path.isdir(meas_folder):
-        os.makedirs(meas_folder)
-    return meas_folder
+    plugin_folder = os.path.join(home_folder, 'AppData', 'Roaming', 'McNeel',
+                                 'Rhinoceros', '6.0', 'Plug-ins')
+    for plugin in os.listdir(plugin_folder):
+        if plugin.startswith('IronPython'):
+            iron_py_path = os.path.join(plugin_folder, plugin)
+            break
+
+    # open the settings file and find the search paths
+    set_file = os.path.join(iron_py_path, 'settings', 'settings-Scheme__Default.xml')
+    with io.open(set_file, 'r', encoding='utf-8') as fp:
+        set_data = fp.read()
+    element = xml.etree.ElementTree.fromstring(set_data)
+    settings = element.find('settings')
+    search_path_needed = True
+    for entry in settings.iter('entry'):
+        if 'SearchPaths' in list(entry.attrib.values()):
+            if entry.text == python_package_dir:
+                search_path_needed = False
+
+    # add the sarch paths if it was not found
+    if search_path_needed:
+        new_tag = xml.etree.ElementTree.SubElement(settings, 'entry')
+        new_tag.text = python_package_dir
+        new_tag.attrib['key'] = 'SearchPaths'
+        tree = xml.etree.ElementTree.ElementTree(element)
+        tree.write(set_file)
+        # add the encoding back at the top of the file
+        with open(set_file, 'r') as fp:
+            lines_of_file = fp.readlines()
+            lines_of_file.insert(0, '<?xml version="1.0" encoding="utf-8"?>\n')
+        with open(set_file, 'w') as fp:
+            fp.writelines(lines_of_file)
 
 
-def get_standards_directory():
-    """Get the directory where Honeybee standards are installed."""
-    home_folder = os.getenv('HOME') or os.path.expanduser('~')
-    hb_folder = os.path.join(home_folder, 'ladybug_tools', 'resources', 'standards')
-    if not os.path.isdir(hb_folder):
-        os.makedirs(hb_folder)
-    return hb_folder
+def update_libraries_pip(python_exe):
+    """Update the core libraries using pip, which installs Ladybug Tools CLI.
+
+    Args:
+        python_exe: The path to the Python executable to be used for installation.
+        """
+    print('Installing Ladybug Tools core Python libraries via pip '
+          'using\n{}'.format(python_exe))
+    cmds = [python_exe, '-m', 'pip', 'install', 'lbt-dragonfly[cli]', '-U']
+    cmd = ' '.join(cmds)
+    process = subprocess.Popen(cmds, shell=True, stderr=subprocess.PIPE)
+    output = process.communicate()
+    stderr = output[-1]
+    print(stderr)  # print any errors if they occurred
 
 
-def update_libraries(repos, target_directory):
+def update_libraries_github(repos, target_directory):
     """Download Ladybug Tools libraries from github.
     
     Args:
         repos: An array of all repo names to be installed.
-            (eg. ['ladybug', 'ladybug-geometry']).
+            (eg. ['honeybee-energy', 'ladybug-geometry']).
         target_directory: the directory where the Python libraries should
             be copied.
         """
@@ -420,21 +537,41 @@ def update_gems(repos):
         except:
             print 'Failed to clean up downloaded library: {}'.format(r)
 
+# core libraries to be updated
+libraries = \
+    ('ladybug-rhino', 'ladybug-geometry', 'ladybug-geometry-polyskel',
+     'ladybug', 'ladybug-comfort', 'honeybee-core', 'honeybee-energy',
+     'honeybee-radiance', 'honeybee-radiance-folder', 'honeybee-radiance-command',
+     'dragonfly-core', 'dragonfly-energy')
+
 
 if _update:
     # update the core libraries
-    libraries = \
-        ('ladybug-rhino', 'ladybug-geometry', 'ladybug-geometry-polyskel',
-         'ladybug', 'ladybug-comfort',
-         'honeybee-core', 'honeybee-energy',
-         'honeybee-radiance', 'honeybee-radiance-folder', 'honeybee-radiance-command',
-         'dragonfly-core', 'dragonfly-energy')
-    update_libraries(libraries, get_library_directory())
+    if os.name == 'nt':  # we are on windows; we have all we need
+        package_dir = get_python_package_dir()
+        py_exe = get_python_exe()
+        if py_exe is not None:  # python is installed correctly; use pip
+            update_libraries_pip(py_exe)
+        else:
+            update_libraries_github(libraries, package_dir)
+        clean_old_library_directory(libraries, get_old_library_directory())
+        set_iron_python_search_path(package_dir)
+    else:  # we are on Mac and unable to set additional Python search paths
+        update_libraries_github(libraries, get_old_library_directory())
+        py_exe = get_python_exe()
+        if py_exe is not None:  # python is installed correctly; use pip
+            update_libraries_pip(py_exe)
 
     # update the standards files
-    if not keep_standards_:
-        standards = ('honeybee-standards', 'honeybee-energy-standards')
-        update_libraries(standards, get_standards_directory())
+    standards = ['honeybee-standards', 'honeybee-energy-standards']
+    stand_dir = get_standards_directory()
+    if not clean_standards_:
+        packages = [os.path.join(stand_dir, pkg_name.replace('-', '_'))
+                    for pkg_name in standards]
+        standards = [standards[i] for i, lib_folder in enumerate(packages)
+                     if not os.path.isdir(lib_folder)]
+    if len(standards) != 0:
+        update_libraries_github(standards, get_standards_directory())
 
     # update the grasshopper components
     components = \
@@ -443,7 +580,7 @@ if _update:
          'dragonfly-grasshopper')
     update_components(components)
 
-    # update the ruby gems
+    # update the ruby gem
     gems = ('honeybee-openstudio-gem',)
     update_gems(gems)
 
