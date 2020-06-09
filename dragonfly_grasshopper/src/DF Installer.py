@@ -8,16 +8,15 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 
 """
-This component downloads dragonfly, honeybee, and ladybug libraries from github to:
-C:\Users\%USERNAME%\AppData\Roaming\McNeel\Rhinoceros\6.0\scripts
+This component downloads dragonfly, honeybee, and ladybug libraries.
 _
-It also installs all of the grasshopper components from github to:
+It also installs all of the grasshopper components to:
 C:\Users\%USERNAME%\AppData\Roaming\Grasshopper\UserObjects
 _
-It also installs the honeybee_openstudio_gem from github to:
+It also installs the honeybee_openstudio_gem to:
 ladybug_tools\openstudio\honeybee_openstudio_gem
 _
-If keep_standards is not True, it also installs standards from github to:
+If stadnards are not found on this machine, it also installs standards to:
 ladybug_tools\resources\standards
 -
 
@@ -36,7 +35,7 @@ ladybug_tools\resources\standards
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.10.0'
+ghenv.Component.Message = '0.10.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
