@@ -35,7 +35,7 @@ ladybug_tools\resources\standards
 
 ghenv.Component.Name = "DF Installer"
 ghenv.Component.NickName = "DFInstaller"
-ghenv.Component.Message = '0.10.1'
+ghenv.Component.Message = '0.10.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = "5 :: Developers"
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -309,24 +309,28 @@ def clean_old_library_directory(repos, target_directory):
             nukedir(lib_folder)
 
 
-def set_iron_python_search_path(python_package_dir):
-    """Set Rhino's to search for libraries in a given directory.
+def iron_python_search_path_windows(python_package_dir, iron_python_path=None):
+    """Set Rhino to search for libraries in a given directory.
+
+    This is used as part of the installation process to ensure that Grasshopper
+    looks for the core Python libraries in
 
     Args:
         python_package_dir: The path to a directory that contains the Ladybug
             Tools core libraries.
     """
     # find the path to the IronPython plugin
-    home_folder = os.getenv('HOME') or os.path.expanduser('~')
-    plugin_folder = os.path.join(home_folder, 'AppData', 'Roaming', 'McNeel',
-                                 'Rhinoceros', '6.0', 'Plug-ins')
-    for plugin in os.listdir(plugin_folder):
-        if plugin.startswith('IronPython'):
-            iron_py_path = os.path.join(plugin_folder, plugin)
-            break
+    if iron_python_path is None:
+        home_folder = os.getenv('HOME') or os.path.expanduser('~')
+        plugin_folder = os.path.join(home_folder, 'AppData', 'Roaming', 'McNeel',
+                                     'Rhinoceros', '6.0', 'Plug-ins')
+        for plugin in os.listdir(plugin_folder):
+            if plugin.startswith('IronPython'):
+                iron_python_path = os.path.join(plugin_folder, plugin)
+                break
 
     # open the settings file and find the search paths
-    set_file = os.path.join(iron_py_path, 'settings', 'settings-Scheme__Default.xml')
+    set_file = os.path.join(iron_python_path, 'settings', 'settings-Scheme__Default.xml')
     with io.open(set_file, 'r', encoding='utf-8') as fp:
         set_data = fp.read()
     element = xml.etree.ElementTree.fromstring(set_data)
@@ -337,19 +341,18 @@ def set_iron_python_search_path(python_package_dir):
             if entry.text == python_package_dir:
                 search_path_needed = False
 
-    # add the sarch paths if it was not found
+    # add the search paths if it was not found
     if search_path_needed:
-        new_tag = xml.etree.ElementTree.SubElement(settings, 'entry')
-        new_tag.text = python_package_dir
-        new_tag.attrib['key'] = 'SearchPaths'
-        tree = xml.etree.ElementTree.ElementTree(element)
-        tree.write(set_file)
-        # add the encoding back at the top of the file
+        line_to_add = '    <entry key="SearchPaths">{}</entry>\n'.format(python_package_dir)
         with open(set_file, 'r') as fp:
-            lines_of_file = fp.readlines()
-            lines_of_file.insert(0, '<?xml version="1.0" encoding="utf-8"?>\n')
+            contents = fp.readlines()
+        for i, line in enumerate(contents):
+            if 'ScriptForm_Location' in line:
+                break
+        contents.insert(i + 1, line_to_add)
         with open(set_file, 'w') as fp:
-            fp.writelines(lines_of_file)
+            fp.write(''.join(contents))
+        sys.path.append(python_package_dir)
 
 
 def update_libraries_pip(python_exe):
@@ -546,20 +549,10 @@ libraries = \
 
 if _update:
     # update the core libraries
-    if os.name == 'nt':  # we are on windows; we have all we need
-        package_dir = get_python_package_dir()
-        py_exe = get_python_exe()
-        if py_exe is not None:  # python is installed correctly; use pip
-            update_libraries_pip(py_exe)
-        else:
-            update_libraries_github(libraries, package_dir)
-        clean_old_library_directory(libraries, get_old_library_directory())
-        set_iron_python_search_path(package_dir)
-    else:  # we are on Mac and unable to set additional Python search paths
-        update_libraries_github(libraries, get_old_library_directory())
-        py_exe = get_python_exe()
-        if py_exe is not None:  # python is installed correctly; use pip
-            update_libraries_pip(py_exe)
+    update_libraries_github(libraries, get_old_library_directory())
+    py_exe = get_python_exe()
+    if py_exe is not None:  # python is installed correctly; use pip
+        update_libraries_pip(py_exe)
 
     # update the standards files
     standards = ['honeybee-standards', 'honeybee-energy-standards']
