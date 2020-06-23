@@ -43,17 +43,11 @@ Create Dragonfly Room2Ds from floor plate geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = "DF Room2D"
 ghenv.Component.NickName = 'Room2D'
-ghenv.Component.Message = '0.1.3'
+ghenv.Component.Message = '0.1.4'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
 
-# document-wide counter to generate new unique Room2D names
-import scriptcontext
-try:
-    scriptcontext.sticky["room_count"]
-except KeyError:  # first time that the component is running
-    scriptcontext.sticky["room_count"] = 1
 
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_and_id_string
@@ -96,9 +90,7 @@ if all_required_inputs(ghenv.Component) and _run:
     for i, geo in enumerate(_geo):
         # get the name for the Room2D
         if _name_ is None:  # make a default Room2D name
-            name = "Building_{}_{}".format(scriptcontext.sticky["bldg_count"],
-                                           str(uuid.uuid4())[:8])
-            scriptcontext.sticky["bldg_count"] += 1
+            name = "Room_{}".format(str(uuid.uuid4())[:8])
         else:
             display_name = '{}_{}'.format(_name_, i + 1)
             name = clean_and_id_string(display_name)

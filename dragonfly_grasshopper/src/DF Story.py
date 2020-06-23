@@ -38,17 +38,11 @@ Create a Dragonfly Story from individual Dragonfly Room2D objects.
 
 ghenv.Component.Name = "DF Story"
 ghenv.Component.NickName = 'Story'
-ghenv.Component.Message = '0.1.2'
+ghenv.Component.Message = '0.1.3'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "3"
 
-# document-wide counter to generate new unique Story names
-import scriptcontext
-try:
-    scriptcontext.sticky["story_count"]
-except KeyError:  # first time that the component is running
-    scriptcontext.sticky["story_count"] = 1
 
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_and_id_string
@@ -82,9 +76,7 @@ if all_required_inputs(ghenv.Component):
 
     # generate a default name
     if _name_ is None:  # get a default Story name
-        name = "Story_{}_{}".format(scriptcontext.sticky["story_count"],
-                                    str(uuid.uuid4())[:8])
-        scriptcontext.sticky["story_count"] += 1
+        name = "Story_{}".format(str(uuid.uuid4())[:8])
     else:
         name = clean_and_id_string(_name_)
 
