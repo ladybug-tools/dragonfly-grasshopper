@@ -37,10 +37,12 @@ Create a Dragonfly Building from individual Dragonfly Story objects.
 
 ghenv.Component.Name = "DF Building from Stories"
 ghenv.Component.NickName = 'BuildingStories'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '0.1.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
+
+import uuid
 
 # document-wide counter to generate new unique Building names
 import scriptcontext
