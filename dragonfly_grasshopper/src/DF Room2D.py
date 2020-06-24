@@ -43,7 +43,7 @@ Create Dragonfly Room2Ds from floor plate geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = "DF Room2D"
 ghenv.Component.NickName = 'Room2D'
-ghenv.Component.Message = '0.1.4'
+ghenv.Component.Message = '0.1.5'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
