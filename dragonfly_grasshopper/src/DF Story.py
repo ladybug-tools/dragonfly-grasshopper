@@ -18,6 +18,10 @@ Create a Dragonfly Story from individual Dragonfly Room2D objects.
             this Story to the floor of the story above this one (if it exists).
             If None, this value will be the maximum floor_to_ceiling_height of the
             input _room_2ds.
+        _flr_height_: A number for the absolute floor height of the Story.
+            If None, this will be the minimum floor height of all the Story's
+            room_2ds, which is suitable for cases where there are no floor
+            plenums. (Default: None).
         _name_: Text to set the name for the Story, which will also be incorporated
             into unique Story identifier. If the name is not provided a random
             one will be assigned.
@@ -38,7 +42,7 @@ Create a Dragonfly Story from individual Dragonfly Room2D objects.
 
 ghenv.Component.Name = "DF Story"
 ghenv.Component.NickName = 'Story'
-ghenv.Component.Message = '0.1.3'
+ghenv.Component.Message = '0.2.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "3"
@@ -84,7 +88,7 @@ if all_required_inputs(ghenv.Component):
     multiplier_ = multiplier_ if multiplier_ is not None else 1
 
     # create the Story
-    story = Story(name, room2ds, _flr_to_flr_, multiplier_)
+    story = Story(name, room2ds, _flr_to_flr_, _flr_height_, multiplier_)
     if _name_ is not None:
         story.display_name = _name_
 
