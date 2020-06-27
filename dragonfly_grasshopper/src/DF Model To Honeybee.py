@@ -28,7 +28,13 @@ Convert a Dragonfly Model into a series of Honeybee Models.
             simulation will be run once for each unique room and then results
             will be multiplied. If False, full geometry objects will be written
             for each and every story in the building such that all resulting
-            multipliers will be 1. Default: True.
+            multipliers will be 1. (Default: True).
+        add_plenum_: Boolean to indicate whether ceiling/floor plenums should
+            be auto-generated for the Rooms. The height of ceiling plenums
+            will be autocalculated as the difference between the Room2D
+            ceiling height and Story ceiling height. The height of the floor
+            plenum will be autocalculated as the difference between the Room2D
+            floor height and Story floor height. (Default: False).
         shade_dist_: An optional number to note the distance beyond which other
             buildings' shade should not be exported into a given Model. This is
             helpful for reducing the simulation run time of each Model when other
@@ -49,7 +55,7 @@ Convert a Dragonfly Model into a series of Honeybee Models.
 
 ghenv.Component.Name = 'DF Model To Honeybee'
 ghenv.Component.NickName = 'ToHoneybee'
-ghenv.Component.Message = '0.1.2'
+ghenv.Component.Message = '0.2.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -71,6 +77,7 @@ except ImportError as e:
 if all_required_inputs(ghenv.Component) and _run:
     # set default inputs if not specified
     use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True
+    add_plenum_ = add_plenum_ if add_plenum_ is not None else False
     _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_
 
     # check the _model input
@@ -78,5 +85,6 @@ if all_required_inputs(ghenv.Component) and _run:
         'Expected Dragonfly Model object. Got {}.'.format(type(_model))
 
     # create the model objects
-    hb_models = _model.to_honeybee(_obj_per_model_, shade_dist_,
-                                   use_multiplier_, tolerance)
+    hb_models = _model.to_honeybee(
+        _obj_per_model_, shade_dist_, use_multiplier_, add_plenum_,
+        tolerance=tolerance)

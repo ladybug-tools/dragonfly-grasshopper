@@ -26,6 +26,12 @@ key in the geoJSON.
             will be multiplied. If False, full geometry objects will be written
             for each and every story in the building such that all resulting
             multipliers will be 1. Default: True.
+        add_plenum_: Boolean to indicate whether ceiling/floor plenums should
+            be auto-generated for the Rooms. The height of ceiling plenums
+            will be autocalculated as the difference between the Room2D
+            ceiling height and Story ceiling height. The height of the floor
+            plenum will be autocalculated as the difference between the Room2D
+            floor height and Story floor height. (Default: False).
         shade_dist_: An optional number to note the distance beyond which other
             buildings' shade should not be exported into a given Model. This is
             helpful for reducing the simulation run time of each Model when other
@@ -59,7 +65,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '0.2.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -92,6 +98,7 @@ if all_required_inputs(ghenv.Component) and _write:
     # set default inputs if not specified
     point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)
     use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True
+    add_plenum_ = add_plenum_ if add_plenum_ is not None else False
 
     # check the _model and _location input
     assert isinstance(_model, Model), \
@@ -104,5 +111,5 @@ if all_required_inputs(ghenv.Component) and _write:
     else:
         # create the geoJSON and honeybee Model JSONs
         geojson, hb_jsons, hb_models = _model.to.urbanopt(
-            _model, _location, point, shade_dist_, use_multiplier_, _folder_,
-            tolerance)
+            _model, _location, point, shade_dist_, use_multiplier_, add_plenum_,
+            _folder_, tolerance=tolerance)
