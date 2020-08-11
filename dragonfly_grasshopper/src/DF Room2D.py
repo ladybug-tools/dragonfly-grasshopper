@@ -43,7 +43,7 @@ Create Dragonfly Room2Ds from floor plate geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = "DF Room2D"
 ghenv.Component.NickName = 'Room2D'
-ghenv.Component.Message = '0.1.5'
+ghenv.Component.Message = '0.1.6'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
@@ -87,7 +87,8 @@ import uuid
 
 if all_required_inputs(ghenv.Component) and _run:
     room2d = []  # list of room2ds that will be returned
-    for i, geo in enumerate(_geo):
+    face3ds = [face for geo in _geo for face in to_face3d(geo)]  # convert to lb geo
+    for i, geo in enumerate(face3ds):
         # get the name for the Room2D
         if _name_ is None:  # make a default Room2D name
             name = "Room_{}".format(str(uuid.uuid4())[:8])
@@ -96,7 +97,7 @@ if all_required_inputs(ghenv.Component) and _run:
             name = clean_and_id_string(display_name)
 
         # create the Room2D
-        room = Room2D(name, to_face3d(geo)[0], _flr_to_ceiling, tolerance=tolerance)
+        room = Room2D(name, geo, _flr_to_ceiling, tolerance=tolerance)
         if _name_ is not None:
             room.display_name = display_name
 
