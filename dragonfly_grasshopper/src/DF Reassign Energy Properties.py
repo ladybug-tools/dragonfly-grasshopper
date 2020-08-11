@@ -17,8 +17,8 @@ to such stories.
 -
 
     Args:
-        _df_obj: A Dragonfly Building, Story or Room2D which is to have its
-            energy properties re-assigned.
+        _df_obj: A Dragonfly Building, Story or Room2D which is to have its energy
+            properties re-assigned.
         program_: Text to reassign the program of the input objects (to be looked
             up in the ProgramType library) such as that output from the "HB List
             Programs" component. This can also be a custom ProgramType object.
@@ -27,20 +27,18 @@ to such stories.
             energy model. Text should refer to a ConstructionSet within the library
             such as that output from the "HB List Construction Sets" component.
             This can also be a custom ConstructionSet object.
-        conditioned_: Boolean to reassign whether the input objects have heating
-            and cooling systems.
-    
+
     Returns:
         df_obj: The input Dragonfly object with its properties re-assigned based
             on the input.
 """
 
-ghenv.Component.Name = "DF Reassign Energy Properties"
+ghenv.Component.Name = 'DF Reassign Energy Properties'
 ghenv.Component.NickName = 'ReassignProp'
-ghenv.Component.Message = '0.1.3'
-ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '3 :: Extensions'
-ghenv.Component.AdditionalHelpFromDocStrings = "1"
+ghenv.Component.Message = '0.2.0'
+ghenv.Component.Category = 'Dragonfly'
+ghenv.Component.SubCategory = '3 :: Energy'
+ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
 try:  # import the core dragonfly dependencies
     from dragonfly.building import Building
@@ -68,7 +66,7 @@ except ImportError as e:
 if all_required_inputs(ghenv.Component):
     # duplicate the initial objects
     df_obj = _df_obj.duplicate()
-    
+
     # try to assign the program
     if program_ is not None:
         if isinstance(program_, str):
@@ -77,23 +75,9 @@ if all_required_inputs(ghenv.Component):
             df_obj.properties.energy.set_all_room_2d_program_type(program_)
         else:  # it's a Room2D
             df_obj.properties.energy.program_type = program_
-    
+
     # try to assign the construction set
     if constr_set_ is not None:
         if isinstance(constr_set_, str):
             constr_set_ = construction_set_by_identifier(constr_set_)
         df_obj.properties.energy.construction_set = constr_set_
-    
-    # assign an ideal air system
-    if conditioned_ is not None:
-        if conditioned_:
-            df_obj.properties.energy.add_default_ideal_air()
-        else:
-            if isinstance(df_obj, Building):
-                for room in df_obj.unique_room_2ds:
-                    room.properties.energy.hvac = None
-            elif isinstance(df_obj, Story):
-                for room in df_obj.room_2ds:
-                    room.properties.energy.hvac = None
-            else:  # it's a Room2D
-                df_obj.properties.energy.hvac = None
