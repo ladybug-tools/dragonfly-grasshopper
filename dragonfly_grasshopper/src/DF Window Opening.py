@@ -26,14 +26,14 @@ Story or Room2D.
         _discharge_coeff_: A number between 0.0 and 1.0 that will be multipled
             by the area of the window in the stack (buoyancy-driven) part of the
             equation to account for additional friction from window geometry,
-            insect screens, etc. (Default: 0.17, for unobstructed windows with
+            insect screens, etc. (Default: 0.45, for unobstructed windows with
             insect screens). This value should be lowered if windows are of an
             awning or casement type and not allowed to fully open. Some common
             values for this coefficient include the following.
             -
                 * 0.0 - Completely discount stack ventilation from the calculation.
-                * 0.17 - For unobstructed windows with an insect screen.
-                * 0.25 - For unobstructed windows with NO insect screen.
+                * 0.45 - For unobstructed windows with an insect screen.
+                * 0.65 - For unobstructed windows with NO insect screen.
         _wind_cross_vent_: Boolean to indicate if there is an opening of roughly
             equal area on the opposite side of the Room such that wind-driven
             cross ventilation will be induced. If False, the assumption is that
@@ -46,7 +46,7 @@ Story or Room2D.
 
 ghenv.Component.Name = 'DF Window Opening'
 ghenv.Component.NickName = 'DFWindowOpen'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -89,7 +89,7 @@ if all_required_inputs(ghenv.Component):
     # create the base ventilation opening
     f_area = 0.5 if _fract_area_oper_ is None else _fract_area_oper_
     f_height = 1.0 if _fract_height_oper_ is None else _fract_height_oper_
-    discharge = 0.17 if _discharge_coeff_ is None else _discharge_coeff_
+    discharge = 0.45 if _discharge_coeff_ is None else _discharge_coeff_
     cross_vent = False if _wind_cross_vent_ is None else _wind_cross_vent_
     vent_open = VentilationOpening(f_area, f_height, discharge, cross_vent)
 
