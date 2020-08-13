@@ -38,13 +38,6 @@ following repositories to be installed in order to work correctly:
 
 ## Installation
 
-To install the most recent version of the Grasshopper plugin, follow these steps:
-
-1. Clone this repository to your machine.
-2. Make sure you are connected to the internet and open the installer.gh file in Grasshopper.
-3. Set the toggle inside the file to `True`.
-4. Restart Rhino + Grasshopper.
-
-Note that following these steps will install the absolute most recent version of
-the plugin. To install the last stable release, download the components and Grasshopper
-file installer from [food4rhino](https://www.food4rhino.com/app/ladybug-tools).
+See the [Wiki of the lbt-grasshopper repository](https://github.com/ladybug-tools/lbt-grasshopper/wiki)
+for the installation instructions for the entire Ladybug Tools Grasshopper plugin
+(including this repository).
