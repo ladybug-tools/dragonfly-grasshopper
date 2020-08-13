@@ -30,19 +30,15 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Load Objects'
 ghenv.Component.NickName = 'LoadObjects'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '0.2.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
-try:
-    import honeybee.model as hb_model
-except ImportError as e:
-    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
-
 try:  # import the core dragonfly dependencies
     import dragonfly.dictutil as df_dict_util
     from dragonfly.model import Model
+    from dragonfly.config import folders
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
@@ -50,6 +46,11 @@ try:  # import the core honeybee_energy dependencies
     import honeybee_energy.dictutil as energy_dict_util
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy:\n\t{}'.format(e))
+
+try:  # import the core honeybee_radiance dependencies
+    import honeybee_radiance.dictutil as radiance_dict_util
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee_radiance:\n\t{}'.format(e))
 
 try:  # import the core ladybug_rhino dependencies
     from ladybug_rhino.grasshopper import all_required_inputs, give_warning
@@ -79,23 +80,55 @@ def model_units_tolerance_check(model):
             'current Rhino model tolerance "{}".\nIt is recommended that the ' \
             'Rhino document tolerance be changed to be coarser and this ' \
             'component is re-reun.'.format(new_tol, tolerance)
-        give_warning(msg)
+        print msg
+        give_warning(ghenv.Component, msg)
+
+
+def version_check(data):
+    """Check the version of the object if it was included in the dictionary.
+
+    This is most useful in cases of importing entire Models to make sure
+    the Model isn't newer than the currently installed Dragonfly.
+
+    Args:
+        data: Dictionary of the object, which optionally has the "version" key.
+    """
+    if 'version' in data and data['version'] is not None:
+        model_ver = tuple(int(d) for d in data['version'].split('.'))
+        df_ver = folders.dragonfly_schema_version
+        if model_ver > df_ver:
+            msg = 'Imported Model schema version "{}" is newer than that with the ' \
+            'currently installed Dragonfly "{}".\nThe Model may fail to import ' \
+            'or (worse) some newer features of the Model might not be imported ' \
+            'without detection.'.format(data['version'], folders.dragonfly_schema_version_str)
+            print msg
+            give_warning(ghenv.Component, msg)
+        elif model_ver != df_ver:
+            msg = 'Imported Model schema version "{}" is older than that with the ' \
+            'currently installed Dragonfly "{}".\nThe Model will be upgraded upon ' \
+            'import.'.format(data['version'], folders.dragonfly_schema_version_str)
+            print msg
 
 
 if all_required_inputs(ghenv.Component) and _load:
     with open(_df_file) as json_file:
         data = json.load(json_file)
 
+    version_check(data)  # try to check the version
     try:
         df_objs = df_dict_util.dict_to_object(data, False)  # re-serialize as a core object
         if df_objs is None:  # try to re-serialize it as an energy object
-            df_objs = energy_dict_util.dict_to_object(hb_dict, False)
+            df_objs = energy_dict_util.dict_to_object(data, False)
+            if df_objs is None:  # try to re-serialize it as a radiance object
+                df_objs = radiance_dict_util.dict_to_object(data, False)
         elif isinstance(df_objs, Model):
             model_units_tolerance_check(df_objs)
     except ValueError:  # no 'type' key; assume that its a group of objects
         df_objs = []
-        for hb_dict in data.values():
-            df_obj = df_dict_util.dict_to_object(hb_dict, False)  # re-serialize as a core object
+        for df_dict in data.values():
+            df_obj = df_dict_util.dict_to_object(df_dict, False)  # re-serialize as a core object
             if df_obj is None:  # try to re-serialize it as an energy object
-                df_obj = energy_dict_util.dict_to_object(hb_dict, False)
+                df_obj = energy_dict_util.dict_to_object(df_dict, False)
+                if df_obj is None:  # try to re-serialize it as a radiance object
+                    df_obj = radiance_dict_util.dict_to_object(df_dict, False)
             df_objs.append(df_obj)

@@ -39,7 +39,7 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Dump Objects'
 ghenv.Component.NickName = 'DumpObjects'
-ghenv.Component.Message = '0.1.0'
+ghenv.Component.Message = '0.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -50,7 +50,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
-    import dragonfly.model as Model
+    from dragonfly.model import Model
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
@@ -66,7 +66,8 @@ import json
 if all_required_inputs(ghenv.Component) and _dump:
     # set the component defaults
     name = _name_ if _name_ is not None else 'unnamed'
-    file_name = '{}.json'.format(name)
+    file_name = '{}.json'.format(name)  if len(_df_objs) > 1 or not \
+        isinstance(_df_objs[0], Model) else '{}.dfjson'.format(name)
     folder = _folder_ if _folder_ is not None else folders.default_simulation_folder
     df_file = os.path.join(folder, file_name)
     indent = indent_ if indent_ is not None else 0
