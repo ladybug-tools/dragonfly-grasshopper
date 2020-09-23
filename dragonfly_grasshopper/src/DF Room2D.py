@@ -34,8 +34,7 @@ Create Dragonfly Room2Ds from floor plate geometry (horizontal Rhino surfaces).
             to the Room2Ds's climate or building energy code.
         conditioned_: Boolean to note whether the Room2Ds have heating and cooling
             systems.
-        _run: Set to True to run the component and create Dragonfly Room2Ds.
-    
+
     Returns:
         report: Reports, errors, warnings, etc.
         room2d: Dragonfly Room2Ds.
@@ -43,7 +42,7 @@ Create Dragonfly Room2Ds from floor plate geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = "DF Room2D"
 ghenv.Component.NickName = 'Room2D'
-ghenv.Component.Message = '0.1.6'
+ghenv.Component.Message = '0.1.7'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
@@ -85,7 +84,7 @@ except ImportError as e:
 import uuid
 
 
-if all_required_inputs(ghenv.Component) and _run:
+if all_required_inputs(ghenv.Component):
     room2d = []  # list of room2ds that will be returned
     face3ds = [face for geo in _geo for face in to_face3d(geo)]  # convert to lb geo
     for i, geo in enumerate(face3ds):
