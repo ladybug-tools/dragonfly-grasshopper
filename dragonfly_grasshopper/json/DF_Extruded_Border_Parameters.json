@@ -1,0 +1,29 @@
+{
+  "version": "0.1.0", 
+  "nickname": "BorderPar", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "shd_par", 
+        "description": "Shading Parameters that can be applied to a Dragonfly object\nusing the \"DF Apply Facade Parameters\" component.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_depth", 
+      "description": "A number for the depth of the extruded border.", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.shadingparameter import ExtrudedBorder\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    shd_par = ExtrudedBorder(_depth)", 
+  "category": "Dragonfly", 
+  "name": "DF Extruded Border Parameters", 
+  "description": "Create Dragonfly shading parameters with instructions for extruded borders over\nall windows.\n-"
+}

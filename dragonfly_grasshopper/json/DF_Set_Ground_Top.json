@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0", 
+  "nickname": "SetGrndTop", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "df_obj", 
+        "description": "The input Dragonfly object with its ground_contact or top_exposed\nproperties edited.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_df_obj", 
+      "description": "Dragonfly Stories or Room2Ds which will have its floor set to be\nin contact with the ground or its roof to be in contact with the\noutdoors.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "grnd_contact_", 
+      "description": "A boolean noting whether the input objects have floors\nin contact with the ground.", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "top_exposed_", 
+      "description": "A boolean noting whether the input objects have ceilings\nexposed to the outdoors.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    df_obj = [obj.duplicate() for obj in _df_obj]\n    \n    # set the ground contact\n    if grnd_contact_ is not None:\n        for obj in df_obj:\n            if isinstance(obj, Room2D):\n                obj.is_ground_contact = grnd_contact_\n            elif isinstance(obj, Story):\n                obj.set_ground_contact(grnd_contact_)\n    \n    # set the top exposure\n    if top_exposed_ is not None:\n        for obj in df_obj:\n            if isinstance(obj, Room2D):\n                obj.is_top_exposed = top_exposed_\n            elif isinstance(obj, Story):\n                obj.set_top_exposed(top_exposed_)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Set Ground Top", 
+  "description": "Set Room2Ds or Stories to have their floor in contact with the ground or\ntheir roofs in contact with the outdoors.\n-"
+}

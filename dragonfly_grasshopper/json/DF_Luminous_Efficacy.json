@@ -1,0 +1,50 @@
+{
+  "version": "0.1.1", 
+  "nickname": "LumEff", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "dir_ill", 
+        "description": "A data collection of direct normal illuminance values at each\ntimestep of the WEA.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "diff_ill", 
+        "description": "A list of diffuse sky solar illuminance values at each\ntimestep of the WEA.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "glob_ill", 
+        "description": "A list of global horizontal illuminance values at each\ntimestep of the WEA.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_wea", 
+      "description": "A Ladybug WEA object.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_dew_point", 
+      "description": "An annual data collection representing dew point temperature [C].", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "4 :: AlternativeWeather", 
+  "code": "\ntry:\n    from ladybug.wea import Wea\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    glob_ill, dir_ill, diff_ill, zen_lum = \\\n        _wea.estimate_illuminance_components(_dew_point)", 
+  "category": "Dragonfly", 
+  "name": "DF Luminous Efficacy", 
+  "description": "Esimtate sky illuminance from the irradiance contained within a WEA object.\n-"
+}

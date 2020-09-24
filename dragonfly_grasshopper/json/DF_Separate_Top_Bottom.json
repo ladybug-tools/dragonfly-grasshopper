@@ -1,0 +1,29 @@
+{
+  "version": "0.1.0", 
+  "nickname": "TopBottom", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "buildings", 
+        "description": "The Building objects with their top and bottom floors separated.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_buildings", 
+      "description": "Dragonfly Building objects which will have their top and bottom\nstories separated into unique ones with a multiplier of 1.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    buildings = []\n    for bldg in _buildings:\n        new_bldg = bldg.duplicate()\n        new_bldg.separate_top_bottom_floors()\n        buildings.append(new_bldg)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Separate Top Bottom", 
+  "description": "Separate the top and bottom floors of a Building into unique Stories with a multiplier\nof 1 and automatically assign the first story Room2Ds to have a ground contact\nfloor and the top story Room2Ds to have an outdoor-exposed roof.\n_\nThis is particularly helpful when using to_honeybee workflows with\nmultipliers but one wants to account for the heat exchange of the top\nor bottom floors with the gound or outdoors.\n-"
+}

@@ -1,0 +1,43 @@
+{
+  "version": "0.1.1", 
+  "nickname": "HorizInfr", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "horiz_infrared", 
+        "description": "A data collection or value indicating the downwelling\nhorizontal infrared radiation [W/m2]", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_sky_cover", 
+      "description": "A value or data collection representing sky cover [tenths]", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_dry_bulb", 
+      "description": "A value or data collection representing  dry bulb temperature [C]", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_dew_point", 
+      "description": "A value or data collection representing dew point temperature [C]", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "4 :: AlternativeWeather", 
+  "code": "\ntry:\n    from ladybug.skymodel import calc_horizontal_infrared\n    from ladybug.datacollection import HourlyContinuousCollection\n    from ladybug.datatype.energyflux import HorizontalInfraredRadiationIntensity\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    horiz_infrared = HourlyContinuousCollection.compute_function_aligned(\n        calc_horizontal_infrared, [_sky_cover, _dry_bulb, _dew_point],\n        HorizontalInfraredRadiationIntensity(), 'W/m2')\n", 
+  "category": "Dragonfly", 
+  "name": "DF Horizontal Infrared", 
+  "description": "Calculate downwelling horizontal infrared radiation intensity from sky cover,\ndry bulb temperature, and dew point temperature.\n-"
+}

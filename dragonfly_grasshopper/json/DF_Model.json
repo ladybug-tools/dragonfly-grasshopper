@@ -1,0 +1,43 @@
+{
+  "version": "0.2.2", 
+  "nickname": "Model", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "model", 
+        "description": "A Dragonfly Model object possessing all of the input geometry\nobjects.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_buildings", 
+      "description": "A list of Dragonfly Building objects to be added to the Model.\nNote that at least one Building is necessary to make a simulate-able\nenergy model.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "context_", 
+      "description": "Optional Dragonfly ContextShade objects to be added to the Model.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_name_", 
+      "description": "Text to be used for the name and identifier of the Model. If no\nname is provided, it will be \"unnamed\".", 
+      "type": "string", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\n    from ladybug_{{cad}}.config import units_system, tolerance, angle_tolerance\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_string(_name_) if _name_ is not None else 'unnamed'\n    units = units_system()\n\n    # create the model\n    model = Model(name, _buildings, context_, units=units, tolerance=tolerance,\n                  angle_tolerance=angle_tolerance)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Model", 
+  "description": "Create a Dragonfly Model, which can be translated to Honeybee model and sent\nfor simulation.\n-"
+}

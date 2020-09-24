@@ -1,0 +1,50 @@
+{
+  "version": "0.1.2", 
+  "nickname": "BuildingStories", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "building", 
+        "description": "Dragonfly Building.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_stories", 
+      "description": "A list of Dragonfly Story objects to be joined into one Building.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "multipliers_", 
+      "description": "An optional list of integers with the same length as the\ninput _stories, which will be used to override any existing multipliers\non the input Story objects. This integer denotes the number of times\nthat each Story is repeated over the height of the building. If\nnothing is input here, the multipliers on the existing Story objects\nwill remain.", 
+      "type": "int", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_name_", 
+      "description": "Text to set the name for the Building, which will also be incorporated\ninto unique Building identifier. If the name is not provided a random\none will be assigned.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_constr_set_", 
+      "description": "Text for the construction set of the Building, which is used\nto assign all default energy constructions needed to create an energy\nmodel. Text should refer to a ConstructionSet within the library such\nas that output from the \"HB List Construction Sets\" component. This\ncan also be a custom ConstructionSet object. If nothing is input here,\nthe Building will have a generic construction set that is not sensitive\nto the Buildings's climate or building energy code.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\nimport uuid\n\n# document-wide counter to generate new unique Building names\nimport scriptcontext\ntry:\n    scriptcontext.sticky[\"bldg_count\"]\nexcept KeyError:  # first time that the component is running\n    scriptcontext.sticky[\"bldg_count\"] = 1\n\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_and_id_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly-energy extension\n    import dragonfly_energy\n    from honeybee_energy.lib.constructionsets import construction_set_by_identifier\nexcept ImportError as e:\n    if _constr_set_ is not None:\n        raise ValueError('_constr_set_ has been specified but dragonfly-energy '\n                         'has failed to import.\\n{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    stories = [story.duplicate() for story in _stories]\n\n    # if there are multipliers, use them to reassign the story multipliers\n    if len(multipliers_) != 0:\n        assert len(multipliers_) == len(stories), 'Length of input multipliers_ ' \\\n            '({}) does not match the length of input _stories ({}).'.format(\n                len(multipliers_), len(_stories))\n        for mult, story in zip(multipliers_, stories):\n            story.multiplier = mult\n\n    # generate a default identifier\n    if _name_ is None:  # get a default Building name\n        name = \"Building_{}\".format(scriptcontext.sticky[\"bldg_count\"],\n                                    str(uuid.uuid4())[:8])\n        scriptcontext.sticky[\"bldg_count\"] += 1\n    else:\n        name = clean_and_id_string(_name_)\n\n    # create the Building\n    building = Building(name, stories)\n    if _name_ is not None:\n        building.display_name = _name_\n\n    # assign the construction set\n    if _constr_set_ is not None:\n        if isinstance(_constr_set_, str):\n            _constr_set_ = construction_set_by_identifier(_constr_set_)\n        building.properties.energy.construction_set = _constr_set_", 
+  "category": "Dragonfly", 
+  "name": "DF Building from Stories", 
+  "description": "Create a Dragonfly Building from individual Dragonfly Story objects.\n-"
+}

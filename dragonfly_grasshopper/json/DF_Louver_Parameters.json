@@ -1,0 +1,71 @@
+{
+  "version": "0.1.0", 
+  "nickname": "LouverPar", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "shd_par", 
+        "description": "Shading Parameters that can be applied to a Dragonfly object\nusing the \"DF Apply Facade Parameters\" component.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_depth", 
+      "description": "A number for the depth to extrude the louvers.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_shade_count_", 
+      "description": "A positive integer for the number of louvers to generate.\nNote that this input should be None if there is an input for\n_dist_between_. Default: 1.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_dist_between_", 
+      "description": "A number for the approximate distance between each louver.\nNote that this input should be None if there is an input for\n_shade_count_.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_facade_offset_", 
+      "description": "A number for the distance to louvers from the Wall.\nDefault is 0 for no offset.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_angle_", 
+      "description": "A number for the for an angle to rotate the louvers in degrees.\nDefault is 0 for no rotation.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "vertical_", 
+      "description": "Optional boolean to note whether the lovers are vertical.\nIf False, the louvers will be horizontal. Default False.", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "flip_start_", 
+      "description": "Boolean to note whether the side the louvers start from\nshould be flipped. Default is False to have contours on top or right.\nSetting to True will start contours on the bottom or left.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:\n    from ladybug_geometry.geometry2d.pointvector import Vector2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.shadingparameter import LouversByDistance, LouversByCount\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set defaults for any blank inputs\n    _facade_offset_ = _facade_offset_ if _facade_offset_ is not None else 0.0\n    _angle_ = _angle_ if _angle_ is not None else 0.0\n    flip_start_ = flip_start_ if flip_start_ is not None else False\n    \n    # process the defaults for _shade_count_ vs _dist_between\n    if _shade_count_ is not None and _dist_between_ is not None:\n        raise ValueError('Inputs for _shade_count_ and _dist_between_ are both set.'\n                         '\\nThis component accepts either method but not both.')\n    elif _shade_count_ is None and _dist_between_ is None:\n        _shade_count_ = 1\n    \n    # process the vertical_ input into a direction vector\n    vertical_ = Vector2D(1, 0) if vertical_ else Vector2D(0, 1)\n    \n    if _shade_count_ is not None:\n        shd_par = LouversByCount(_shade_count_, _depth, _facade_offset_,\n                                 _angle_, vertical_, flip_start_)\n    else:\n        shd_par = LouversByDistance(_dist_between_, _depth, _facade_offset_,\n                                    _angle_, vertical_, flip_start_)", 
+  "category": "Dragonfly", 
+  "name": "DF Louver Parameters", 
+  "description": "Create Dragonfly shading parameters with instructions for a series of louvered\nShades over a Wll.\n-"
+}

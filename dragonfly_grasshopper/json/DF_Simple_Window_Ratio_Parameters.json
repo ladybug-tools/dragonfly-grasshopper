@@ -1,0 +1,29 @@
+{
+  "version": "0.1.0", 
+  "nickname": "SimpleRatioPar", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "win_par", 
+        "description": "Window Parameters that can be applied to a Dragonfly object\nusing the \"DF Apply Facade Parameters\" component.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_ratio", 
+      "description": "A number between 0 and 1 for the ratio between the window\narea and the parent wall surface area.", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import SimpleWindowRatio\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    win_par = SimpleWindowRatio(_ratio)", 
+  "category": "Dragonfly", 
+  "name": "DF Simple Window Ratio Parameters", 
+  "description": "Create Dragonfly window parameters with instructions for a single window using\nan area ratio with the base surface.\n-"
+}

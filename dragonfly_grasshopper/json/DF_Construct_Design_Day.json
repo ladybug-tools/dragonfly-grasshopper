@@ -1,0 +1,113 @@
+{
+  "version": "0.1.1", 
+  "nickname": "ConstrDesignDay", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "design_day", 
+        "description": "Script output design_day.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_name", 
+      "description": "The name of the DesignDay object.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_day_type", 
+      "description": "Text indicating the type of design day (ie. 'SummerDesignDay',\n'WinterDesignDay' or other EnergyPlus days).", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_location", 
+      "description": "A Ladybug Location object describing the location of the design day.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_date", 
+      "description": "A Ladybug Date for the day of the year on which the design day occurs.\nThis should be in the format of 'DD Month' (eg. '1 Jan', '4 Jul').\nThe LB Calculate HOY component can also be used to construct this date.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_dry_bulb_max", 
+      "description": "Maximum dry bulb temperature over the design day (in C).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_dry_bulb_range_", 
+      "description": "Dry bulb range over the design day (in C).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_humidity_type", 
+      "description": "Type of humidity to use. (ie. Wetbulb, Dewpoint, HumidityRatio, Enthalpy)", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_humidity_value", 
+      "description": "The value of the humidity condition above.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_barometric_p_", 
+      "description": "Barometric pressure in Pa.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_wind_speed", 
+      "description": "Wind speed over the design day in m/s.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_wind_dir", 
+      "description": "Wind direction over the design day in degrees.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_sky_type", 
+      "description": "Type of solar model to use.  (eg. ASHRAEClearSky, ASHRAETau)", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_sky_properties", 
+      "description": "A list of properties describing the sky above.\nFor ASHRAEClearSky this is a single value for clearness.\nFor ASHRAETau, this is the tau_beam and tau_diffuse.", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "4 :: AlternativeWeather", 
+  "code": "\n\ntry:\n    from ladybug.designday import DesignDay\n    from ladybug.dt import Date, DateTime\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set defaults for relevant items\n    if _dry_bulb_range_ is None:\n        _dry_bulb_range_ = 0\n    if _barometric_p_ is None:\n        _barometric_p_ = 101325\n    \n    # process the input date\n    try:\n        date = Date.from_date_string(_date)\n    except ValueError:\n        date = DateTime.from_date_time_string(_date).date\n    \n    design_day = DesignDay.from_design_day_properties(\n        _name, _day_type, _location, date, _dry_bulb_max, _dry_bulb_range_,\n        _humidity_type, _humidity_value, _barometric_p_, _wind_speed, _wind_dir,\n        _sky_type, _sky_properties)", 
+  "category": "Dragonfly", 
+  "name": "DF Construct Design Day", 
+  "description": "Construct a design day from a set of parameters.\n-"
+}

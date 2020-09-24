@@ -1,0 +1,36 @@
+{
+  "version": "0.1.0", 
+  "nickname": "SolveAdj2D", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "adj_room2ds", 
+        "description": "The input Room2Ds but with adjacencies solved for between\nsegments.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_room2ds", 
+      "description": "A list of dragonfly Room2Ds for which adjacencies will be solved.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_run", 
+      "description": "Set to True to run the component and solve adjacencies.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the core ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    adj_room2ds = [room.duplicate() for room in _room2ds] # duplicate the initial objects\n    \n    # solve adjacnecy\n    Room2D.solve_adjacency(adj_room2ds, tolerance)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Solve Adjacency", 
+  "description": "Solve adjacencies between a series of dragonfly Room2Ds.\n_\nNote that rooms must have matching edge segments in order for them to be discovered\nas adjacent.\n-"
+}

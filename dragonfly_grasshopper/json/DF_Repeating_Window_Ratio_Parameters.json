@@ -1,0 +1,57 @@
+{
+  "version": "0.1.1", 
+  "nickname": "RepeatingRatioPar", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "win_par", 
+        "description": "Window Parameters that can be applied to a Dragonfly object\nusing the \"DF Apply Facade Parameters\" component.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_ratio", 
+      "description": "A number between 0 and 0.95 for the ratio between the area of\nthe apertures and the area of the parent face. If an array of values\nare input here, different ratios will be assigned based on\ncardinal direction, starting with north and moving clockwise.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_win_height_", 
+      "description": "A number for the target height of the output apertures.\nNote that, if the ratio is too large for the height, the ratio will\ntake precedence and the actual aperture height will be larger\nthan this value. If an array of values are input here, different\nheights will be assigned based on cardinal direction, starting with\nnorth and moving clockwise. Default: 2 meters.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_sill_height_", 
+      "description": "A number for the target height above the bottom edge of\nthe face to start the apertures. Note that, if the ratio is too large\nfor the height, the ratio will take precedence and the sill_height\nwill be smaller than this value. If an array of values are input here,\ndifferent heights will be assigned based on cardinal direction, starting\nwith north and moving clockwise. Default: 0.8 meters.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_horiz_separ_", 
+      "description": "A number for the horizontal separation between\nindividual aperture centerlines.  If this number is larger than\nthe parent face's length, only one aperture will be produced.\nIf an array of values are input here, different separation distances\nwill be assigned based on cardinal direction, starting with north\nand moving clockwise. Default: 3 meters.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "vert_separ_", 
+      "description": "An optional number to create a single vertical\nseparation between top and bottom apertures. If an array of values\nare input here, different separation distances will be assigned based\non cardinal direction, starting with north and moving clockwise.", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import RepeatingWindowRatio\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set defaults for any blank inputs\n    conversion = conversion_to_meters()\n    _win_height_ = _win_height_ if _win_height_ is not None else 2.0 / conversion\n    _sill_height_ = _sill_height_ if _sill_height_ is not None else 0.8 / conversion\n    _horiz_separ_ = _horiz_separ_ if _horiz_separ_ is not None else 3.0 / conversion\n    vert_separ_ = vert_separ_ if vert_separ_ is not None else 0.0\n    \n    win_par = RepeatingWindowRatio(_ratio, _win_height_, _sill_height_,\n                                    _horiz_separ_, vert_separ_)", 
+  "category": "Dragonfly", 
+  "name": "DF Repeating Window Ratio Parameters", 
+  "description": "Create Dragonfly window parameters with instructions for repeating windows\nderived from an area ratio with the base surface.\n-"
+}

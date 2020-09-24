@@ -1,1 +1,2 @@
 recursive-include dragonfly_grasshopper/user_objects *.ghuser
+recursive-exclude dragonfly_grasshopper/json *.json

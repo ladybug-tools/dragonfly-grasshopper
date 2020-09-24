@@ -1,0 +1,92 @@
+{
+  "version": "0.2.0", 
+  "nickname": "ToGeoJSON", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "geojson", 
+        "description": "The path to a geoJSON file that contains polygons for all of the\nBuildings within the dragonfly model along with their properties\n(floor area, number of stories, etc.). The polygons will also possess\ndetailed_model_filename keys that align with where the Honeybee Model\nJSONs are written.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "hb_jsons", 
+        "description": "A list of file paths to honeybee Model JSONS that correspond to\nthe detailed_model_filename keys in the geojson.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "hb_models", 
+        "description": "A list of honeybee Model objects that were generated in process\nof writing the URBANopt files. These can be visulazed using the\ncomponents in the Honeybee 1 :: Visualize tab in order to verify\nthat properties have been translated as expected.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_model", 
+      "description": "A Dragonfly Model object.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_location", 
+      "description": "A ladybug Location object possessing longitude and lattiude data\nused to position geoJSON file on the globe.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_point_", 
+      "description": "A Point for where the _location object exists within the space of\nthe Rhino scene. This is used to posistion the geoJSON file on the\nglobe. (Default: Rhino origin (0, 0, 0)).", 
+      "type": "Point3d", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "use_multiplier_", 
+      "description": "If True, the multipliers on each Building's Stories will be\npassed along to the generated Honeybee Room objects, indicating the\nsimulation will be run once for each unique room and then results\nwill be multiplied. If False, full geometry objects will be written\nfor each and every story in the building such that all resulting\nmultipliers will be 1. Default: True.", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "add_plenum_", 
+      "description": "Boolean to indicate whether ceiling/floor plenums should\nbe auto-generated for the Rooms. The height of ceiling plenums\nwill be autocalculated as the difference between the Room2D\nceiling height and Story ceiling height. The height of the floor\nplenum will be autocalculated as the difference between the Room2D\nfloor height and Story floor height. (Default: False).", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "shade_dist_", 
+      "description": "An optional number to note the distance beyond which other\nbuildings' shade should not be exported into a given Model. This is\nhelpful for reducing the simulation run time of each Model when other\nconnected buildings are too far away to have a meaningful impact on\nthe results. If None, all other buildings will be included as context\nshade in each and every Model. Set to 0 to exclude all neighboring\nbuildings from the resulting models. Default: None.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_folder_", 
+      "description": "Text for the full path to the folder where the geojson will be\nwritten along with all of the Honeybee Model JSONs. If None, the\nhoneybee default simulation folder is used.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_write", 
+      "description": "Set to \"True\" to have the Dragonfly Model translated to an\nURBANopt-compatible geoJSON. This input can also be the integer \"2\",\nwhich will only create the geojson file but not create any honeybee\nModel json files that are linked to it (note that a geojson produced\nthis way is not compatible with URBANopt).", 
+      "type": "int", 
+      "default": null
+    }
+  ], 
+  "subcategory": "2 :: Serialize", 
+  "code": "\n\ntry:  # import the ladybug_geometry dependencies\n    from ladybug_geometry.geometry2d.pointvector import Point2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug dependencies\n    from ladybug.location import Location\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_point2d\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _write:\n    # set default inputs if not specified\n    point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)\n    use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True\n    add_plenum_ = add_plenum_ if add_plenum_ is not None else False\n\n    # check the _model and _location input\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n    assert isinstance(_location, Location), \\\n        'Expected Ladybug Location object. Got {}.'.format(type(_location))\n\n    if _write == 2:\n        geojson = _model.to_geojson(_location, point, _folder_, tolerance)\n    else:\n        # create the geoJSON and honeybee Model JSONs\n        geojson, hb_jsons, hb_models = _model.to.urbanopt(\n            _model, _location, point, shade_dist_, use_multiplier_, add_plenum_,\n            _folder_, tolerance=tolerance)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Model To geoJSON", 
+  "description": "Convert a Dragonfly Model into an URBANopt-compatible geoJSON with linked Honeybee\nModel JSONs. Honeybee Model JSONs will be referenced using the \"detailed_model_filename\"\nkey in the geoJSON.\n-"
+}

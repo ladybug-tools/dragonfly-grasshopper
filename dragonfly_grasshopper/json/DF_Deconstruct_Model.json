@@ -1,0 +1,36 @@
+{
+  "version": "0.1.0", 
+  "nickname": "DeconstructModel", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "buildings", 
+        "description": "All of the Building objects contained within the input Model.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "context", 
+        "description": "All of the ContextShade objects within the input Model.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_model", 
+      "description": "A Dragonfly Model to be deconstructed into into its constituent\nobjects (Buildings, ContextShades).", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    buildings = _model.buildings\n    context = _model.context_shades\n", 
+  "category": "Dragonfly", 
+  "name": "DF Deconstruct Model", 
+  "description": "Deconstruct a Dragonfly Model object into all of its constituent Dragonfly objects.\n-"
+}

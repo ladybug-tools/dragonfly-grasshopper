@@ -1,0 +1,36 @@
+{
+  "version": "0.1.2", 
+  "nickname": "DecnstrDF", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "stories", 
+        "description": "The unique Story objects that make up the input _df_obj. This\nincludes unique Stories that make up input Buildings as well as any\ninput orphaned Stories.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "room2ds", 
+        "description": "The unique Room2D objects that make up the input _df_obj. This\nincludes any unique Room2Ds assigned to input Stories or Buildings as\nwell as any input orphaned Room2Ds.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_df_obj", 
+      "description": "A Dragonfly Building, Story or Room2D to be deconstructed into\nits constituent objects. Note that, Room2Ds do not have sub-objects\nassigned to them and the original object will be output.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef deconstruct_story(story, stories, room2ds):\n    \"\"\"Deconstruct Story object.\"\"\"\n    stories.append(story)\n    room2ds.extend(story.room_2ds)\n\ndef deconstruct_building(bldg, stories, room2ds):\n    \"\"\"Deconstruct Building object.\"\"\"\n    for story in bldg.unique_stories:\n        deconstruct_story(story, stories, room2ds)\n\n\nif all_required_inputs(ghenv.Component):\n    # lists of to be filled with constituent objects\n    stories = []\n    room2ds = []\n    \n    if isinstance(_df_obj, Building):\n        deconstruct_building(_df_obj, stories, room2ds)\n    elif isinstance(_df_obj, Story):\n        deconstruct_story(_df_obj, stories, room2ds)\n    elif isinstance(_df_obj, Story):\n        room2ds.append(_df_obj)\n    else:\n        raise TypeError(\n            'Unrecognized dragonfly object type: {}'.format(type(_df_obj)))\n", 
+  "category": "Dragonfly", 
+  "name": "DF Deconstruct Object", 
+  "description": "Deconstruct any Dragonfly geometry object into its unique constituent Dragonfly objects.\n_\nThis is useful for editing auto-generated child objects separately from their parent.\nFor example, if you want to assign all of the ground floors of a given auto-generated\nBuilding to have a Retail ProgramType, this can give you all of such Stories. Then\nyou can assign a Retail ProgramType to them and combine them with the other Stories\ninto a new Building.\n-"
+}
