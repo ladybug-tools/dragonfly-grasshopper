@@ -1,0 +1,57 @@
+{
+  "version": "0.1.0", 
+  "nickname": "GeoProp", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "height", 
+        "description": "For a Model or a Building, this will be the average height of the\nobject above the ground. For a Story, this will be the floor-to-floor\nheight and, for a Room2D, this will be the floor-to-ceiling height.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "floor_area", 
+        "description": "A number for the floor area  of all Rooms in the dragonfly object.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "ext_wall_area", 
+        "description": "A number for the total area of walls in the dragonfly object\nwith an Outdoors boundary condition.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "ext_win_area", 
+        "description": "A number for the total area of windows in the dragonfly object\nwith an Outdoors boundary condition.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "volume", 
+        "description": "A number for the volume of all Rooms in the dragonfly object.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_df_objs", 
+      "description": "A Dragonfly Model, Building, Story or Room2D for which\nproperties will be output.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "1 :: Visualize", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # get the properties that all objects share\n    floor_area = [df_obj.floor_area for df_obj in _df_objs]\n    ext_wall_area = [df_obj.exterior_wall_area for df_obj in _df_objs]\n    ext_win_area = [df_obj.exterior_aperture_area for df_obj in _df_objs]\n    volume = [df_obj.volume for df_obj in _df_objs]\n\n    # extract the height info by height\n    height = []\n    for df_obj in _df_objs:\n        if isinstance(df_obj, Model):\n            height.append(df_obj.average_height_above_ground)\n        elif isinstance(df_obj, Building):\n            height.append(df_obj.height_above_ground)\n        elif isinstance(df_obj, Story):\n            height.append(df_obj.floor_to_floor_height)\n        elif isinstance(df_obj, Room2D):\n            height.append(df_obj.floor_to_ceiling_height)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Geometry Properties", 
+  "description": "Get properties of any Dragonfly geometry object.\n-"
+}

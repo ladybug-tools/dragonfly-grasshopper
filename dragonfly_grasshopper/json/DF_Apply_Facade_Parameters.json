@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0", 
+  "nickname": "ApplyFacadePar", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "df_obj", 
+        "description": "The input Dragonfly object with the WindowParameters and/or\nShadingParameters assigned to it.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_df_obj", 
+      "description": "A Dragonfly Building, Story or Room2D which will have the input\nWindowParameters and/or ShadingParameters assigned to it.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_win_par_", 
+      "description": "A WindowParameter object that dictates how the window geometries\nwill be generated for each of the walls. If None, the window\nparameters will remain unchanged across the input object. If an array\nof values are input here, different WindowParameters will be assigned\nbased on cardinal direction, starting with north and moving clockwise.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_shd_par_", 
+      "description": "A ShadingParameter objects that dictate how the shade geometries\nwill be generated for each of the walls. If None, the shading\nparameters will remain unchanged across the input object. If an array\nof values are input here, different ShadingParameters will be assigned\nbased on cardinal direction, starting with north and moving clockwise.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.boundarycondition import Outdoors\n    from honeybee.orientation import angles_from_num_orient, orient_index\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef extract_room_2ds(df_objs):\n    \"\"\"Extract the Room2Ds from any dragonfly objects (Building, Story, etc.)\"\"\"\n    rooms = []\n    for obj in df_objs:\n        if isinstance(obj, Building):\n            rooms.extend(obj.unique_room_2ds)\n        elif isinstance(obj, Story):\n            rooms.extend(obj.room_2ds)\n        elif isinstance(obj, Room2D):\n            rooms.append(obj)\n    return rooms\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    df_obj = [obj.duplicate() for obj in _df_obj]\n    \n    # add the window parameters\n    if len(_win_par_) == 1:  # one window parameter for all\n        for obj in df_obj:\n            obj.set_outdoor_window_parameters(_win_par_[0])\n    elif len(_win_par_) > 1:  # different window parameters by cardinal direction\n        angles = angles_from_num_orient(len(_win_par_))\n        rooms = extract_room_2ds(df_obj)\n        for room in rooms:\n            room_win_par = []\n            for bc, orient in zip(room.boundary_conditions, room.segment_orientations()):\n                orient_i = orient_index(orient, angles)\n                win_p = _win_par_[orient_i] if isinstance(bc, Outdoors) else None\n                room_win_par.append(win_p)\n            room.window_parameters = room_win_par\n    \n    # add the shading parameters\n    if len(_shd_par_) == 1:  # one shading parameter for all\n        for obj in df_obj:\n            obj.set_outdoor_shading_parameters(_shd_par_[0])\n    elif len(_shd_par_) > 1:  # different shading parameters by cardinal direction\n        angles = angles_from_num_orient(len(_shd_par_))\n        rooms = extract_room_2ds(df_obj)\n        for room in rooms:\n            room_shd_par = []\n            for bc, orient in zip(room.boundary_conditions, room.segment_orientations()):\n                orient_i = orient_index(orient, angles)\n                shd_p = _shd_par_[orient_i] if isinstance(bc, Outdoors) else None\n                room_shd_par.append(shd_p)\n            room.shading_parameters = room_shd_par\n", 
+  "category": "Dragonfly", 
+  "name": "DF Apply Facade Parameters", 
+  "description": "Apply WindowParameters and/or ShadingParameters to any Dragonfly object (Building,\nStory, Room2D).\n-"
+}

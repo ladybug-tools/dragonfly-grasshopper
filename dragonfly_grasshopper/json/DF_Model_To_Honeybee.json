@@ -1,0 +1,64 @@
+{
+  "version": "0.2.0", 
+  "nickname": "ToHoneybee", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "hb_models", 
+        "description": "Honeybee Model objects derived from the input _models. These\nModels are ready to be simulated in either an Energy or Radiance\nsimulation or they can be edited further with the Honeybee\ncomponents.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_model", 
+      "description": "A Dragonfly Model object.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_obj_per_model_", 
+      "description": "Text to describe how the input Buildings should be divided\nacross the output Models. Default: 'Building'. Choose from the\nfollowing options:\n* District - All buildings will be added to a single Honeybee Model.\nSuch a Model can take a long time to simulate so this is only\nrecommended for small numbers of buildings.\n* Building - Each input building will be exported into its own Model.\nFor each Model, the other buildings input to this component will\nappear as context shade geometry. Thus, each Model is its own\nsimulate-able unit.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "use_multiplier_", 
+      "description": "If True, the multipliers on each Building's Stories will be\npassed along to the generated Honeybee Room objects, indicating the\nsimulation will be run once for each unique room and then results\nwill be multiplied. If False, full geometry objects will be written\nfor each and every story in the building such that all resulting\nmultipliers will be 1. (Default: True).", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "add_plenum_", 
+      "description": "Boolean to indicate whether ceiling/floor plenums should\nbe auto-generated for the Rooms. The height of ceiling plenums\nwill be autocalculated as the difference between the Room2D\nceiling height and Story ceiling height. The height of the floor\nplenum will be autocalculated as the difference between the Room2D\nfloor height and Story floor height. (Default: False).", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "shade_dist_", 
+      "description": "An optional number to note the distance beyond which other\nbuildings' shade should not be exported into a given Model. This is\nhelpful for reducing the simulation run time of each Model when other\nconnected buildings are too far away to have a meaningful impact on\nthe results. If None, all other buildings will be included as context\nshade in each and every Model. Set to 0 to exclude all neighboring\nbuildings from the resulting models. Default: None.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_run", 
+      "description": "Set to \"True\" to have the Dragonfly Model translated to a series\nof Honeybee Models.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "2 :: Serialize", 
+  "code": "\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_vector2d\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # set default inputs if not specified\n    use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True\n    add_plenum_ = add_plenum_ if add_plenum_ is not None else False\n    _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_\n\n    # check the _model input\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n\n    # create the model objects\n    hb_models = _model.to_honeybee(\n        _obj_per_model_, shade_dist_, use_multiplier_, add_plenum_,\n        tolerance=tolerance)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Model To Honeybee", 
+  "description": "Convert a Dragonfly Model into a series of Honeybee Models.\n-"
+}

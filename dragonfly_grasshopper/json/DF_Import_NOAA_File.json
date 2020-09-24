@@ -1,0 +1,99 @@
+{
+  "version": "0.1.1", 
+  "nickname": "ImportNOAA", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "dry_bulb_temp", 
+        "description": "The houlry dry bulb temperature, in C.\nNote that this is a full numeric field (i.e. 23.6) and not an integer\nrepresentation with tenths. Valid values range from 70 C to\n70 C. Missing value for this field is 99.9.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "dew_point_temp", 
+        "description": "The hourly dew point temperature, in C.\nNote that this is a full numeric field (i.e. 23.6) and not an integer\nrepresentation with tenths. Valid values range from 70 C to\n70 C. Missing value for this field is 99.9.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "wind_speed", 
+        "description": "The hourly wind speed in m/sec.\nValues can range from 0 to 40. Missing value is 999.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "wind_direction", 
+        "description": "The hourly wind direction in degrees.\nThe convention is that North=0.0, East=90.0, South=180.0, West=270.0.\n(If wind is calm for the given hour, the direction equals zero.)\nValues can range from 0 to 360. Missing value is 999.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "total_sky_cover", 
+        "description": "The fraction for total sky cover (tenths of coverage).\n(i.e. 1 is 1/10 covered. 10 is total coverage) (Amount of sky\ndome in tenths covered by clouds or obscuring phenomena at the\nhour indicated at the time indicated.) Minimum value is 0;\nmaximum value is 10; missing value is 99.\"", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "atmos_pressure", 
+        "description": "The hourly weather station pressure in Pa.\nValid values range from 31,000 to 120,000...\nMissing value for this field is 999999.\"", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "visibility", 
+        "description": "This is the value for visibility in km. (Horizontal\nvisibilitY). It is not currently used in EnergyPlus calculations.\nMissing value is 9999.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "ceiling_height", 
+        "description": "Script output ceiling_height.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "model_year", 
+        "description": "The year from which the hourly data has been extracted.\nNote that, for this component to run correclty, all of the data in\nthe text file must be from a single year.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_noaa_file", 
+      "description": "The path to a .txt file of annual data obtained from the NOAA\ndatabase on your system as a string.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_timestep_", 
+      "description": "The timestep at which the data collections should be output.\nDefault is 1 but this can be set as high as 60 to ensure that all data\nfrom the .txt file is imported.", 
+      "type": "int", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_run", 
+      "description": "Set to True to run the component and import the data.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "4 :: AlternativeWeather", 
+  "code": "\nimport os\nimport csv\n\ntry:\n    from ladybug.dt import DateTime\n    from ladybug.analysisperiod import AnalysisPeriod\n    from ladybug.header import Header\n    from ladybug.datacollection import HourlyDiscontinuousCollection, HourlyContinuousCollection\n    from ladybug.datatype.temperature import DryBulbTemperature, DewPointTemperature\n    from ladybug.datatype.speed import WindSpeed\n    from ladybug.datatype.angle import WindDirection\n    from ladybug.datatype.fraction import TotalSkyCover\n    from ladybug.datatype.pressure import AtmosphericStationPressure\n    from ladybug.datatype.distance import Visibility, CeilingHeight\n    from ladybug.datatype.generic import GenericType\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\n# dictionary that converts from sky cover codes to tenths of sky cover.\nsky_codes_dict = {\n    'CLR': 0,\n    'SCT': 3,\n    'BKN': 7,\n    'OVC': 10,\n    'OBS': 10,\n    'POB': 5\n    }\n\n\ndef build_collection(values, dates, data_type, unit):\n    \"\"\"Build a data collection from raw noaa data and process it to the timestep.\"\"\"\n    \n    if values == []:\n        return None\n    \n    # convert date codes into datetimes.\n    datetimes = [DateTime(int(dat[4:6]), int(dat[6:8]), int(dat[8:10]),\n                 int(dat[10:12])) for dat in dates]\n    \n    # make a discontinuous cata collection\n    data_header = Header(data_type, unit, AnalysisPeriod())\n    data_init = HourlyDiscontinuousCollection(data_header, values, datetimes)\n    data_final = data_init.validate_analysis_period()\n    \n    # cull out unwanted timesteps.\n    if _timestep_:\n        data_final.convert_to_culled_timestep(_timestep_)\n    else:\n        data_final.convert_to_culled_timestep(1)\n    \n    return data_final\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # check that the file exists.\n    assert os.path.isfile(_noaa_file), 'Cannot find file at {}.'.format(_noaa_file)\n    \n    # empty lists to be filled with data\n    all_years = []\n    header_txt = []\n    db_t = []\n    db_t_dates = []\n    dp_t = []\n    dp_t_dates = []\n    ws = []\n    ws_dates = []\n    wd = []\n    wd_dates = []\n    sc = []\n    sc_dates = []\n    ap = []\n    ap_dates = []\n    slp = []\n    slp_dates = []\n    vis = []\n    vis_dates = []\n    ceil = []\n    ceil_dates = []\n    \n    # pull relevant data out of the file\n    with open(_noaa_file) as csv_file:\n        csv_reader = csv.reader(csv_file, delimiter=' ', skipinitialspace=True)\n        next(csv_reader)  # Skip header row.\n        for row in csv_reader:\n            all_years.append(int(row[2][:4]))\n            if row[3] != '***':\n                wd.append(float(row[3]))\n                wd_dates.append(row[2])\n            if row[4] != '***':\n                ws.append(float(row[4]))\n                ws_dates.append(row[2])\n            if row[6] != '***':\n                ceil.append(float(row[6]))\n                ceil_dates.append(row[2])\n            if row[7] != '***':\n                sc.append(row[7])\n                sc_dates.append(row[2])\n            if row[11] != '****':\n                vis.append(float(row[11]))\n                vis_dates.append(row[2])\n            if row[21] != '****':\n                db_t.append(float(row[21]))\n                db_t_dates.append(row[2])\n            if row[22] != '****':\n                dp_t.append(float(row[22]))\n                dp_t_dates.append(row[2])\n            if row[25] != '******':\n                ap.append(float(row[25]))\n                ap_dates.append(row[2])\n            if row[23] != '******':\n                slp.append(float(row[23]))\n                slp_dates.append(row[2])\n    \n    # check that all years in the file are the same.\n    yr1 = all_years[0]\n    for yr in all_years:\n        assert yr == yr1, 'Not all of the data in the file is from the same ' \\\n            'year. {} != {}'.format(yr1, yr)\n    data_header = Header(GenericType('Years', 'yr'), 'yr', AnalysisPeriod())\n    model_year = HourlyContinuousCollection(data_header, [yr1] * 8760)\n    \n    # perform conversions\n    sc = [sky_codes_dict[cov] for cov in sc]  # sky cover codes to values\n    ceil = [c * 100 for c in ceil]  # hundreds of feet to feet\n    \n    # build data collections from the imported values\n    dry_bulb_temp = build_collection(db_t, db_t_dates, DryBulbTemperature(), 'F')\n    dew_point_temp = build_collection(dp_t, dp_t_dates, DewPointTemperature(), 'F')\n    wind_speed = build_collection(ws, ws_dates, WindSpeed(), 'mph')\n    wind_direction = build_collection(wd, wd_dates, WindDirection(), 'degrees')\n    total_sky_cover = build_collection(sc, sc_dates, TotalSkyCover(), 'tenths')\n    visibility = build_collection(vis, vis_dates, Visibility(), 'mi')\n    ceiling_height = build_collection(ceil, ceil_dates, CeilingHeight(), 'ft')\n    \n    # deal with available atmospheric pressure data\n    if ap != []:\n        ap = [press / 1000 for press in ap]  # pressure mbar to bar\n        atmos_pressure = build_collection(ap, ap_dates, AtmosphericStationPressure(), 'bar')\n    else:\n        slp = [press / 1000 for press in slp]  # pressure mbar to bar\n        atmos_pressure = build_collection(slp, slp_dates, AtmosphericStationPressure(), 'bar')\n    \n    # convert all units to SI.\n    if dry_bulb_temp is not None:\n        dry_bulb_temp.convert_to_unit('C')\n    if dew_point_temp is not None:\n        dew_point_temp.convert_to_unit('C')\n    if wind_speed is not None:\n        wind_speed.convert_to_unit('m/s')\n    if visibility is not None:\n        visibility.convert_to_unit('km')\n    if ceiling_height is not None:\n        ceiling_height.convert_to_unit('m')\n    if atmos_pressure is not None:\n        atmos_pressure.convert_to_unit('Pa')", 
+  "category": "Dragonfly", 
+  "name": "DF Import NOAA File", 
+  "description": "Import climate data from a .txt file of annual data obtained from the National\nOceanic and Atmospheric Administration (NOAA) database.  The database can be\naccessed here:\nhttps://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly\n-"
+}

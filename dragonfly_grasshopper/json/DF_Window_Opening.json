@@ -1,0 +1,71 @@
+{
+  "version": "0.1.1", 
+  "nickname": "DFWindowOpen", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "report", 
+        "description": "...", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "df_objs", 
+        "description": "The input Dragonfly object with their window-opening properties edited.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_df_objs", 
+      "description": "Dragonfly Buildings, Stories or Room2Ds to which window ventilation\nopening properties will be assigned. Note that this component\nassigns such properties to all Outdoor Apertures on the rooms.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_vent_cntrl", 
+      "description": "A Ventilation Control object from the \"HB Ventilation Control\"\ncomponent, which dictates the opening behaviour of the Room's apertures.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_fract_area_oper_", 
+      "description": "A number between 0.0 and 1.0 for the fraction of the\nwindow area that is operable. (Default: 0.5, typical of sliding windows).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_fract_height_oper_", 
+      "description": "A number between 0.0 and 1.0 for the fraction\nof the distance from the bottom of the window to the top that is\noperable. (Default: 1.0, typical of windows that slide horizontally).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_discharge_coeff_", 
+      "description": "A number between 0.0 and 1.0 that will be multipled\nby the area of the window in the stack (buoyancy-driven) part of the\nequation to account for additional friction from window geometry,\ninsect screens, etc. (Default: 0.45, for unobstructed windows with\ninsect screens). This value should be lowered if windows are of an\nawning or casement type and not allowed to fully open. Some common\nvalues for this coefficient include the following.\n-\n* 0.0 - Completely discount stack ventilation from the calculation.\n* 0.45 - For unobstructed windows with an insect screen.\n* 0.65 - For unobstructed windows with NO insect screen.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_wind_cross_vent_", 
+      "description": "Boolean to indicate if there is an opening of roughly\nequal area on the opposite side of the Room such that wind-driven\ncross ventilation will be induced. If False, the assumption is that\nthe operable area is primarily on one side of the Room and there is\nno wind-driven ventilation. (Default: False)", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\ntry:\n    from honeybee_energy.ventcool.opening import VentilationOpening\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee_energy:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\n    from dragonfly.story import Story\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly-energy extension\n    import dragonfly_energy\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef extract_room2ds(obj):\n    \"\"\"Get all of the Room2Ds assinged to a given dragonfly object.\"\"\"\n    if isinstance(obj, Building):\n        return obj.unique_room_2ds\n    elif isinstance(obj, Story):\n        return obj.room_2ds\n    return [obj]  # assume that the object is already a Room2D\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    df_objs = [obj.duplicate() for obj in _df_objs]\n\n    # create the base ventilation opening\n    f_area = 0.5 if _fract_area_oper_ is None else _fract_area_oper_\n    f_height = 1.0 if _fract_height_oper_ is None else _fract_height_oper_\n    discharge = 0.45 if _discharge_coeff_ is None else _discharge_coeff_\n    cross_vent = False if _wind_cross_vent_ is None else _wind_cross_vent_\n    vent_open = VentilationOpening(f_area, f_height, discharge, cross_vent)\n\n    for obj in df_objs:\n        for room in extract_room2ds(obj):\n            room.properties.energy.window_vent_control = _vent_cntrl\n            room.properties.energy.window_vent_opening = vent_open", 
+  "category": "Dragonfly", 
+  "name": "DF Window Opening", 
+  "description": "Define the window opening properties for all apertures of a Dragonfly Building,\nStory or Room2D.\n-"
+}
