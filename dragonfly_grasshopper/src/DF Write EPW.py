@@ -27,7 +27,7 @@ Write an EPW object into a .epw file.
 
 ghenv.Component.Name = "DF Write EPW"
 ghenv.Component.NickName = 'WriteEPW'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '0.1.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -35,6 +35,7 @@ ghenv.Component.AdditionalHelpFromDocStrings = "1"
 import os
 
 try:
+    from ladybug.config import folders
     from ladybug.epw import EPW
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
@@ -50,12 +51,9 @@ if all_required_inputs(ghenv.Component) and _run:
         'Create EPW component. Got {}.'.format(type(_epw_obj))
     
     # write out the epw object
-    if _folder_ is None:
-        _folder_ = os.path.join(os.environ['USERPROFILE'], 'ladybug')
-    if _file_name_ is None:
-        _file_name_ = _epw_obj.location.city
+    _folder_ = folders.default_epw_folder if _folder_ is None else _folder_
+    _file_name_ = _epw_obj.location.city if _file_name_ is None else _file_name_
     if not _file_name_.endswith('.epw'):
         _file_name_ = _file_name_ + '.epw'
-    
     epw_file = os.path.join(_folder_, _file_name_)
     _epw_obj.save(epw_file)
