@@ -58,7 +58,7 @@ https://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly
 
 ghenv.Component.Name = "DF Import NOAA File"
 ghenv.Component.NickName = 'ImportNOAA'
-ghenv.Component.Message = '0.2.0'
+ghenv.Component.Message = '0.2.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "3"
@@ -210,5 +210,5 @@ if all_required_inputs(ghenv.Component) and _run:
     wind_direction = build_collection(wd, wd_dates, WindDirection(), 'degrees')
     ceiling_height = build_collection(ceil, ceil_dates, CeilingHeight(), 'm')
     visibility = build_collection(vis, vis_dates, Visibility(), 'km')
-    atmos_pressure = build_collection(slp, slp_dates, AtmosphericStationPressure(), 'bar')
+    atmos_pressure = build_collection(slp, slp_dates, AtmosphericStationPressure(), 'Pa')
     total_sky_cover = build_collection(sc, sc_dates, TotalSkyCover(), 'tenths')

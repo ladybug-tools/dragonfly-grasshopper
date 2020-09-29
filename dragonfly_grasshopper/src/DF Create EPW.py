@@ -49,7 +49,7 @@ hourly data.
 
 ghenv.Component.Name = "DF Create EPW"
 ghenv.Component.NickName = 'CreateEPW'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '0.1.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -156,7 +156,7 @@ if all_required_inputs(ghenv.Component) and _run:
             RelativeHumidity(), '%')
         epw_obj.relative_humidity.values = rel_humid.values
     if _direct_normal_rad_ and _diffuse_horiz_rad_:
-        wea = Wea(_location, _direct_normal_rad_, _diffuse_horiz_rad_, is_leap_year=leap_yr)
+        wea = Wea(_location, _direct_normal_rad_, _diffuse_horiz_rad_)
         epw_obj.global_horizontal_radiation.values = wea.global_horizontal_irradiance.values
     if _direct_normal_ill_ and _diffuse_horiz_ill_:
         glob_horiz = []
