@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1", 
+  "version": "0.2.0", 
   "nickname": "ImportStaion", 
   "outputs": [
     [
@@ -16,7 +16,7 @@
     {
       "access": "item", 
       "name": "_station_file", 
-      "description": "The path to a .txt file of NOAA station location data\non your system as a string.", 
+      "description": "The path to a .csv file of NOAA station location data\non your system as a string.", 
       "type": "string", 
       "default": null
     }, 
@@ -29,8 +29,8 @@
     }
   ], 
   "subcategory": "4 :: AlternativeWeather", 
-  "code": "\nimport os\n\ntry:\n    from ladybug.datatype.distance import Distance\n    from ladybug.location import Location\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # check that the file exists.\n    assert os.path.isfile(_station_file), 'Cannot find file at {}.'.format(_station_file)\n    \n    with open(_station_file) as station_file:\n        station_file.readline()  # Skip header row\n        \n        # get the pattern of data within the file\n        char_pattern = station_file.readline().strip().split(' ')\n        data_line = station_file.readline()\n        data_list = []\n        total_char = 0\n        for pattern in char_pattern:\n            data_list.append(data_line[total_char:total_char + len(pattern)])\n            total_char += len(pattern) + 1\n        \n        # parse all of the info from the file\n        station_id, wban_id = data_list[0].split(' ')\n        station_name = data_list[1].strip()\n        country = data_list[2].strip()\n        state = data_list[3].strip()\n        latitude = float(data_list[4])\n        longitude = float(data_list[5])\n        elevation = float(data_list[6])\n        \n        elevation = Distance().to_unit([elevation], 'm', 'ft')[0]  # convert to meters\n        \n        # estimate or parse time zone.\n        if time_zone_:\n            assert -12 <= time_zone_ <= 12, ' time_zone_ must be between -12 and '\\\n                ' 12. Got {}.'.format(time_zone_)\n            time_zone = time_zone_\n        else:\n            time_zone = int((longitude / 180) * 12)\n        \n        # build the location object\n        location = Location(city=station_name,\n                            state=state,\n                            country=country,\n                            latitude=latitude,\n                            longitude=longitude,\n                            time_zone=time_zone,\n                            elevation=elevation,\n                            station_id=station_id,\n                            source='NCDC')", 
+  "code": "\nimport os\n\ntry:\n    from ladybug.datatype.distance import Distance\n    from ladybug.location import Location\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # check that the file exists.\n    assert os.path.isfile(_station_file), 'Cannot find file at {}.'.format(_station_file)\n    \n    with open(_station_file) as station_file:\n        station_file.readline()  # Skip header row\n\n        # get the pattern of data within the file\n        dat_line = station_file.readline().strip().split(',')\n\n        # parse all of the info from the file\n        station_id = dat_line[0].replace('\"', '')\n        city = dat_line[6].replace('\"', '')\n        latitude = float(dat_line[3].replace('\"', ''))\n        longitude = float(dat_line[4].replace('\"', ''))\n        elevation = float(dat_line[5].replace('\"', ''))\n        elevation = Distance().to_unit([elevation], 'm', 'ft')[0]  # convert to meters\n\n        # estimate or parse time zone.\n        if time_zone_:\n            assert -12 <= time_zone_ <= 14, ' time_zone_ must be between -12 and '\\\n                ' 14. Got {}.'.format(time_zone_)\n            time_zone = time_zone_\n        else:\n            time_zone = int((longitude / 180) * 12)\n\n        # build the location object\n        location = Location(\n            city=city, latitude=latitude, longitude=longitude,\n            time_zone=time_zone, elevation=elevation,\n            station_id=station_id, source='NCDC')\n", 
   "category": "Dragonfly", 
   "name": "DF Import NOAA Staion Location", 
-  "description": "Import station location from a .txt file of station information obtained from the\nNational Oceanic and Atmospheric Administration (NOAA) database.  The database can\nbe accessed here:\nhttps://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly\n-"
+  "description": "Import station location from a .csv file of station information obtained from the\nNational Oceanic and Atmospheric Administration (NOAA) database.  The database can\nbe accessed here:\nhttps://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly\n-"
 }

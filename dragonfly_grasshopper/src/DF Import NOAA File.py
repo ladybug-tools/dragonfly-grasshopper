@@ -8,20 +8,20 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 
 """
-Import climate data from a .txt file of annual data obtained from the National
+Import climate data from a .csv file of annual data obtained from the National
 Oceanic and Atmospheric Administration (NOAA) database.  The database can be
 accessed here:
 https://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly
 -
 
     Args:
-        _noaa_file: The path to a .txt file of annual data obtained from the NOAA
+        _noaa_file: The path to a .csv file of annual data obtained from the NOAA
             database on your system as a string.
         _timestep_: The timestep at which the data collections should be output.
             Default is 1 but this can be set as high as 60 to ensure that all data
-            from the .txt file is imported.
+            from the .csv file is imported.
         _run: Set to True to run the component and import the data.
-        
+
     Returns:
         dry_bulb_temp: The houlry dry bulb temperature, in C.
             Note that this is a full numeric field (i.e. 23.6) and not an integer
@@ -58,7 +58,7 @@ https://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly
 
 ghenv.Component.Name = "DF Import NOAA File"
 ghenv.Component.NickName = 'ImportNOAA'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '0.2.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "3"
@@ -87,26 +87,14 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 
-# dictionary that converts from sky cover codes to tenths of sky cover.
-sky_codes_dict = {
-    'CLR': 0,
-    'SCT': 3,
-    'BKN': 7,
-    'OVC': 10,
-    'OBS': 10,
-    'POB': 5
-    }
-
-
 def build_collection(values, dates, data_type, unit):
     """Build a data collection from raw noaa data and process it to the timestep."""
-    
     if values == []:
         return None
     
     # convert date codes into datetimes.
-    datetimes = [DateTime(int(dat[4:6]), int(dat[6:8]), int(dat[8:10]),
-                 int(dat[10:12])) for dat in dates]
+    datetimes = [DateTime(int(dat[5:7]), int(dat[8:10]), int(dat[11:13]),
+                 int(dat[14:16])) for dat in dates]
     
     # make a discontinuous cata collection
     data_header = Header(data_type, unit, AnalysisPeriod())
@@ -125,7 +113,7 @@ def build_collection(values, dates, data_type, unit):
 if all_required_inputs(ghenv.Component) and _run:
     # check that the file exists.
     assert os.path.isfile(_noaa_file), 'Cannot find file at {}.'.format(_noaa_file)
-    
+
     # empty lists to be filled with data
     all_years = []
     header_txt = []
@@ -139,49 +127,74 @@ if all_required_inputs(ghenv.Component) and _run:
     wd_dates = []
     sc = []
     sc_dates = []
-    ap = []
-    ap_dates = []
     slp = []
     slp_dates = []
     vis = []
     vis_dates = []
     ceil = []
     ceil_dates = []
-    
+
     # pull relevant data out of the file
     with open(_noaa_file) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=' ', skipinitialspace=True)
-        next(csv_reader)  # Skip header row.
+        csv_reader = csv.reader(csv_file, delimiter=',', skipinitialspace=True)
+
+        # find the column with total sky cover if it exists
+        header = csv_reader.next()  # get header row
+        sc_col = None
+        for i, colname in enumerate(header):
+            if colname == 'GF1':
+                sc_col = i
+
         for row in csv_reader:
-            all_years.append(int(row[2][:4]))
-            if row[3] != '***':
-                wd.append(float(row[3]))
-                wd_dates.append(row[2])
-            if row[4] != '***':
-                ws.append(float(row[4]))
-                ws_dates.append(row[2])
-            if row[6] != '***':
-                ceil.append(float(row[6]))
-                ceil_dates.append(row[2])
-            if row[7] != '***':
-                sc.append(row[7])
-                sc_dates.append(row[2])
-            if row[11] != '****':
-                vis.append(float(row[11]))
-                vis_dates.append(row[2])
-            if row[21] != '****':
-                db_t.append(float(row[21]))
-                db_t_dates.append(row[2])
-            if row[22] != '****':
-                dp_t.append(float(row[22]))
-                dp_t_dates.append(row[2])
-            if row[25] != '******':
-                ap.append(float(row[25]))
-                ap_dates.append(row[2])
-            if row[23] != '******':
-                slp.append(float(row[23]))
-                slp_dates.append(row[2])
-    
+            # parse the dates and the years
+            date_row = row[1]
+            all_years.append(int(date_row[:4]))
+
+            # parse the wind information
+            wind_info = row[10].split(',')
+            if wind_info[0] != '999':
+                wd.append(float(wind_info[0]))
+                wd_dates.append(date_row)
+            if wind_info[3] != '9999':
+                ws.append(float(wind_info[3]) / 10)
+                ws_dates.append(date_row)
+
+            # parse the ceiling height information
+            ceil_info = row[11].split(',')
+            if ceil_info[0] != '99999':
+                ceil.append(float(ceil_info[0]))
+                ceil_dates.append(date_row)
+
+            # parse the visibility information
+            vis_info = row[12].split(',')
+            if vis_info[0] != '999999':
+                vis.append(float(vis_info[0]) / 1000)
+                vis_dates.append(date_row)
+
+            # parse the dry bulb and dew point information
+            temp_info = row[13].split(',')
+            if temp_info[0] != '+9999':
+                db_t.append(float(temp_info[0]) / 10)
+                db_t_dates.append(date_row)
+            dwpt_info = row[14].split(',')
+            if dwpt_info[0] != '+9999':
+                dp_t.append(float(dwpt_info[0]) / 10)
+                dp_t_dates.append(date_row)
+
+            # parse the pressure information
+            slp_info = row[15].split(',')
+            if slp_info[0] != '99999':
+                slp.append(float(slp_info[0]) * 10)
+                slp_dates.append(date_row)
+
+            # parse the sky cover info if it exists
+            if sc_col is not None and row[sc_col] != '':
+                sc_info = row[sc_col].split(',')
+                sc_oktas = int(sc_info[0])
+                sc_tenths = sc_oktas * (10 / 8) if sc_oktas != 9 else 10
+                sc.append(sc_tenths)
+                sc_dates.append(date_row)
+
     # check that all years in the file are the same.
     yr1 = all_years[0]
     for yr in all_years:
@@ -189,38 +202,13 @@ if all_required_inputs(ghenv.Component) and _run:
             'year. {} != {}'.format(yr1, yr)
     data_header = Header(GenericType('Years', 'yr'), 'yr', AnalysisPeriod())
     model_year = HourlyContinuousCollection(data_header, [yr1] * 8760)
-    
-    # perform conversions
-    sc = [sky_codes_dict[cov] for cov in sc]  # sky cover codes to values
-    ceil = [c * 100 for c in ceil]  # hundreds of feet to feet
-    
+
     # build data collections from the imported values
-    dry_bulb_temp = build_collection(db_t, db_t_dates, DryBulbTemperature(), 'F')
-    dew_point_temp = build_collection(dp_t, dp_t_dates, DewPointTemperature(), 'F')
-    wind_speed = build_collection(ws, ws_dates, WindSpeed(), 'mph')
+    dry_bulb_temp = build_collection(db_t, db_t_dates, DryBulbTemperature(), 'C')
+    dew_point_temp = build_collection(dp_t, dp_t_dates, DewPointTemperature(), 'C')
+    wind_speed = build_collection(ws, ws_dates, WindSpeed(), 'm/s')
     wind_direction = build_collection(wd, wd_dates, WindDirection(), 'degrees')
+    ceiling_height = build_collection(ceil, ceil_dates, CeilingHeight(), 'm')
+    visibility = build_collection(vis, vis_dates, Visibility(), 'km')
+    atmos_pressure = build_collection(slp, slp_dates, AtmosphericStationPressure(), 'bar')
     total_sky_cover = build_collection(sc, sc_dates, TotalSkyCover(), 'tenths')
-    visibility = build_collection(vis, vis_dates, Visibility(), 'mi')
-    ceiling_height = build_collection(ceil, ceil_dates, CeilingHeight(), 'ft')
-    
-    # deal with available atmospheric pressure data
-    if ap != []:
-        ap = [press / 1000 for press in ap]  # pressure mbar to bar
-        atmos_pressure = build_collection(ap, ap_dates, AtmosphericStationPressure(), 'bar')
-    else:
-        slp = [press / 1000 for press in slp]  # pressure mbar to bar
-        atmos_pressure = build_collection(slp, slp_dates, AtmosphericStationPressure(), 'bar')
-    
-    # convert all units to SI.
-    if dry_bulb_temp is not None:
-        dry_bulb_temp.convert_to_unit('C')
-    if dew_point_temp is not None:
-        dew_point_temp.convert_to_unit('C')
-    if wind_speed is not None:
-        wind_speed.convert_to_unit('m/s')
-    if visibility is not None:
-        visibility.convert_to_unit('km')
-    if ceiling_height is not None:
-        ceiling_height.convert_to_unit('m')
-    if atmos_pressure is not None:
-        atmos_pressure.convert_to_unit('Pa')
