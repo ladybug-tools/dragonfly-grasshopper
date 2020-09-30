@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2019, Ladybug Tools.
+# Copyright (c) 2020, Ladybug Tools.
 # You should have received a copy of the GNU General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -39,7 +39,7 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Dump Objects'
 ghenv.Component.NickName = 'DumpObjects'
-ghenv.Component.Message = '0.1.1'
+ghenv.Component.Message = '1.0.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
