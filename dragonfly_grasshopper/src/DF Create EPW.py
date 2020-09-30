@@ -100,11 +100,11 @@ if all_required_inputs(ghenv.Component) and _run:
         epw_obj = EPW(base_epw_)
         leap_yr = epw_obj.is_leap_year
     else:
-        epw_obj = EPW.from_missing_values()
         if _model_year_:
             leap_yr = _model_year_.header.analysis_period.is_leap_year
         else:
             leap_yr = False
+        epw_obj = EPW.from_missing_values(is_leap_year=leap_yr)
     
     # assign data to the EPW
     epw_obj.location = _location

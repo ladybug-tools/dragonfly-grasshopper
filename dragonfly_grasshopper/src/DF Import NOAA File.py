@@ -17,9 +17,14 @@ https://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly
     Args:
         _noaa_file: The path to a .csv file of annual data obtained from the NOAA
             database on your system as a string.
-        _timestep_: The timestep at which the data collections should be output.
-            Default is 1 but this can be set as high as 60 to ensure that all data
-            from the .csv file is imported.
+        time_zone_: Optional time zone for the station.  If blank, a default time
+            zone will be estimated from the longitude.
+        _timestep_: Integer forthe timestep at which the data collections should be output.
+            Data in the .csv that does not conform to this timestep will be
+            ignored in the output data collections. This can be set as high
+            as 60 to ensure that all data from the .csv file is imported.
+            However, such large data collections can be time consuming to
+            edit. (Default: 1).
         _run: Set to True to run the component and import the data.
 
     Returns:
@@ -65,8 +70,10 @@ ghenv.Component.AdditionalHelpFromDocStrings = "3"
 
 import os
 import csv
+import datetime
 
 try:
+    from ladybug.location import Location
     from ladybug.dt import DateTime
     from ladybug.analysisperiod import AnalysisPeriod
     from ladybug.header import Header
@@ -87,26 +94,83 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 
-def build_collection(values, dates, data_type, unit):
-    """Build a data collection from raw noaa data and process it to the timestep."""
+def extract_location(climate_file, time_zone=None):
+    """Extract a Ladybug Location object from the data in the CSV.
+    
+    Args:
+        climate_file: file path to the NCDC .csv file.
+        time_zone: Optional integer for the time zone. If None, it will be
+            estimated from the longitude in the file.
+    """
+    with open(climate_file) as station_file:
+        station_file.readline()  # Skip header row
+
+        # get the pattern of data within the file
+        dat_line = station_file.readline().strip().split(',')
+
+        # parse all of the info from the file
+        station_id = dat_line[0].replace('"', '')
+        city = dat_line[6].replace('"', '')
+        latitude = float(dat_line[3].replace('"', ''))
+        longitude = float(dat_line[4].replace('"', ''))
+        elevation = float(dat_line[5].replace('"', ''))
+
+        # estimate or parse time zone.
+        if time_zone:
+            assert -12 <= time_zone <= 14, ' time_zone must be between -12 and '\
+                ' 14. Got {}.'.format(time_zone)
+            time_zone = time_zone
+        else:
+            time_zone = int((longitude / 180) * 12)
+
+        # build the location object
+        location = Location(
+            city=city, latitude=latitude, longitude=longitude,
+            time_zone=time_zone, elevation=elevation,
+            station_id=station_id, source='NCDC')
+    return location, time_zone
+
+
+def build_collection(values, dates, data_type, unit, time_offset, year):
+    """Build a data collection from raw noaa data and process it to the timestep.
+
+    Args:
+        values: A list of values to be included in the data collection.
+        dates: A list of datetime strings that align with the values.
+        data_type: Ladybug data type for the data collection.
+        unit: Text for the unit of the collection.
+        time_offset: Python timedelta object to correct for the time zone.
+        year: Integer for the year of the data.
+    """
     if values == []:
         return None
-    
-    # convert date codes into datetimes.
-    datetimes = [DateTime(int(dat[5:7]), int(dat[8:10]), int(dat[11:13]),
-                 int(dat[14:16])) for dat in dates]
-    
+
+    # convert date codes into datetimes and ensure no duplicates
+    leap_yr = True if year % 4 == 0 else False
+    datetimes = []
+    clean_values = []
+    for i, (dat, val) in enumerate(zip(dates, values)):
+        if dat != dates[i - 1]:
+            yr, month, day, hr, minute = int(dat[:4]), int(dat[5:7]), \
+                int(dat[8:10]), int(dat[11:13]), int(dat[14:16])
+            py_dat = datetime.datetime(yr, month, day, hr, minute) + time_offset
+            if py_dat.year == year:
+                lb_dat = DateTime(py_dat.month, py_dat.day, py_dat.hour,
+                                  py_dat.minute, leap_year=leap_yr)
+                datetimes.append(lb_dat)
+                clean_values.append(val)
+
     # make a discontinuous cata collection
-    data_header = Header(data_type, unit, AnalysisPeriod())
-    data_init = HourlyDiscontinuousCollection(data_header, values, datetimes)
+    data_header = Header(data_type, unit, AnalysisPeriod(is_leap_year=leap_yr))
+    data_init = HourlyDiscontinuousCollection(data_header, clean_values, datetimes)
     data_final = data_init.validate_analysis_period()
-    
+
     # cull out unwanted timesteps.
     if _timestep_:
         data_final.convert_to_culled_timestep(_timestep_)
     else:
         data_final.convert_to_culled_timestep(1)
-    
+
     return data_final
 
 
@@ -114,8 +178,13 @@ if all_required_inputs(ghenv.Component) and _run:
     # check that the file exists.
     assert os.path.isfile(_noaa_file), 'Cannot find file at {}.'.format(_noaa_file)
 
+    # extract the location and the time zone
+    location, t_zone = extract_location(_noaa_file, time_zone_)
+    t_offset = datetime.timedelta(seconds=t_zone * 3600)
+
     # empty lists to be filled with data
     all_years = []
+    all_dates = []
     header_txt = []
     db_t = []
     db_t_dates = []
@@ -148,6 +217,7 @@ if all_required_inputs(ghenv.Component) and _run:
         for row in csv_reader:
             # parse the dates and the years
             date_row = row[1]
+            all_dates.append(date_row)
             all_years.append(int(date_row[:4]))
 
             # parse the wind information
@@ -195,20 +265,25 @@ if all_required_inputs(ghenv.Component) and _run:
                 sc.append(sc_tenths)
                 sc_dates.append(date_row)
 
-    # check that all years in the file are the same.
-    yr1 = all_years[0]
-    for yr in all_years:
-        assert yr == yr1, 'Not all of the data in the file is from the same ' \
-            'year. {} != {}'.format(yr1, yr)
-    data_header = Header(GenericType('Years', 'yr'), 'yr', AnalysisPeriod())
-    model_year = HourlyContinuousCollection(data_header, [yr1] * 8760)
+    # get the most predominant year in the file to make sure all data is for one year
+    dom_yr = int(max(set(all_years), key=all_years.count))
+    model_year = build_collection(
+        all_years, all_dates, GenericType('Years', 'yr'), 'yr', t_offset, dom_yr)
 
     # build data collections from the imported values
-    dry_bulb_temp = build_collection(db_t, db_t_dates, DryBulbTemperature(), 'C')
-    dew_point_temp = build_collection(dp_t, dp_t_dates, DewPointTemperature(), 'C')
-    wind_speed = build_collection(ws, ws_dates, WindSpeed(), 'm/s')
-    wind_direction = build_collection(wd, wd_dates, WindDirection(), 'degrees')
-    ceiling_height = build_collection(ceil, ceil_dates, CeilingHeight(), 'm')
-    visibility = build_collection(vis, vis_dates, Visibility(), 'km')
-    atmos_pressure = build_collection(slp, slp_dates, AtmosphericStationPressure(), 'Pa')
-    total_sky_cover = build_collection(sc, sc_dates, TotalSkyCover(), 'tenths')
+    dry_bulb_temp = build_collection(
+        db_t, db_t_dates, DryBulbTemperature(), 'C', t_offset, dom_yr)
+    dew_point_temp = build_collection(
+        dp_t, dp_t_dates, DewPointTemperature(), 'C', t_offset, dom_yr)
+    wind_speed = build_collection(
+        ws, ws_dates, WindSpeed(), 'm/s', t_offset, dom_yr)
+    wind_direction = build_collection(
+        wd, wd_dates, WindDirection(), 'degrees', t_offset, dom_yr)
+    ceiling_height = build_collection(
+        ceil, ceil_dates, CeilingHeight(), 'm', t_offset, dom_yr)
+    visibility = build_collection(
+        vis, vis_dates, Visibility(), 'km', t_offset, dom_yr)
+    atmos_pressure = build_collection(
+        slp, slp_dates, AtmosphericStationPressure(), 'Pa', t_offset, dom_yr)
+    total_sky_cover = build_collection(
+        sc, sc_dates, TotalSkyCover(), 'tenths', t_offset, dom_yr)
