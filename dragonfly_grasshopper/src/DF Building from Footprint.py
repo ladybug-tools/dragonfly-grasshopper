@@ -41,7 +41,7 @@ Create Dragonfly Buildings from footprint geometry (horizontal Rhino surfaces).
         conditioned_: Boolean to note whether the Buildings have heating and cooling
             systems.
         _run: Set to True to run the component and create Dragonfly Buildings.
-    
+
     Returns:
         report: Reports, errors, warnings, etc.
         buildings: Dragonfly buildings.
@@ -49,17 +49,10 @@ Create Dragonfly Buildings from footprint geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = "DF Building from Footprint"
 ghenv.Component.NickName = 'BuildingFootprint'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
-
-# document-wide counter to generate new unique Building identifiers
-import scriptcontext
-try:
-    scriptcontext.sticky["bldg_count"]
-except KeyError:  # first time that the component is running
-    scriptcontext.sticky["bldg_count"] = 1
 
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_and_id_string
@@ -74,7 +67,8 @@ except ImportError as e:
 try:
     from ladybug_rhino.config import tolerance
     from ladybug_rhino.togeometry import to_face3d
-    from ladybug_rhino.grasshopper import all_required_inputs
+    from ladybug_rhino.grasshopper import all_required_inputs, document_counter, \
+        longest_list
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -84,13 +78,13 @@ try:  # import the dragonfly-energy extension
         office_program
     from honeybee_energy.lib.constructionsets import construction_set_by_identifier
 except ImportError as e:
-    if _program_ is not None:
+    if len(_program_) != 0:
         raise ValueError('_program_ has been specified but dragonfly-energy '
                          'has failed to import.\n{}'.format(e))
-    elif _constr_set_ is not None:
+    elif len(_constr_set_) != 0:
         raise ValueError('_constr_set_ has been specified but dragonfly-energy '
                          'has failed to import.\n{}'.format(e))
-    elif conditioned_ is not None:
+    elif len(conditioned_) != 0:
         raise ValueError('conditioned_ has been specified but dragonfly-energy '
                          'has failed to import.\n{}'.format(e))
 
@@ -100,29 +94,28 @@ import uuid
 if all_required_inputs(ghenv.Component) and _run:
     perim_offset_ = 0 if perim_offset_ is None else perim_offset_
     buildings = []  # list of buildings that will be returned
-
     for i, geo in enumerate(_footprint_geo):
         # get the name for the Building
-        if _name_ is None:  # make a default Building name
-            name = "Building_{}_{}".format(scriptcontext.sticky["bldg_count"],
+        if len(_name_) == 0:  # make a default Building name
+            name = "Building_{}_{}".format(document_counter('bldg_count'),
                                            str(uuid.uuid4())[:8])
-            scriptcontext.sticky["bldg_count"] += 1
         else:
-            display_name = '{}_{}'.format(_name_, i + 1)
+            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1)
             name = clean_and_id_string(display_name)
 
         # create the Building
         building = Building.from_footprint(
             name, footprint=to_face3d(geo), floor_to_floor_heights=_floor_to_floor,
             perimeter_offset=perim_offset_, tolerance=tolerance)
-        if _name_ is not None:
+        if len(_name_) != 0:
             building.display_name = display_name
 
         # assign the program
-        if _program_ is not None:
-            if isinstance(_program_, str):
-                _program_ = program_type_by_identifier(_program_)
-            building.properties.energy.set_all_room_2d_program_type(_program_)
+        if len(_program_) != 0:
+            program = longest_list(_program_, i)
+            if isinstance(program, str):
+                program = program_type_by_identifier(program)
+            building.properties.energy.set_all_room_2d_program_type(program)
         else:  # generic office program by default
             try:
                 building.properties.energy.set_all_room_2d_program_type(office_program)
@@ -130,13 +123,14 @@ if all_required_inputs(ghenv.Component) and _run:
                 pass  # honeybee-energy is not installed
 
         # assign the construction set
-        if _constr_set_ is not None:
-            if isinstance(_constr_set_, str):
-                _constr_set_ = construction_set_by_identifier(_constr_set_)
-            building.properties.energy.construction_set = _constr_set_
+        if len(_constr_set_) != 0:
+            constr_set = longest_list(_constr_set_, i)
+            if isinstance(constr_set, str):
+                constr_set = construction_set_by_identifier(constr_set)
+            building.properties.energy.construction_set = constr_set
 
         # assign an ideal air system
-        if conditioned_ or conditioned_ is None:  # conditioned by default
+        if len(conditioned_) == 0 or longest_list(conditioned_, i):
             try:
                 building.properties.energy.add_default_ideal_air()
             except (NameError, AttributeError):
