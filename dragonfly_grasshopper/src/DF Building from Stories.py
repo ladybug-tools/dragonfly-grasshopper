@@ -37,19 +37,12 @@ Create a Dragonfly Building from individual Dragonfly Story objects.
 
 ghenv.Component.Name = "DF Building from Stories"
 ghenv.Component.NickName = 'BuildingStories'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.0.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
 
 import uuid
-
-# document-wide counter to generate new unique Building names
-import scriptcontext
-try:
-    scriptcontext.sticky["bldg_count"]
-except KeyError:  # first time that the component is running
-    scriptcontext.sticky["bldg_count"] = 1
 
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_and_id_string
@@ -62,7 +55,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:
-    from ladybug_rhino.grasshopper import all_required_inputs
+    from ladybug_rhino.grasshopper import all_required_inputs, document_counter
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -89,9 +82,8 @@ if all_required_inputs(ghenv.Component):
 
     # generate a default identifier
     if _name_ is None:  # get a default Building name
-        name = "Building_{}".format(scriptcontext.sticky["bldg_count"],
-                                    str(uuid.uuid4())[:8])
-        scriptcontext.sticky["bldg_count"] += 1
+        name = 'Building_{}_{}'.format(document_counter('bldg_count'),
+                                       str(uuid.uuid4())[:8])
     else:
         name = clean_and_id_string(_name_)
 

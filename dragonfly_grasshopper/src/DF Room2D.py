@@ -42,7 +42,7 @@ Create Dragonfly Room2Ds from floor plate geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = "DF Room2D"
 ghenv.Component.NickName = 'Room2D'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
@@ -61,7 +61,7 @@ except ImportError as e:
 try:  # import the ladybug_rhino dependencies
     from ladybug_rhino.config import tolerance
     from ladybug_rhino.togeometry import to_face3d
-    from ladybug_rhino.grasshopper import all_required_inputs
+    from ladybug_rhino.grasshopper import all_required_inputs, longest_list
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -71,13 +71,13 @@ try:  # import the dragonfly-energy extension
         office_program
     from honeybee_energy.lib.constructionsets import construction_set_by_identifier
 except ImportError as e:
-    if _program_ is not None:
+    if len(_program_) != 0:
         raise ValueError('_program_ has been specified but dragonfly-energy '
                          'has failed to import.\n{}'.format(e))
-    elif _constr_set_ is not None:
+    elif len(_constr_set_) != 0:
         raise ValueError('_constr_set_ has been specified but dragonfly-energy '
                          'has failed to import.\n{}'.format(e))
-    elif conditioned_ is not None:
+    elif len(conditioned_) != 0:
         raise ValueError('conditioned_ has been specified but dragonfly-energy '
                          'has failed to import.\n{}'.format(e))
 
@@ -89,39 +89,41 @@ if all_required_inputs(ghenv.Component):
     face3ds = [face for geo in _geo for face in to_face3d(geo)]  # convert to lb geo
     for i, geo in enumerate(face3ds):
         # get the name for the Room2D
-        if _name_ is None:  # make a default Room2D name
+        if len(_name_) == 0:  # make a default Room2D name
             name = "Room_{}".format(str(uuid.uuid4())[:8])
         else:
-            display_name = '{}_{}'.format(_name_, i + 1)
+            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1)
             name = clean_and_id_string(display_name)
 
         # create the Room2D
-        room = Room2D(name, geo, _flr_to_ceiling, tolerance=tolerance)
-        if _name_ is not None:
+        room = Room2D(name, geo, longest_list(_flr_to_ceiling, i), tolerance=tolerance)
+        if len(_name_) != 0:
             room.display_name = display_name
 
         # assign the program
-        if _program_ is not None:
-            if isinstance(_program_, str):
-                _program_ = program_type_by_identifier(_program_)
-            room.properties.energy.program_type = _program_ 
+        if len(_program_) != 0:
+            program = longest_list(_program_, i)
+            if isinstance(program, str):
+                program = program_type_by_identifier(program)
+            room.properties.energy.program_type = program 
         else:  # generic office program by default
             try:
                 room.properties.energy.program_type = office_program
             except (NameError, AttributeError):
                 pass  # honeybee-energy is not installed
-        
+
         # assign the construction set
-        if _constr_set_ is not None:
-            if isinstance(_constr_set_, str):
-                _constr_set_ = construction_set_by_identifier(_constr_set_)
-            room.properties.energy.construction_set = _constr_set_
-        
+        if len(_constr_set_) != 0:
+            constr_set = longest_list(_constr_set_, i)
+            if isinstance(constr_set, str):
+                constr_set = construction_set_by_identifier(constr_set)
+            room.properties.energy.construction_set = constr_set
+
         # assign an ideal air system
-        if conditioned_ or conditioned_ is None:  # conditioned by default
+        if len(conditioned_) == 0 or longest_list(conditioned_, i):
             try:
                 room.properties.energy.add_default_ideal_air()
             except (NameError, AttributeError):
                 pass  # honeybee-energy is not installed
-        
+
         room2d.append(room)
