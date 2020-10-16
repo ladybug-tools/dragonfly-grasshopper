@@ -30,7 +30,7 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Load Objects'
 ghenv.Component.NickName = 'LoadObjects'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.0.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -79,7 +79,7 @@ def model_units_tolerance_check(model):
         msg = 'Imported Model tolerance "{}" is significantly coarser than the ' \
             'current Rhino model tolerance "{}".\nIt is recommended that the ' \
             'Rhino document tolerance be changed to be coarser and this ' \
-            'component is re-reun.'.format(new_tol, tolerance)
+            'component is re-reun.'.format(model.tolerance, tolerance)
         print msg
         give_warning(ghenv.Component, msg)
 
