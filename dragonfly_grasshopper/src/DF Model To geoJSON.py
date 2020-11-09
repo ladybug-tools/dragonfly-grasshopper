@@ -65,7 +65,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

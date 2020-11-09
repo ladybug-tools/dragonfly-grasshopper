@@ -29,7 +29,7 @@ their roofs in contact with the outdoors.
 
 ghenv.Component.Name = "DF Set Ground Top"
 ghenv.Component.NickName = 'SetGrndTop'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "3"

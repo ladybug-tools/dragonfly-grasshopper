@@ -35,7 +35,7 @@ after runing this component.
 
 ghenv.Component.Name = "DF Intersect Room2Ds"
 ghenv.Component.NickName = 'IntRoom2D'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"

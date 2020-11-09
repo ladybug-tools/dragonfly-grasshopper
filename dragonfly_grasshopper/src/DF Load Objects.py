@@ -30,7 +30,7 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Load Objects'
 ghenv.Component.NickName = 'LoadObjects'
-ghenv.Component.Message = '1.0.1'
+ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

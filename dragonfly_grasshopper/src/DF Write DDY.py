@@ -27,7 +27,7 @@ Write Ladybug DesignDays a standard .ddy file.
 
 ghenv.Component.Name = "DF Write DDY"
 ghenv.Component.NickName = 'WriteDDY'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"

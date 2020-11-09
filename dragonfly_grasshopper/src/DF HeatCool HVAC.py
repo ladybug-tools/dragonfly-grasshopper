@@ -47,7 +47,7 @@ of occupancy is so low that infiltration is enough to meet fresh air demand.
 
 ghenv.Component.Name = "DF HeatCool HVAC"
 ghenv.Component.NickName = 'DFHeatCoolHVAC'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

@@ -65,7 +65,7 @@ than systems that separate ventilation from the meeting of thermal loads.
 
 ghenv.Component.Name = "DF All-Air HVAC"
 ghenv.Component.NickName = 'DFAllAirHVAC'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
