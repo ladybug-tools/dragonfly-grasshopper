@@ -26,7 +26,7 @@ as adjacent.
 
 ghenv.Component.Name = "DF Solve Adjacency"
 ghenv.Component.NickName = 'SolveAdj2D'
-ghenv.Component.Message = '1.0.0'
+ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
