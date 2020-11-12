@@ -23,7 +23,7 @@ scene, including all stories represented by multipliers
 
 ghenv.Component.Name = 'DF Vizualize Wireframe'
 ghenv.Component.NickName = 'VizWireF'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -45,14 +45,15 @@ except ImportError as e:
 
 
 def room_2d_geometry(room_2ds):
-    """Get Rhino geometry from a list of Room2Ds."""
-    return [from_face3d_to_wireframe(room.floor_geometry) for room in room_2ds]
-
+    """Get Rhino geometry curves from a list of Room2Ds."""
+    return [curve for room in room_2ds for curve in from_face3d_to_wireframe(room.floor_geometry)]
 
 def context_shade_geometry(context_shades):
-    """Get Rhino geometry from a list of ContextShades."""
-    return [from_face3d_to_wireframe(fc) for shd_geo in context_shades
-            for fc in shd_geo.geometry]
+    """Get Rhino geometry curves from a list of ContextShades."""
+    
+    faces =  [face for shd_geo in context_shades
+            for face in shd_geo.geometry]
+    return [curve for face in faces for curve in from_face3d_to_wireframe(face)]
 
 
 if all_required_inputs(ghenv.Component):
