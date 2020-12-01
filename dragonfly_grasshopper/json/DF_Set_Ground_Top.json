@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0", 
+  "version": "1.1.1", 
   "nickname": "SetGrndTop", 
   "outputs": [
     [
@@ -36,7 +36,7 @@
     }
   ], 
   "subcategory": "0 :: Create", 
-  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    df_obj = [obj.duplicate() for obj in _df_obj]\n    \n    # set the ground contact\n    if grnd_contact_ is not None:\n        for obj in df_obj:\n            if isinstance(obj, Room2D):\n                obj.is_ground_contact = grnd_contact_\n            elif isinstance(obj, Story):\n                obj.set_ground_contact(grnd_contact_)\n    \n    # set the top exposure\n    if top_exposed_ is not None:\n        for obj in df_obj:\n            if isinstance(obj, Room2D):\n                obj.is_top_exposed = top_exposed_\n            elif isinstance(obj, Story):\n                obj.set_top_exposed(top_exposed_)\n", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    df_obj = [obj.duplicate() for obj in _df_obj]\n\n    # set the ground contact\n    if grnd_contact_ is not None:\n        for obj in df_obj:\n            if isinstance(obj, Room2D):\n                obj.is_ground_contact = grnd_contact_\n            elif isinstance(obj, Story):\n                obj.set_ground_contact(grnd_contact_)\n            else:\n                raise TypeError('_df_obj must be a Room2D or a Story. '\n                                'Got {}.'.format(type(obj)))\n\n    # set the top exposure\n    if top_exposed_ is not None:\n        for obj in df_obj:\n            if isinstance(obj, Room2D):\n                obj.is_top_exposed = top_exposed_\n            elif isinstance(obj, Story):\n                obj.set_top_exposed(top_exposed_)\n            else:\n                raise TypeError('_df_obj must be a Room2D or a Story. '\n                                'Got {}.'.format(type(obj)))\n", 
   "category": "Dragonfly", 
   "name": "DF Set Ground Top", 
   "description": "Set Room2Ds or Stories to have their floor in contact with the ground or\ntheir roofs in contact with the outdoors.\n-"
