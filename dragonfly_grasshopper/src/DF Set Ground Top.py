@@ -27,12 +27,12 @@ their roofs in contact with the outdoors.
             properties edited.
 """
 
-ghenv.Component.Name = "DF Set Ground Top"
+ghenv.Component.Name = 'DF Set Ground Top'
 ghenv.Component.NickName = 'SetGrndTop'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = "3"
+ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
 try:  # import the core dragonfly dependencies
     from dragonfly.story import Story
@@ -49,7 +49,7 @@ except ImportError as e:
 if all_required_inputs(ghenv.Component):
     # duplicate the initial objects
     df_obj = [obj.duplicate() for obj in _df_obj]
-    
+
     # set the ground contact
     if grnd_contact_ is not None:
         for obj in df_obj:
@@ -57,7 +57,10 @@ if all_required_inputs(ghenv.Component):
                 obj.is_ground_contact = grnd_contact_
             elif isinstance(obj, Story):
                 obj.set_ground_contact(grnd_contact_)
-    
+            else:
+                raise TypeError('_df_obj must be a Room2D or a Story. '
+                                'Got {}.'.format(type(obj)))
+
     # set the top exposure
     if top_exposed_ is not None:
         for obj in df_obj:
@@ -65,3 +68,6 @@ if all_required_inputs(ghenv.Component):
                 obj.is_top_exposed = top_exposed_
             elif isinstance(obj, Story):
                 obj.set_top_exposed(top_exposed_)
+            else:
+                raise TypeError('_df_obj must be a Room2D or a Story. '
+                                'Got {}.'.format(type(obj)))
