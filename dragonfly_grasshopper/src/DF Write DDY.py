@@ -8,8 +8,7 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 
 """
-Write Ladybug DesignDays a standard .ddy file.
-
+Write Ladybug DesignDays to a standard .ddy file.
 -
 
     Args:
@@ -20,21 +19,22 @@ Write Ladybug DesignDays a standard .ddy file.
         _folder_: An optional folder to save the .ddy file.
         _name_: An optional name for this .ddy file.
         _run: Set to "True" to run the component and write the .ddy file.
-        
+
     Returns:
         ddy_file: A .ddy file path that has been written to your system.
 """
 
-ghenv.Component.Name = "DF Write DDY"
+ghenv.Component.Name = 'DF Write DDY'
 ghenv.Component.NickName = 'WriteDDY'
-ghenv.Component.Message = '1.1.0'
-ghenv.Component.Category = "Dragonfly"
+ghenv.Component.Message = '1.1.1'
+ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
-ghenv.Component.AdditionalHelpFromDocStrings = "2"
+ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
 import os
 
 try:
+    from ladybug.config import folders
     from ladybug.ddy import DDY
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
@@ -47,14 +47,13 @@ except ImportError as e:
 
 if all_required_inputs(ghenv.Component) and _run:
     # default folder and file name
-    if _folder_ is None:
-        _folder_ = os.path.join(os.environ['USERPROFILE'], 'ladybug')
+    _folder_ = folders.default_epw_folder if _folder_ is None else _folder_
     if _name_ is None:
         _name_ = 'unnamed.ddy'
     if not _name_.lower().endswith('.ddy'):
         _name_ = _name_ + '.ddy'
     ddy_file = os.path.join(_folder_, _name_)
-    
+
     # write the DDY file
     ddy_obj = DDY(_location, _design_days)
     ddy_obj.save(ddy_file)
