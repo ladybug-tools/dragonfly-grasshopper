@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0", 
+  "version": "1.1.1", 
   "nickname": "ToHoneybee", 
   "outputs": [
     [
@@ -23,7 +23,7 @@
     {
       "access": "item", 
       "name": "_obj_per_model_", 
-      "description": "Text to describe how the input Buildings should be divided\nacross the output Models. Default: 'Building'. Choose from the\nfollowing options:\n* District - All buildings will be added to a single Honeybee Model.\nSuch a Model can take a long time to simulate so this is only\nrecommended for small numbers of buildings.\n* Building - Each input building will be exported into its own Model.\nFor each Model, the other buildings input to this component will\nappear as context shade geometry. Thus, each Model is its own\nsimulate-able unit.", 
+      "description": "Text to describe how the input Buildings should be divided\nacross the output Models. Default: 'Building'. Choose from the\nfollowing options:\n* District - All buildings will be added to a single Honeybee Model.\nSuch a Model can take a long time to simulate so this is only\nrecommended for small numbers of buildings.\n* Building - Each building will be exported into its own Model.\nFor each Model, the other buildings input to this component will\nappear as context shade geometry.\n* Story - Each Story of each Building will be exported into its\nown Model. For each Honeybee Model, the other input Buildings\nwill appear as context shade geometry as will all of the other\nstories of the same building.", 
       "type": "string", 
       "default": null
     }, 
@@ -43,6 +43,13 @@
     }, 
     {
       "access": "item", 
+      "name": "cap_shades_", 
+      "description": "Boolean to note whether building shade representations should be\ncapped with a top face. Usually, this is not necessary to account for\nblocked sun and is only needed when it's important to account for\nreflected sun off of roofs. (Default: False).", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
       "name": "shade_dist_", 
       "description": "An optional number to note the distance beyond which other\nbuildings' shade should not be exported into a given Model. This is\nhelpful for reducing the simulation run time of each Model when other\nconnected buildings are too far away to have a meaningful impact on\nthe results. If None, all other buildings will be included as context\nshade in each and every Model. Set to 0 to exclude all neighboring\nbuildings from the resulting models. Default: None.", 
       "type": "double", 
@@ -57,7 +64,7 @@
     }
   ], 
   "subcategory": "2 :: Serialize", 
-  "code": "\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_vector2d\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # set default inputs if not specified\n    use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True\n    add_plenum_ = add_plenum_ if add_plenum_ is not None else False\n    _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_\n\n    # check the _model input\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n\n    # create the model objects\n    hb_models = _model.to_honeybee(\n        _obj_per_model_, shade_dist_, use_multiplier_, add_plenum_,\n        tolerance=tolerance)\n", 
+  "code": "\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_vector2d\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # set default inputs if not specified\n    use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True\n    add_plenum_ = add_plenum_ if add_plenum_ is not None else False\n    _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_\n\n    # check the _model input\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n\n    # create the model objects\n    hb_models = _model.to_honeybee(\n        _obj_per_model_, shade_dist_, use_multiplier_, add_plenum_, cap_shades_,\n        tolerance=tolerance)\n", 
   "category": "Dragonfly", 
   "name": "DF Model To Honeybee", 
   "description": "Convert a Dragonfly Model into a series of Honeybee Models.\n-"
