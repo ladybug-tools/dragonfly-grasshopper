@@ -19,10 +19,13 @@ Convert a Dragonfly Model into a series of Honeybee Models.
                 * District - All buildings will be added to a single Honeybee Model.
                     Such a Model can take a long time to simulate so this is only
                     recommended for small numbers of buildings.
-                * Building - Each input building will be exported into its own Model.
+                * Building - Each building will be exported into its own Model.
                     For each Model, the other buildings input to this component will
-                    appear as context shade geometry. Thus, each Model is its own
-                    simulate-able unit.
+                    appear as context shade geometry.
+                * Story - Each Story of each Building will be exported into its
+                    own Model. For each Honeybee Model, the other input Buildings
+                    will appear as context shade geometry as will all of the other
+                    stories of the same building.
         use_multiplier_: If True, the multipliers on each Building's Stories will be
             passed along to the generated Honeybee Room objects, indicating the
             simulation will be run once for each unique room and then results
@@ -35,6 +38,10 @@ Convert a Dragonfly Model into a series of Honeybee Models.
             ceiling height and Story ceiling height. The height of the floor
             plenum will be autocalculated as the difference between the Room2D
             floor height and Story floor height. (Default: False).
+        cap_shades_: Boolean to note whether building shade representations should be
+            capped with a top face. Usually, this is not necessary to account for
+            blocked sun and is only needed when it's important to account for
+            reflected sun off of roofs. (Default: False).
         shade_dist_: An optional number to note the distance beyond which other
             buildings' shade should not be exported into a given Model. This is
             helpful for reducing the simulation run time of each Model when other
@@ -44,7 +51,7 @@ Convert a Dragonfly Model into a series of Honeybee Models.
             buildings from the resulting models. Default: None.
         _run: Set to "True" to have the Dragonfly Model translated to a series
             of Honeybee Models.
-    
+
     Returns:
         report: Reports, errors, warnings, etc.
         hb_models: Honeybee Model objects derived from the input _models. These
@@ -55,7 +62,7 @@ Convert a Dragonfly Model into a series of Honeybee Models.
 
 ghenv.Component.Name = 'DF Model To Honeybee'
 ghenv.Component.NickName = 'ToHoneybee'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -86,5 +93,5 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # create the model objects
     hb_models = _model.to_honeybee(
-        _obj_per_model_, shade_dist_, use_multiplier_, add_plenum_,
+        _obj_per_model_, shade_dist_, use_multiplier_, add_plenum_, cap_shades_,
         tolerance=tolerance)
