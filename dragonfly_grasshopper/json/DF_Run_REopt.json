@@ -1,0 +1,92 @@
+{
+  "version": "1.1.0", 
+  "nickname": "RunREopt", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "csv", 
+        "description": "Path to a CSV file containing scenario optimization results.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "json", 
+        "description": "Path to a JSON file containing scenario optimization results.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_geojson", 
+      "description": "The path to an URBANopt-compatible geoJSON file. This geoJSON\nfile can be obtained form the \"DF Model to geoJSON\" component.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_scenario", 
+      "description": "The path to an URBANopt .csv file for the scenario. This CSV\nfile can be obtained form the \"DF Run URBANopt\" component.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_urdb_label", 
+      "description": "Text string for the Utility Rate Database (URDB) label for the particular\nelectrical utility rate for the optimization. The label is the last\nterm of the URL of a utility rate detail page (eg. the urdb label\nat https://openei.org/apps/IURDB/rate/view/5b0d83af5457a3f276733305\nis 5b0d83af5457a3f276733305). Utility rates for specific locations\ncan be looked up in the REopt Lite tool (https://reopt.nrel.gov/tool)\nand the label can be obtained by clicking on \"Rate Details\" link\nfor a particular selected rate.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_financial_par_", 
+      "description": "A REoptParameter object to describe the financial assumptions\nof the REopt analysis. This can be obtained from the \"DF REopt\nFinancial Parameters\" component. If None, some default parameters\nwill be generated for a typical analysis. (Default: None).", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_wind_", 
+      "description": "A number for the maximum installed kilowatts of wind power. (Default: 0).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_pv_", 
+      "description": "A number for the maximum installed kilowatts of photovoltaic\npower. (Default: 1000000000).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_storage_", 
+      "description": "A number for the maximum installed kilowatts of electrical\nstorage. (Default: 1000000).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_generator_", 
+      "description": "A number for the maximum installed kilowatts of generator power.\nNote that generators are only used in outages. (Default: 1000000000).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_run", 
+      "description": "Set to \"True\" to run the geojson and scenario through REopt.\nThis will ensure that all result files appear in their respective\noutputs from this component.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\n\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.reopt import REoptParameter\n    from dragonfly_energy.run import run_reopt\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # generate default REoptParameter if None are input to the component\n    if _financial_par_ is None:\n        _financial_par_ = REoptParameter()\n\n    # set the ax sizes for the variou energy sources\n    _financial_par_.wind_parameter.max_kw = _wind_ if _wind_ is not None else 0\n    _financial_par_.pv_parameter.max_kw = _wind_ if _wind_ is not None else 1000000000\n    _financial_par_.storage_parameter.max_kw = _wind_ if _wind_ is not None else 1000000\n    _financial_par_.generator_parameter.max_kw = _wind_ if _wind_ is not None else 1000000000\n\n    # execute the simulation with URBANopt CLI\n    csv, json = run_reopt(_geojson, _scenario, _urdb_label, _financial_par_)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Run REopt", 
+  "description": "Run a an URBANopt geoJSON and scenario through REopt using the URBANopt CLI.\n_\nThis component requires the URBANopt CLI to be installed in order to run.\nInstallation instructions for the URBANopt CLI can be found at:\nhttps://docs.urbanopt.net/installation/installation.html\n-"
+}
