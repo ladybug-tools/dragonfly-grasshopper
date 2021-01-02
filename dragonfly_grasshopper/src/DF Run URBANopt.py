@@ -17,7 +17,7 @@ https://docs.urbanopt.net/installation/installation.html
 
     Args:
         _geojson: The path to an URBANopt-compatible geoJSON file. This geoJSON
-            file can be obtained form the "DF Model to URBANopt" component.
+            file can be obtained form the "DF Model to geoJSON" component.
         _epw_file: Path to an .epw file on this computer as a text string.
         _sim_par_: A honeybee Energy SimulationParameter object that describes all
             of the settings for the simulation. If None, some default simulation
@@ -29,7 +29,7 @@ https://docs.urbanopt.net/installation/installation.html
             (https://bcl.nrel.gov/).
         report_: Boolean to note whether to include the URBANopt default feature reporting
             measure as part of the simulation. If True, the measure will be run
-            after all simulations are complete.
+            after all simulations are complete. (Default:True).
         _cpus_: A positive integer for the number of CPUs to use in the simulation.
             This should be changed based on the machine on which the simulation
             is being run in order to yield the fastest simulation (Default: 2).
@@ -42,6 +42,8 @@ https://docs.urbanopt.net/installation/installation.html
 
     Returns:
         report: Reports, errors, warnings, etc.
+        scenario: File path to the URBANopt scenario CSV used as input for the
+            URBANopt CLI run.
         osm: File paths to the OpenStudio Models (OSM) that were generated in the
             process of running URBANopt.
         idf: File paths to the EnergyPlus Input Data Files (IDF) that were generated
@@ -58,7 +60,7 @@ https://docs.urbanopt.net/installation/installation.html
 
 ghenv.Component.Name = 'DF Run URBANopt'
 ghenv.Component.NickName = 'RunURBANopt'
-ghenv.Component.Message = '1.1.1'
+ghenv.Component.Message = '1.1.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -116,7 +118,7 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # write the base OSW to be used to translate all geoJSON features
     measures = None if len(measures_) == 0 or measures_[0] is None else measures_
-    skip_report = not report_
+    skip_report = not report_ if report_ is not None else True
     base_honeybee_osw(
         directory, sim_par_json=sim_par_json, additional_measures=measures,
         epw_file=_epw_file, skip_report=skip_report)
