@@ -29,23 +29,21 @@ Create a Dragonfly Building from individual Dragonfly Story objects.
             can also be a custom ConstructionSet object. If nothing is input here,
             the Building will have a generic construction set that is not sensitive
             to the Buildings's climate or building energy code.
-    
+
     Returns:
         report: Reports, errors, warnings, etc.
         building: Dragonfly Building.
 """
 
-ghenv.Component.Name = "DF Building from Stories"
+ghenv.Component.Name = 'DF Building from Stories'
 ghenv.Component.NickName = 'BuildingStories'
-ghenv.Component.Message = '1.1.0'
-ghenv.Component.Category = "Dragonfly"
+ghenv.Component.Message = '1.1.1'
+ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = "2"
-
-import uuid
+ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
 try:  # import the core honeybee dependencies
-    from honeybee.typing import clean_and_id_string
+    from honeybee.typing import clean_and_id_string, clean_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
@@ -82,15 +80,15 @@ if all_required_inputs(ghenv.Component):
 
     # generate a default identifier
     if _name_ is None:  # get a default Building name
-        name = 'Building_{}_{}'.format(document_counter('bldg_count'),
-                                       str(uuid.uuid4())[:8])
+        display_name = 'Building_{}'.format(document_counter('bldg_count'))
+        name = clean_and_id_string(display_name)
     else:
-        name = clean_and_id_string(_name_)
+        display_name = _name_
+        name = clean_string(display_name)
 
     # create the Building
     building = Building(name, stories)
-    if _name_ is not None:
-        building.display_name = _name_
+    building.display_name = display_name
 
     # assign the construction set
     if _constr_set_ is not None:

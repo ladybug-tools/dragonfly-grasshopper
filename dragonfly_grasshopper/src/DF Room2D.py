@@ -40,12 +40,12 @@ Create Dragonfly Room2Ds from floor plate geometry (horizontal Rhino surfaces).
         room2d: Dragonfly Room2Ds.
 """
 
-ghenv.Component.Name = "DF Room2D"
+ghenv.Component.Name = 'DF Room2D'
 ghenv.Component.NickName = 'Room2D'
-ghenv.Component.Message = '1.1.0'
-ghenv.Component.Category = "Dragonfly"
+ghenv.Component.Message = '1.1.1'
+ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = "4"
+ghenv.Component.AdditionalHelpFromDocStrings = '4'
 
 
 try:  # import the core honeybee dependencies
@@ -61,7 +61,8 @@ except ImportError as e:
 try:  # import the ladybug_rhino dependencies
     from ladybug_rhino.config import tolerance
     from ladybug_rhino.togeometry import to_face3d
-    from ladybug_rhino.grasshopper import all_required_inputs, longest_list
+    from ladybug_rhino.grasshopper import all_required_inputs, longest_list, \
+        document_counter
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -81,8 +82,6 @@ except ImportError as e:
         raise ValueError('conditioned_ has been specified but dragonfly-energy '
                          'has failed to import.\n{}'.format(e))
 
-import uuid
-
 
 if all_required_inputs(ghenv.Component):
     room2d = []  # list of room2ds that will be returned
@@ -90,15 +89,15 @@ if all_required_inputs(ghenv.Component):
     for i, geo in enumerate(face3ds):
         # get the name for the Room2D
         if len(_name_) == 0:  # make a default Room2D name
-            name = "Room_{}".format(str(uuid.uuid4())[:8])
+            display_name = 'Room_{}'.format(document_counter('room_count'))
         else:
-            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1)
-            name = clean_and_id_string(display_name)
+            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1) \
+                if len(_name_) != len(face3ds) else longest_list(_name_, i)
+        name = clean_and_id_string(display_name)
 
         # create the Room2D
         room = Room2D(name, geo, longest_list(_flr_to_ceiling, i), tolerance=tolerance)
-        if len(_name_) != 0:
-            room.display_name = display_name
+        room.display_name = display_name
 
         # assign the program
         if len(_program_) != 0:

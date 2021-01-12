@@ -19,19 +19,19 @@ for simulation.
         context_: Optional Dragonfly ContextShade objects to be added to the Model.
         _name_: Text to be used for the name and identifier of the Model. If no
             name is provided, it will be "unnamed".
-    
+
     Returns:
         report: Reports, errors, warnings, etc.
         model: A Dragonfly Model object possessing all of the input geometry
             objects.
 """
 
-ghenv.Component.Name = "DF Model"
+ghenv.Component.Name = 'DF Model'
 ghenv.Component.NickName = 'Model'
-ghenv.Component.Message = '1.1.0'
-ghenv.Component.Category = "Dragonfly"
+ghenv.Component.Message = '1.1.1'
+ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = "1"
+ghenv.Component.AdditionalHelpFromDocStrings = '1'
 
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_string
@@ -58,3 +58,5 @@ if all_required_inputs(ghenv.Component):
     # create the model
     model = Model(name, _buildings, context_, units=units, tolerance=tolerance,
                   angle_tolerance=angle_tolerance)
+    if _name_ is not None:
+        model.display_name = _name_
