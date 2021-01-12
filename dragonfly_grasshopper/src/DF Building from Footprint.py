@@ -47,15 +47,15 @@ Create Dragonfly Buildings from footprint geometry (horizontal Rhino surfaces).
         buildings: Dragonfly buildings.
 """
 
-ghenv.Component.Name = "DF Building from Footprint"
+ghenv.Component.Name = 'DF Building from Footprint'
 ghenv.Component.NickName = 'BuildingFootprint'
-ghenv.Component.Message = '1.1.0'
-ghenv.Component.Category = "Dragonfly"
+ghenv.Component.Message = '1.1.1'
+ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = "2"
+ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
 try:  # import the core honeybee dependencies
-    from honeybee.typing import clean_and_id_string
+    from honeybee.typing import clean_and_id_string, clean_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
@@ -88,8 +88,6 @@ except ImportError as e:
         raise ValueError('conditioned_ has been specified but dragonfly-energy '
                          'has failed to import.\n{}'.format(e))
 
-import uuid
-
 
 if all_required_inputs(ghenv.Component) and _run:
     perim_offset_ = 0 if perim_offset_ is None else perim_offset_
@@ -97,18 +95,18 @@ if all_required_inputs(ghenv.Component) and _run:
     for i, geo in enumerate(_footprint_geo):
         # get the name for the Building
         if len(_name_) == 0:  # make a default Building name
-            name = "Building_{}_{}".format(document_counter('bldg_count'),
-                                           str(uuid.uuid4())[:8])
-        else:
-            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1)
+            display_name = 'Building_{}'.format(document_counter('bldg_count'))
             name = clean_and_id_string(display_name)
+        else:
+            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1) \
+                if len(_name_) != len(_footprint_geo) else longest_list(_name_, i)
+            name = clean_string(display_name)
 
         # create the Building
         building = Building.from_footprint(
             name, footprint=to_face3d(geo), floor_to_floor_heights=_floor_to_floor,
             perimeter_offset=perim_offset_, tolerance=tolerance)
-        if len(_name_) != 0:
-            building.display_name = display_name
+        building.display_name = display_name
 
         # assign the program
         if len(_program_) != 0:

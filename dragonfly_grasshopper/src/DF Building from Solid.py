@@ -47,7 +47,7 @@ Create Dragonfly Buildings from solid geometry (closed Rhino polysurfaces).
         conditioned_: Boolean to note whether the Buildings have heating and cooling
             systems.
         _run: Set to True to run the component and create Dragonfly Buildings.
-    
+
     Returns:
         report: Reports, errors, warnings, etc.
         buildings: Dragonfly buildings.
@@ -55,13 +55,13 @@ Create Dragonfly Buildings from solid geometry (closed Rhino polysurfaces).
 
 ghenv.Component.Name = "DF Building from Solid"
 ghenv.Component.NickName = 'BuildingSolid'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
 
 try:  # import the core honeybee dependencies
-    from honeybee.typing import clean_and_id_string
+    from honeybee.typing import clean_and_id_string, clean_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
@@ -96,8 +96,6 @@ except ImportError as e:
         raise ValueError('conditioned_ has been specified but dragonfly-energy '
                          'has failed to import.\n{}'.format(e))
 
-import uuid
-
 
 if all_required_inputs(ghenv.Component) and _run:
     perim_offset_ = 0 if perim_offset_ is None else perim_offset_
@@ -105,11 +103,12 @@ if all_required_inputs(ghenv.Component) and _run:
     for i, geo in enumerate(_bldg_geo):
         # get the name for the Building
         if len(_name_) == 0:  # make a default Building name
-            name = "Building_{}_{}".format(document_counter('bldg_count'),
-                                           str(uuid.uuid4())[:8])
-        else:
-            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1)
+            display_name = 'Building_{}'.format(document_counter('bldg_count'))
             name = clean_and_id_string(display_name)
+        else:
+            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1) \
+                if len(_name_) != len(_bldg_geo) else longest_list(_name_, i)
+            name = clean_string(display_name)
 
         # interpret the input _floor_to_floor information
         min, max = geo_min_max_height(geo)
@@ -129,8 +128,7 @@ if all_required_inputs(ghenv.Component) and _run:
         building = Building.from_all_story_geometry(
             name, floor_faces, floor_to_floor_heights=interpreted_f2f,
             perimeter_offset=perim_offset_, tolerance=tolerance)
-        if len(_name_) != 0:
-            building.display_name = display_name
+        building.display_name = display_name
 
         # assign the program
         if len(_program_) != 0:

@@ -34,22 +34,22 @@ Create a Dragonfly Story from individual Dragonfly Room2D objects.
             can also be a custom ConstructionSet object. If nothing is input here,
             the Story will have a generic construction set that is not sensitive
             to the Story's climate or building energy code.
-    
+
     Returns:
         report: Reports, errors, warnings, etc.
         building: Dragonfly Story.
 """
 
-ghenv.Component.Name = "DF Story"
+ghenv.Component.Name = 'DF Story'
 ghenv.Component.NickName = 'Story'
-ghenv.Component.Message = '1.1.0'
-ghenv.Component.Category = "Dragonfly"
+ghenv.Component.Message = '1.1.1'
+ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = "3"
+ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
 
 try:  # import the core honeybee dependencies
-    from honeybee.typing import clean_and_id_string
+    from honeybee.typing import clean_and_id_string, clean_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
@@ -59,7 +59,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:  # import the core ladybug_rhino dependencies
-    from ladybug_rhino.grasshopper import all_required_inputs
+    from ladybug_rhino.grasshopper import all_required_inputs, document_counter
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -71,8 +71,6 @@ except ImportError as e:
         raise ValueError('_constr_set_ has been specified but dragonfly-energy '
                          'has failed to import.\n{}'.format(e))
 
-import uuid
-
 
 if all_required_inputs(ghenv.Component):
     # duplicate the initial objects
@@ -80,17 +78,18 @@ if all_required_inputs(ghenv.Component):
 
     # generate a default name
     if _name_ is None:  # get a default Story name
-        name = "Story_{}".format(str(uuid.uuid4())[:8])
+        display_name = 'Story_{}'.format(document_counter('story_count'))
+        name = clean_and_id_string(display_name)
     else:
-        name = clean_and_id_string(_name_)
+        display_name = _name_
+        name = clean_string(display_name)
 
     # set other defaults
     multiplier_ = multiplier_ if multiplier_ is not None else 1
 
     # create the Story
     story = Story(name, room2ds, _flr_to_flr_, _flr_height_, multiplier_)
-    if _name_ is not None:
-        story.display_name = _name_
+    story.display_name = display_name
 
     # assign the construction set
     if _constr_set_ is not None:
