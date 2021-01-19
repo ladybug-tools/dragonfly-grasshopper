@@ -31,17 +31,17 @@ Construct a design day from a set of parameters.
         _sky_properties: A list of properties describing the sky above.
             For ASHRAEClearSky this is a single value for clearness.
             For ASHRAETau, this is the tau_beam and tau_diffuse.
-        
+
     Returns:
         _design_days: A DesignDay object to deconstruct.
 """
 
-ghenv.Component.Name = "DF Construct Design Day"
+ghenv.Component.Name = 'DF Construct Design Day'
 ghenv.Component.NickName = 'ConstrDesignDay'
-ghenv.Component.Message = '1.1.0'
-ghenv.Component.Category = "Dragonfly"
+ghenv.Component.Message = '1.1.1'
+ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
-ghenv.Component.AdditionalHelpFromDocStrings = "2"
+ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
 
 try:

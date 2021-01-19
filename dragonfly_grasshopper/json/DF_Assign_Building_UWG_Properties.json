@@ -1,0 +1,78 @@
+{
+  "version": "1.1.0", 
+  "nickname": "BuildingUWG", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "building", 
+        "description": "The input Dragonfly Building with its UWG properties re-assigned based\non the input.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_building", 
+      "description": "A Dragonfly Building which is to have its Urban Weather Generator (UWG)\nproperties assigned.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "program_", 
+      "description": "Text for the name of the building program. Must be one of the\noptions below. (Default: LargeOffice).\n* LargeOffice\n* MediumOffice\n* SmallOffice\n* MidriseApartment\n* Retail\n* StripMall\n* PrimarySchool\n* SecondarySchool\n* SmallHotel\n* LargeHotel\n* Hospital\n* Outpatient\n* Warehouse\n* SuperMarket\n* FullServiceRestaurant\n* QuickServiceRestaurant", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "vintage_", 
+      "description": "Text for the vintage of the building. This will be used to set\ndefault constructions. Must be one of the options below or one of\nthe options from the \"HB Building Vintages\" component, which will\nbe mapped to one of the options below. (Default: New).\n* New\n* 1980_Present\n* Pre1980", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "fr_canyon_", 
+      "description": "A number from 0 to 1 that represents the fraction of the building's\nwaste heat from air conditioning that gets rejected into the urban\ncanyon. (Default: 0.5).", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "shgc_", 
+      "description": "A number from 0 to 1 that represents the SHGC of the building's windows.\nThis is used to evaluate the amount of solar heat reflected into the\nstreet canyon. By default, it will be set by the building vintage\nand the Model climate zone.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "wall_alb_", 
+      "description": "A number from 0 to 1 that represents the exterior wall albedo\nof the building. By default, it will be set by the building program\nand the DoE commercial reference buildings.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "roof_alb_", 
+      "description": "A number from 0 to 1 that represents the exterior roof albedo of\nthe building. By default, it will be set by the vintage, meaning 0.7\nfor New and 0.2 for 1980_Present and Pre1980.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "roof_veg_", 
+      "description": "A number from 0 to 1 that represents the fraction of the building's\nroofs covered in vegetation. (Default: 0).", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "4 :: AlternativeWeather", 
+  "code": "\ntry:  # import the dragonfly dependencies\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n# dictionary to map vintages to acceptable UWG ones\nVINTAGE_MAP = {\n    'New': 'New',\n    '1980_Present': '1980_Present',\n    'Pre1980': 'Pre1980',\n    '2013': '1980_Present',\n    '2010': '1980_Present',\n    '2007': '1980_Present',\n    '2004': '1980_Present',\n    '1980_2004': '1980_Present',\n    'pre_1980': 'Pre1980'\n}\n\n\nif all_required_inputs(ghenv.Component):\n    # check and duplicate the input\n    assert isinstance(_building, Building), \\\n        'Expected Dragonfly Building. Got {}.'.format(type(_building))\n    building = _building.duplicate()\n\n    # assign all of the properties to the building\n    if program_ is not None:\n        building.properties.uwg.program = program_\n    if vintage_ is not None:\n        building.properties.uwg.vintage = VINTAGE_MAP[vintage_]\n    if fr_canyon_ is not None:\n        building.properties.uwg.fract_heat_to_canyon = fr_canyon_\n    if shgc_ is not None:\n        building.properties.uwg.shgc = shgc_\n    if wall_alb_ is not None:\n        building.properties.uwg.wall_albedo = wall_alb_\n    if roof_alb_ is not None:\n        building.properties.uwg.roof_albedo = roof_alb_\n    if roof_veg_ is not None:\n        building.properties.uwg.roof_veg_fraction = roof_veg_\n", 
+  "category": "Dragonfly", 
+  "name": "DF Assign Building UWG Properties", 
+  "description": "Edit the properties of a Dragonfly Building that affect simulation with to the Urban\nWeather Generator (UWG).\n-"
+}

@@ -1,0 +1,92 @@
+{
+  "version": "1.1.0", 
+  "nickname": "RunUWG", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "uwg_json", 
+        "description": "Path to a fully-simulatable JSON file following the UWG schema.\nThis contains all of the relevant Dragonfly Model properties and\ninput parameters.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "urban_epw", 
+        "description": "Path to the morphed EPW file output from the UWG, which represents\nurban heat island conditions within the street canyon.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_model", 
+      "description": "A Dragonfly Model to be used to morph the EPW for the urban area.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_epw_file", 
+      "description": "Full path to an .epw file. This is the rural or airport file that\nwill be morphed to reflect the climate conditions within an urban canyon.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_run_period_", 
+      "description": "A Ladybug Analysis Period object to describe the time period over\nwhich to run the simulation. If None, the simulation will be run for\nthe whole year.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_veg_par_", 
+      "description": "A VegetationParameter object to specify the behavior of vegetation\nin the urban area. If None, generic vegetation parameters will be\ngenerated.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_epw_site_", 
+      "description": "A ReferenceEPWSite object to specify the properties of the\nreference site where the input rural EPW was recorded. If None,\ngeneric airport properties will be generated.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_bnd_layer_", 
+      "description": "A BoundaryLayerParameter to specify the properties of the urban\nboundary layer. If None, generic boundary layer parameters will\nbe generated.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_folder_", 
+      "description": "File path for the directory into which the the uwg JSON and morphed\nurban EPW will be written. If None, it will be written into the\nladybug default_epw_folder within a subfolder bearing the name\nof the dragonfly Model.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_write", 
+      "description": "Set to \"True\" to generate a UWG JSON from the connected _model and\nparameters. This JSON can be edited and simulated by the UWG directly.", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "run_", 
+      "description": "Set to \"True\" to simulate the uwg_json with the Urban Weather Generator\n(UWG) and morph the input EPW to account for urban heat island. This\ncan also be the integer \"2\", which will run the UWG silently (without\nany batch windows).", 
+      "type": "int", 
+      "default": null
+    }
+  ], 
+  "subcategory": "4 :: AlternativeWeather", 
+  "code": "\nimport os\nimport json\n\ntry:  # import the core ladybug dependencies\n    from ladybug.config import folders as lb_folders\n    from ladybug.futil import preparedir\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly uwg dependencies\n    from dragonfly_uwg.simulation.runperiod import UWGRunPeriod\n    from dragonfly_uwg.simulation.parameter import UWGSimulationParameter\n    from dragonfly_uwg.run import run_uwg\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_uwg:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _write:\n    # create the UWGSimulationParameter and assign all properties to it\n    sim_par = UWGSimulationParameter()\n    if _run_period_:\n        sim_par.run_period = UWGRunPeriod.from_analysis_period(_run_period_)\n    if _veg_par_:\n        sim_par.vegetation_parameter = _veg_par_\n    if _epw_site_:\n        sim_par.reference_epw_site = _epw_site_\n    if _bnd_layer_:\n        sim_par.boundary_layer_parameter = _bnd_layer_\n\n    if run_ is not None and run_ > 0:  # write and simulate the UWG JSON\n        silent = True if run_ > 1 else False\n        uwg_json, urban_epw = run_uwg(_model, _epw_file, sim_par, _folder_, silent)\n        if urban_epw is None:\n            msg = 'The Urban Weather Generator Failed to run.'\n            print(msg)\n            give_warning(ghenv.Component, msg)\n    else:  # only write the UWG JSON but don't run it\n        # get the directory into which the urban epw will be written\n        if _folder_ is None:\n            _folder_ = os.path.join(lb_folders.default_epw_folder, _model.identifier)\n        preparedir(_folder_, remove_content=False)\n        # write the model to a UWG dictionary\n        uwg_dict = _model.to.uwg(_model, _epw_file, sim_par)\n        uwg_json = os.path.join(_folder_, '{}_uwg.json'.format(_model.identifier))\n        with open(uwg_json, 'w') as fp:\n            json.dump(uwg_dict, fp, indent=4)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Run Urban Weather Generator", 
+  "description": "Morph a rural or airport EPW to reflect the conditions within an urban street canyon.\nThe properties of this urban street canyon are specified in the connected _model.\n_\nFor definitions of the inputs of the Urban Weather Generator, please see the UWG\nschema documentation (https://www.ladybug.tools/uwg-schema/index.html).\n_\nFor a full list of publications on the Urban Weather Generator, see the MIT Urban\nMicroclimate Group (http://urbanmicroclimate.scripts.mit.edu/publications.php).\n-"
+}

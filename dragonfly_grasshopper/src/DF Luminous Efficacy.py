@@ -27,10 +27,10 @@ Esimtate sky illuminance from the irradiance contained within a WEA object.
 
 ghenv.Component.Name = "DF Luminous Efficacy"
 ghenv.Component.NickName = 'LumEff'
-ghenv.Component.Message = '1.1.0'
-ghenv.Component.Category = "Dragonfly"
+ghenv.Component.Message = '1.1.1'
+ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
-ghenv.Component.AdditionalHelpFromDocStrings = "4"
+ghenv.Component.AdditionalHelpFromDocStrings = '5'
 
 try:
     from ladybug.wea import Wea

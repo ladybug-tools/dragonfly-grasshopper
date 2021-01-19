@@ -1,0 +1,57 @@
+{
+  "version": "1.1.0", 
+  "nickname": "Terrain", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "terrain", 
+        "description": "A Terrain object that can be plugged into the \"DF Assign Model\nUWG Properties\" component to specify the terrain of an urban area.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_terrain_geo", 
+      "description": "An array of Breps or meshes that together\nrepresent the terrian. This should include the entire area of the\nsite, including that beneath building footprints.", 
+      "type": "GeometryBase", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_albedo_", 
+      "description": "A number between 0 and 1 that represents the albedo (reflectivity) of\nthe pavement. (Default: 0.1, typical of fresh asphalt).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_thickness_", 
+      "description": "A number that represents the thickness of the pavement material\nin meters. (Default: 0.5 meters).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_conductivity_", 
+      "description": "A number representing the conductivity of the pavement\nmaterial in W/m-K. (Default: 1 W/m-K, typical of asphalt).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_vol_heat_cap_", 
+      "description": "A number representing the volumetric heat capacity of the\npavement material in J/m3-K. This is the number of joules\nneeded to raise one cubic meter of the material by 1 degree\nKelvin. (Default: 1.6e6 J/m3-K, typical of asphalt).", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "4 :: AlternativeWeather", 
+  "code": "\ntry:  # import the dragonfly_uwg dependencies\n    from dragonfly_uwg.terrain import Terrain\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_uwg:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_face3d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # process the input geometry\n    geo = [face for rh_geo in _terrain_geo for face in to_face3d(rh_geo)]\n    \n    # assign default values for the pvement properties\n    _albedo_ = _albedo_ if _albedo_ is not None else 0.1\n    _thickness_ = _thickness_ if _thickness_ is not None else 0.5\n    _conductivity_ = _conductivity_ if _conductivity_ is not None else 1.0\n    _vol_heat_cap_ = _vol_heat_cap_ if _vol_heat_cap_ is not None else 1.6e6\n\n    # create the terrain\n    terrain = Terrain(geo, _albedo_, _thickness_, _conductivity_, _vol_heat_cap_)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Terrain", 
+  "description": "Create a Terrain object representing the land on which an urban area sits.\n_\nThis includes both the geometry and the properties of the pavement within\nthe urban area.\n-"
+}

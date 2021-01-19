@@ -22,12 +22,12 @@ dry bulb temperature, and dew point temperature.
             horizontal infrared radiation [W/m2]
 """
 
-ghenv.Component.Name = "DF Horizontal Infrared"
+ghenv.Component.Name = 'DF Horizontal Infrared'
 ghenv.Component.NickName = 'HorizInfr'
-ghenv.Component.Message = '1.1.0'
-ghenv.Component.Category = "Dragonfly"
+ghenv.Component.Message = '1.1.1'
+ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
-ghenv.Component.AdditionalHelpFromDocStrings = "4"
+ghenv.Component.AdditionalHelpFromDocStrings = '5'
 
 try:
     from ladybug.skymodel import calc_horizontal_infrared

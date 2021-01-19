@@ -1,0 +1,57 @@
+{
+  "version": "1.1.0", 
+  "nickname": "BoundaryLayer", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "bnd_layer", 
+        "description": "Boundary layer parameters that can be plugged into the \"DF Run\nUrban Weather Generator\" component to specify the properties of\nthe urban boundary layer.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_day_hght_", 
+      "description": "A number that represents the height in meters of the urban boundary\nlayer during the daytime. This is the height to which the urban\nmeteorological conditions are stable and representative of the\noverall urban area. Typically, this boundary layer height increases\nwith the height of the buildings. (Default: 1000 meters).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_night_hght_", 
+      "description": "A number that represents the height in meters of the urban\nboundary layer during the nighttime. This is the height to which the\nurban meteorological conditions are stable and representative of\nthe overall urban area. Typically, this boundary layer height\nincreases with the height of the buildings. (Default: 80 meters).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_inversion_hght_", 
+      "description": "A number that represents the height in meters at which\nthe vertical profile of potential temperature becomes stable.\nCan be determined by flying helium balloons equipped\nwith temperature sensors and recording the air temperatures\nat different heights. (Default: 150 meters).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_circ_coeff_", 
+      "description": "A number representing the circulation coefficient. (Default: 1.2,\nper Bueno (2012)).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_exch_coeff_", 
+      "description": "A number representing the exchange coefficient. (Default: 1.0,\nper Bueno (2014)).", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "4 :: AlternativeWeather", 
+  "code": "\ntry:  # import the dragonfly_uwg dependencies\n    from dragonfly_uwg.simulation.boundary import BoundaryLayerParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_uwg:\\n\\t{}'.format(e))\n\n\n# process default values\n_day_hght_ = _day_hght_ if _day_hght_ is not None else 1000\n_night_hght_ = _night_hght_ if _night_hght_ is not None else 80\n_inversion_hght_ = _inversion_hght_ if _inversion_hght_ is not None else 150\n_circ_coeff_ = _circ_coeff_ if _circ_coeff_ is not None else 1.2\n_exch_coeff_ = _exch_coeff_ if _exch_coeff_ is not None else 1.0\n\n# create the traffic parameters\nbnd_layer = BoundaryLayerParameter(\n    _day_hght_, _night_hght_, _inversion_hght_, _circ_coeff_, _exch_coeff_)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Boundary Layer Parameters", 
+  "description": "Create BoundaryLayerParameters representing the properties of the urban boundary\nlayer in an Urban Weather Genrator (UWG) simulation.\n-"
+}
