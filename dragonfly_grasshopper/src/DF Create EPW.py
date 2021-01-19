@@ -40,19 +40,19 @@ hourly data.
         base_epw_: File path to an optional .epw to fill empty slots for data
             that has not been connected here.
         _run: Set to True to run the component and create the epw_obj.
-    
+
     Returns:
         report: Reports, errors, warnings, etc.
         epw_obj: An EPW object that can be written to a file using the Write EPW
             component.
 """
 
-ghenv.Component.Name = "DF Create EPW"
+ghenv.Component.Name = 'DF Create EPW'
 ghenv.Component.NickName = 'CreateEPW'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
-ghenv.Component.AdditionalHelpFromDocStrings = "1"
+ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
 import math
 

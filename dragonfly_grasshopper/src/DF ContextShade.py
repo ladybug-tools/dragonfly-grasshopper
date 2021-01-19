@@ -23,6 +23,9 @@ Create Dragonfly ContextShade.
             schedule to be looked up in the schedule library. This can also be a
             custom schedule object. If no energy schedule is input here, the default
             will be always opaque.
+        uwg_is_veg_: Boolean to note whether the shade represents a tree canopy within
+            simulations with the Urban Weather Generator (UWG), in which case,
+            it will be incorporated into the simulation as tree cover. (Default: False).
 
     Returns:
         report: Reports, errors, warnings, etc.
@@ -31,12 +34,10 @@ Create Dragonfly ContextShade.
 
 ghenv.Component.Name = 'DF ContextShade'
 ghenv.Component.NickName = 'Context'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '7'
-
-import uuid
 
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_and_id_string
@@ -68,12 +69,18 @@ except ImportError as e:
 
 if all_required_inputs(ghenv.Component):
     context = []  # list of context shades that will be returned
-    base_name = str(uuid.uuid4())
     for i, geo in enumerate(_geo):
-        lb_faces = to_face3d(geo)
-        name = longest_list(_name_, i) if len(_name_) != 0 else base_name
-        df_shd = ContextShade(clean_and_id_string('{}_{}'.format(name, i)), lb_faces)
-        df_shd.display_name = '{}_{}'.format(name, i)
+        # get the name for the ContextShade
+        if len(_name_) == 0:  # make a default name
+            display_name = 'Context_{}'.format(document_counter('context_count'))
+        else:
+            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1) \
+                if len(_name_) != len(_geo) else longest_list(_name_, i)
+        name = clean_and_id_string(display_name)
+
+        # create the ContextShade object
+        df_shd = ContextShade(name, to_face3d(geo))
+        df_shd.display_name = display_name
 
         # try to assign the energyplus construction
         if len(ep_constr_) != 0:
@@ -88,5 +95,11 @@ if all_required_inputs(ghenv.Component):
             if isinstance(ep_trans_sch, str):
                 ep_trans_sch = schedule_by_identifier(ep_trans_sch)
             df_shd.properties.energy.transmittance_schedule = ep_trans_sch
+
+        # try to assign the uwg us_vegetation property
+        try:
+            df_shd.properties.uwg.is_vegetation = uwg_is_veg_
+        except AttributeError:
+            pass  # no dragonfly_uwg extension installed
 
         context.append(df_shd)  # collect the final ContextShades

@@ -1,0 +1,50 @@
+{
+  "version": "1.1.0", 
+  "nickname": "Traffic", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "traffic", 
+        "description": "Traffic parameters that can be plugged into the \"DF Assign Model\nUWG Properties\" component to specify the behavior of traffic within\nan urban area.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_watts_per_area", 
+      "description": "A number representing the maximum sensible anthropogenic heat\nflux of the urban area in watts per square meter. This is specifcally the\nheat that DOES NOT originate from buildings and mostly includes heat\nfrom automobiles, street lighting, and human metabolism. If autocalculate,\nit will be estimated frm the average building story count of the model\nhosting the traffic parameters (Default: autocalculate). Values\nfor different cities can be found in (Sailor, 2011)[1]. Typical\nvalues include:\n* 20 W/m2 = A typical downtown area\n* 10 W/m2 = A commercial area in Singapore\n* 8 W/m2 = A typical mixed use part of Toulouse, France\n* 4 W/m2 = A residential area in Singapore", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_weekday_sch_", 
+      "description": "A list of 24 fractional values that will be multiplied by\nthe watts_per_area to produce hourly values for heat on the weekday\nof the simulation. (Default: a typical schedule for a commercial area).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_saturday_sch_", 
+      "description": "A list of 24 fractional values that will be multiplied by the\nwatts_per_area to produce hourly values for heat on the Saturday\nof the simulation. (Default: a typical schedule for a commercial\narea).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_sunday_sch_", 
+      "description": "A list of 24 fractional values that will be\nmultiplied by the watts_per_area to produce hourly values for\nheat on the Sunday of the simulation. (Default: a typical schedule\nfor a commercial area).", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "4 :: AlternativeWeather", 
+  "code": "\ntry:  # import the dragonfly_uwg dependencies\n    from dragonfly_uwg.traffic import TrafficPararameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_uwg:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # process default values\n    _weekday_sch_ = _weekday_sch_ if len(_weekday_sch_) != 0 else None\n    _saturday_sch_ = _saturday_sch_ if len(_saturday_sch_) != 0 else None\n    _sunday_sch_ = _sunday_sch_ if len(_sunday_sch_) != 0 else None\n\n    # create the traffic parameters\n    traffic = TrafficPararameter(\n        _watts_per_area, _weekday_sch_, _saturday_sch_, _sunday_sch_)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Traffic Parameters", 
+  "description": "Create TrafficParameters representing the traffic within an urban area.\n-"
+}

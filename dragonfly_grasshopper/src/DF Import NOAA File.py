@@ -61,12 +61,12 @@ https://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly
             the text file must be from a single year.
 """
 
-ghenv.Component.Name = "DF Import NOAA File"
+ghenv.Component.Name = 'DF Import NOAA File'
 ghenv.Component.NickName = 'ImportNOAA'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
-ghenv.Component.AdditionalHelpFromDocStrings = "3"
+ghenv.Component.AdditionalHelpFromDocStrings = '4'
 
 import os
 import csv
