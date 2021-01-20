@@ -1,12 +1,12 @@
 {
-  "version": "1.1.0", 
+  "version": "1.1.1", 
   "nickname": "VegetationPar", 
   "outputs": [
     [
       {
         "access": "None", 
         "name": "veg_par", 
-        "description": "Vegetation parameters that can be plugged into the \"DF Run\nUrban Weather Generator\" component to specify the behavior of\nvegetation in the simulation.", 
+        "description": "Vegetation parameters that can be plugged into the \"DF UWG Simulation\nParameter\" component to specify the behavior of vegetation in\nthe simulation.", 
         "type": null, 
         "default": null
       }

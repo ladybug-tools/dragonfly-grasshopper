@@ -38,14 +38,14 @@ urban area.
             it will affect the temperature. (Default: 0.5).
 
     Returns:
-        veg_par: Vegetation parameters that can be plugged into the "DF Run
-            Urban Weather Generator" component to specify the behavior of
-            vegetation in the simulation.
+        veg_par: Vegetation parameters that can be plugged into the "DF UWG Simulation
+            Parameter" component to specify the behavior of vegetation in
+            the simulation.
 """
 
 ghenv.Component.Name = "DF Vegetation Parameters"
 ghenv.Component.NickName = 'VegetationPar'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
