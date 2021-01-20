@@ -34,14 +34,14 @@ layer in an Urban Weather Genrator (UWG) simulation.
             per Bueno (2014)).
 
     Returns:
-        bnd_layer: Boundary layer parameters that can be plugged into the "DF Run
-            Urban Weather Generator" component to specify the properties of
-            the urban boundary layer.
+        bnd_layer: Boundary layer parameters that can be plugged into the "DF UWG
+            Simulation Parameter" component to specify the properties of the
+            urban boundary layer.
 """
 
 ghenv.Component.Name = "DF Boundary Layer Parameters"
 ghenv.Component.NickName = 'BoundaryLayer'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

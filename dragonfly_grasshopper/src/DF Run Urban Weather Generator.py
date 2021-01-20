@@ -22,18 +22,9 @@ Microclimate Group (http://urbanmicroclimate.scripts.mit.edu/publications.php).
         _model: A Dragonfly Model to be used to morph the EPW for the urban area.
         _epw_file: Full path to an .epw file. This is the rural or airport file that
             will be morphed to reflect the climate conditions within an urban canyon.
-        _run_period_: A Ladybug Analysis Period object to describe the time period over
-            which to run the simulation. If None, the simulation will be run for
-            the whole year.
-        _veg_par_: A VegetationParameter object to specify the behavior of vegetation
-            in the urban area. If None, generic vegetation parameters will be
-            generated.
-        _epw_site_: A ReferenceEPWSite object to specify the properties of the
-            reference site where the input rural EPW was recorded. If None,
-            generic airport properties will be generated.
-        _bnd_layer_: A BoundaryLayerParameter to specify the properties of the urban
-            boundary layer. If None, generic boundary layer parameters will
-            be generated.
+        _sim_par_: A dragonfly UWG SimulationParameter object that describes all
+            of the setting for the simulation. If None, some default simulation
+            parameters will be used.
         _folder_: File path for the directory into which the the uwg JSON and morphed
             urban EPW will be written. If None, it will be written into the
             ladybug default_epw_folder within a subfolder bearing the name
@@ -56,7 +47,7 @@ Microclimate Group (http://urbanmicroclimate.scripts.mit.edu/publications.php).
 
 ghenv.Component.Name = 'DF Run Urban Weather Generator'
 ghenv.Component.NickName = 'RunUWG'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -71,7 +62,6 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
 try:  # import the dragonfly uwg dependencies
-    from dragonfly_uwg.simulation.runperiod import UWGRunPeriod
     from dragonfly_uwg.simulation.parameter import UWGSimulationParameter
     from dragonfly_uwg.run import run_uwg
 except ImportError as e:
@@ -84,20 +74,16 @@ except ImportError as e:
 
 
 if all_required_inputs(ghenv.Component) and _write:
-    # create the UWGSimulationParameter and assign all properties to it
-    sim_par = UWGSimulationParameter()
-    if _run_period_:
-        sim_par.run_period = UWGRunPeriod.from_analysis_period(_run_period_)
-    if _veg_par_:
-        sim_par.vegetation_parameter = _veg_par_
-    if _epw_site_:
-        sim_par.reference_epw_site = _epw_site_
-    if _bnd_layer_:
-        sim_par.boundary_layer_parameter = _bnd_layer_
+    # create the UWGSimulationParameter or use the input
+    if _sim_par_ is not None:
+        assert isinstance(_sim_par_, UWGSimulationParameter), \
+        'Expected UWG Simulation Parameters. Got {}.'.format(type(_sim_par_))
+    else:
+        _sim_par_ = UWGSimulationParameter()
 
     if run_ is not None and run_ > 0:  # write and simulate the UWG JSON
         silent = True if run_ > 1 else False
-        uwg_json, urban_epw = run_uwg(_model, _epw_file, sim_par, _folder_, silent)
+        uwg_json, urban_epw = run_uwg(_model, _epw_file, _sim_par_, _folder_, silent)
         if urban_epw is None:
             msg = 'The Urban Weather Generator Failed to run.'
             print(msg)
@@ -108,7 +94,7 @@ if all_required_inputs(ghenv.Component) and _write:
             _folder_ = os.path.join(lb_folders.default_epw_folder, _model.identifier)
         preparedir(_folder_, remove_content=False)
         # write the model to a UWG dictionary
-        uwg_dict = _model.to.uwg(_model, _epw_file, sim_par)
+        uwg_dict = _model.to.uwg(_model, _epw_file, _sim_par_)
         uwg_json = os.path.join(_folder_, '{}_uwg.json'.format(_model.identifier))
         with open(uwg_json, 'w') as fp:
             json.dump(uwg_dict, fp, indent=4)

@@ -26,14 +26,14 @@ where rural EPW data was recorded for an Urban Weather Genrator (UWG) simulation
             standard measurement height for US DoE EPW files).
 
     Returns:
-        epw_site: Reference EPW site parameters that can be plugged into the "DF Run
-            Urban Weather Generator" component to specify the behavior of
-            vegetation in the simulation.
+        epw_site: Reference EPW site parameters that can be plugged into the "DF UWG
+            Simulation Parameter" component to specify the behavior of vegetation
+            in the simulation.
 """
 
 ghenv.Component.Name = "DF Reference EPW Parameters"
 ghenv.Component.NickName = 'RefEPWPar'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

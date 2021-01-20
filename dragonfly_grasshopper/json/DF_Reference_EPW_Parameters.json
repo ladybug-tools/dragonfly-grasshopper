@@ -1,12 +1,12 @@
 {
-  "version": "1.1.0", 
+  "version": "1.1.1", 
   "nickname": "RefEPWPar", 
   "outputs": [
     [
       {
         "access": "None", 
         "name": "epw_site", 
-        "description": "Reference EPW site parameters that can be plugged into the \"DF Run\nUrban Weather Generator\" component to specify the behavior of\nvegetation in the simulation.", 
+        "description": "Reference EPW site parameters that can be plugged into the \"DF UWG\nSimulation Parameter\" component to specify the behavior of vegetation\nin the simulation.", 
         "type": null, 
         "default": null
       }
