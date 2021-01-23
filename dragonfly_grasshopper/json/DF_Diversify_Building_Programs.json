@@ -1,0 +1,92 @@
+{
+  "version": "1.1.0", 
+  "nickname": "DiversifyBldg", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "building", 
+        "description": "The input Dragonfly Building with its programs diversified. The\ndiversified values can be checked by using the \"DF Color Room2D\nAttributes\" component.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_building", 
+      "description": "A Dragonfly Building, which will have its room programs diversified.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_occ_stdev_", 
+      "description": "A number between 0 and 100 for the percent of the occupancy\npeople_per_area representing one standard deviation\nof diversification from the mean. (Default 20 percent).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_lighting_stdev_", 
+      "description": "A number between 0 and 100 for the percent of the\nlighting watts_per_area representing one standard deviation\nof diversification from the mean. (Default 20 percent).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_electric_stdev_", 
+      "description": "A number between 0 and 100 for the percent of the electric\nequipment watts_per_area representing one standard deviation\nof diversification from the mean. (Default 20 percent).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_gas_stdev_", 
+      "description": "A number between 0 and 100 for the percent of the gas equipment\nwatts_per_area representing one standard deviation of\ndiversification from the mean. (Default 20 percent).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_hot_wtr_stdev_", 
+      "description": "A number between 0 and 100 for the percent of the\nservice hot water flow_per_area representing one standard deviation\nof diversification from the mean. (Default 20 percent).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_infilt_stdev_", 
+      "description": "A number between 0 and 100 for the percent of the infiltration\nflow_per_exterior_area representing one standard deviation of\ndiversification from the mean. (Default 20 percent).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_sched_offset_", 
+      "description": "A positive integer for the number of timesteps at which all\nschedules of the resulting programs will be shifted - roughly 1/3 of\nthe programs ahead and another 1/3 behind. (Default: 1).", 
+      "type": "int", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_timestep_", 
+      "description": "An integer for the number of timesteps per hour at which the\nshifting is occurring. This must be a value between 1 and 60, which\nis evenly divisible by 60. 1 indicates that each step is an hour\nwhile 60 indicates that each step is a minute. (Default: 1).", 
+      "type": "int", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "seed_", 
+      "description": "An optional integer to set the seed of the random number generator\nthat is diversifying the loads. Setting a value here will ensure\nthat the same \"random\" values are assigned every time that this\ncomponent is run, making comparison of energy simulation results\neasier. If not set, the loads assigned by this component will be\ndifferent every time it is run.", 
+      "type": "int", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\nimport random\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import ladybug-{{cad}}\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly-energy extension\n    import dragonfly_energy\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy energy:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set default values for any unspecified inputs\n    _occ_stdev_ = 20 if _occ_stdev_ is None else _occ_stdev_\n    _lighting_stdev_ = 20 if _lighting_stdev_ is None else _lighting_stdev_\n    _electric_stdev_ = 20 if _electric_stdev_ is None else _electric_stdev_\n    _gas_stdev_ = 20 if _gas_stdev_ is None else _gas_stdev_\n    _hot_wtr_stdev_ = 20 if _hot_wtr_stdev_ is None else _hot_wtr_stdev_\n    _infilt_stdev_ = 20 if _infilt_stdev_ is None else _infilt_stdev_\n    _sched_offset_ = 1 if _sched_offset_ is None else _sched_offset_\n    _timestep_ = 1 if _timestep_ is None else _timestep_\n\n    # set the seed if specified\n    if seed_ is not None:\n        random.seed(seed_)\n\n    # duplicate the initial objects and diversify the programs\n    assert isinstance(_building, Building), \\\n        'Expected Dragonfly Building. Got {}.'.format(type(_building))\n    building = _building.duplicate()\n    building.properties.energy.diversify(\n        _occ_stdev_, _lighting_stdev_, _electric_stdev_, _gas_stdev_,\n        _hot_wtr_stdev_, _infilt_stdev_, _sched_offset_, _timestep_)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Diversify Building Programs", 
+  "description": "Diversify the ProgramTypes assigned to a Building's Room2Ds.\n_\nThis is useful when attempting to account for the fact that not all rooms are\nused by occupants according to a strict scheduled regimen. Some rooms will be\nused more than expected and others less.\n_\nThis component uses a random number generator and gaussian distribution to\ngenerate loads that vary about the original \"mean\" programs. Note that the\nrandomly generated values assigned by this component will be different every\ntime that this component is run unless and input for seed_ has been specified.\n_\nIn addition to diversifying load values, approximately 2/3 of the schedules\nin the resulting Room2Ds will be offset from the mean by the input\nschedule_offset (1/3 ahead and another 1/3 behind).\n-"
+}
