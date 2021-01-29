@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1", 
+  "version": "1.1.2", 
   "nickname": "BuildingFootprint", 
   "outputs": [
     [
@@ -59,14 +59,14 @@
       "access": "list", 
       "name": "conditioned_", 
       "description": "Boolean to note whether the Buildings have heating and cooling\nsystems.", 
-      "type": "System.Object", 
+      "type": "bool", 
       "default": null
     }, 
     {
       "access": "item", 
       "name": "_run", 
       "description": "Set to True to run the component and create Dragonfly Buildings.", 
-      "type": "System.Object", 
+      "type": "bool", 
       "default": null
     }
   ], 
