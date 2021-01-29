@@ -34,7 +34,7 @@ Create Dragonfly ContextShade.
 
 ghenv.Component.Name = 'DF ContextShade'
 ghenv.Component.NickName = 'Context'
-ghenv.Component.Message = '1.1.1'
+ghenv.Component.Message = '1.1.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '7'
@@ -51,7 +51,8 @@ except ImportError as e:
 
 try:  # import the ladybug_rhino dependencies
     from ladybug_rhino.togeometry import to_face3d
-    from ladybug_rhino.grasshopper import all_required_inputs, longest_list
+    from ladybug_rhino.grasshopper import all_required_inputs, longest_list, \
+        document_counter
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
