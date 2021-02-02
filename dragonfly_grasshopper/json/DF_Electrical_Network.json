@@ -1,0 +1,50 @@
+{
+  "version": "1.1.0", 
+  "nickname": "Network", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "network", 
+        "description": "A Dragonfly Electrical Newtork object possessing all electrical\ninfrastructure for an OpenDSS simulation.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_substation", 
+      "description": "A Substation object representing the electrical substation\nsupplying the network with electricity.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_transformers", 
+      "description": "An array of Transformer objects that are included within the\nelectrical network. Generally, there should always be a transformer\nsomewhere between the substation and a given building.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_connectors", 
+      "description": "An array of ElectricalConnector objects that are included within\nthe electrical network. In order for a given connector to be valid\nwithin the network, each end of the connector must touch either\nanother connector, a transformer/substation or a Dragonfly Building\nfootprint. In order for the network as a whole to be valid, all\nBuildings and Transformers must be connected back to the Substation\nvia connectors.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_name_", 
+      "description": "Text to be used for the name and identifier of the Electrical\nNewtork. If no name is provided, it will be \"unnamed\".", 
+      "type": "string", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.opendss.network import ElectricalNetwork\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\n\n    # create the model\n    network = ElectricalNetwork(name, _substation, _transformers, _connectors)\n    if _name_ is not None:\n        network.display_name = _name_\n", 
+  "category": "Dragonfly", 
+  "name": "DF Electrical Network", 
+  "description": "Create an OpenDSS Electrical Network, which represents all electrical infrastructure\nfor an OpenDSS simulation.\n_\nThis includes a substation, transformers, and all electrical connectors needed\nto connect these objects to Dragonfly Buildings.\n-"
+}

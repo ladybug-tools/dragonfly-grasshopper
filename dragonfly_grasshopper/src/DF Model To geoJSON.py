@@ -39,6 +39,10 @@ key in the geoJSON.
             the results. If None, all other buildings will be included as context
             shade in each and every Model. Set to 0 to exclude all neighboring
             buildings from the resulting models. Default: None.
+        elec_network_: An optional OpenDSS ElectricalNetwork that's associated
+            with the input Dragonfly Model and will be written into the
+            geoJSON. An input here is required to perform an OpenDSS
+            simulation after running URBANopt.
         _folder_: Text for the full path to the folder where the geojson will be
             written along with all of the Honeybee Model JSONs. If None, the
             honeybee default simulation folder is used.
@@ -47,7 +51,7 @@ key in the geoJSON.
             which will only create the geojson file but not create any honeybee
             Model json files that are linked to it (note that a geojson produced
             this way is not compatible with URBANopt).
-    
+
     Returns:
         report: Reports, errors, warnings, etc.
         geojson: The path to a geoJSON file that contains polygons for all of the
@@ -65,7 +69,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -112,4 +116,4 @@ if all_required_inputs(ghenv.Component) and _write:
         # create the geoJSON and honeybee Model JSONs
         geojson, hb_jsons, hb_models = _model.to.urbanopt(
             _model, _location, point, shade_dist_, use_multiplier_, add_plenum_,
-            _folder_, tolerance=tolerance)
+            electrical_network=elec_network_, folder=_folder_, tolerance=tolerance)
