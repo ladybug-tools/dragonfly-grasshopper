@@ -1,0 +1,43 @@
+{
+  "version": "1.1.0", 
+  "nickname": "RunOpenDSS", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "result", 
+        "description": "...", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_geojson", 
+      "description": "The path to an URBANopt-compatible geoJSON file. This geoJSON\nfile can be obtained form the \"DF Model to geoJSON\" component.\nThe geoJSON must have a valid Electrical Network assigned to it\nin order to run correctly through OpenDSS.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_scenario", 
+      "description": "The path to an URBANopt .csv file for the scenario. This CSV\nfile can be obtained form the \"DF Run URBANopt\" component.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_run", 
+      "description": "Set to \"True\" to run the geojson and scenario through OpenDSS.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\nimport os\nimport subprocess\nimport json\n\ntry:\n    from ladybug_{{cad}}.download import download_file_by_name\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # download the files that execute the translation\n    uod_url = 'https://github.com/urbanopt/urbanopt-ditto-reader/raw/develop/'\n    project_folder = os.path.dirname(_geojson)\n    deps_folder = os.path.join(project_folder, 'deps_opendss')\n    reader = 'urbanopt_ditto_reader.py'\n    converter = 'convert.py'\n    download_file_by_name(uod_url + reader, deps_folder, reader, True)\n    download_file_by_name(uod_url + converter, deps_folder, converter, True)\n\n    # get the path to the ditto folder\n    assert os.name == 'nt', 'Dragonfly OpenDSS workflows are currently windows-only'\n    home_folder = os.getenv('HOME') or os.path.expanduser('~')\n    python_folder = os.path.join(\n        home_folder, 'AppData', 'Local', 'Programs', 'Python', 'Python37', \n        'Lib', 'site-packages')\n    ditto_folder = os.path.join(python_folder, 'ditto')\n    assert os.path.isdir(ditto_folder), 'Ditto is not currently installed. Use:\\n' \\\n        'pip install git+https://github.com/urbanopt/urbanopt-ditto-reader'\n\n    # write out a config file\n    scen_name = os.path.basename(_scenario).replace('.csv', '')\n    run_folder = os.path.join(project_folder, 'run', scen_name)\n    result = os.path.join(run_folder, 'opendss')\n    if not os.path.isdir(result):\n        os.mkdir(result)\n    config_dict = {\n        'urbanopt_scenario': run_folder,\n        'equipment_file': os.path.join(project_folder, 'electrical_database.json'),\n        'opendss_folder': result,\n        'geojson_file': _geojson,\n        'ditto_folder': ditto_folder,\n        'use_reopt': False\n    }\n    config_json = os.path.join(deps_folder, 'config.json')\n    with open(config_json, 'w') as fp:\n        json.dump(config_dict, fp, indent=4)\n\n    # execute the Pyhon script to run everything through OpenDSS\n    cmds = ['python', os.path.join(deps_folder, converter), config_json]\n    process = subprocess.Popen(cmds, stdout=subprocess.PIPE)\n    stdout = process.communicate()\n", 
+  "category": "Dragonfly", 
+  "name": "DF Run OpenDSS", 
+  "description": "Run a an URBANopt geoJSON and scenario through OpenDSS.\n_\nThe geoJSON must have a valid Electrical Network assigned to it in order to\nrun correctly through OpenDSS.\n_\nThis component also requires the urbanopt-ditto-reader to be installed.\nThe urbanopt-ditto-reader can be installed by installing Python 3.7 and then\nrunning the following from command line;\n_\npip install git+https://github.com/urbanopt/urbanopt-ditto-reader\n-"
+}
