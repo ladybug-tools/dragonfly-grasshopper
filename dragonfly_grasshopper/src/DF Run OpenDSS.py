@@ -31,19 +31,35 @@ pip install git+https://github.com/urbanopt/urbanopt-ditto-reader
 
     Returns:
         report: Reports, errors, warnings, etc.
-        result: ...
+        buildings: A list of CSV files containing the voltage and over/under voltage
+            results of the simulation at each timestep. There is one CSV per
+            building in the dragonfly model. These can be imported with the
+            "DF Read OpenDSS Result" component.
+        connectors: A list of CSV result files containing the power line loading and
+            over/under loading results of the simulation at each timestep.
+            There is one CSV per electrical connector in the network. These can
+            be imported with the "DF Read OpenDSS Result" component.
+        transformers: A list of CSV result files containing the transformer loading and
+            over/under loading results of the simulation at each timestep.
+            There is one CSV per transformer in the network. These can be
+            imported with the "DF Read OpenDSS Result" component.
 """
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
-ghenv.Component.AdditionalHelpFromDocStrings = '1'
+ghenv.Component.AdditionalHelpFromDocStrings = '0'
 
 import os
 import subprocess
 import json
+
+try:  # import the dragonfly_energy dependencies
+    from dragonfly_energy.run import run_default_report
+except ImportError as e:
+    raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:
     from ladybug_rhino.download import download_file_by_name
@@ -59,8 +75,11 @@ if all_required_inputs(ghenv.Component) and _run:
     deps_folder = os.path.join(project_folder, 'deps_opendss')
     reader = 'urbanopt_ditto_reader.py'
     converter = 'convert.py'
+    read = 'read.py'
     download_file_by_name(uod_url + reader, deps_folder, reader, True)
     download_file_by_name(uod_url + converter, deps_folder, converter, True)
+    download_file_by_name(
+        uod_url + 'reader/' + read, os.path.join(deps_folder, 'reader'), read, True)
 
     # get the path to the ditto folder
     assert os.name == 'nt', 'Dragonfly OpenDSS workflows are currently windows-only'
@@ -75,13 +94,13 @@ if all_required_inputs(ghenv.Component) and _run:
     # write out a config file
     scen_name = os.path.basename(_scenario).replace('.csv', '')
     run_folder = os.path.join(project_folder, 'run', scen_name)
-    result = os.path.join(run_folder, 'opendss')
-    if not os.path.isdir(result):
-        os.mkdir(result)
+    result_folder = os.path.join(run_folder, 'opendss')
+    if not os.path.isdir(result_folder):
+        os.mkdir(result_folder)
     config_dict = {
         'urbanopt_scenario': run_folder,
         'equipment_file': os.path.join(project_folder, 'electrical_database.json'),
-        'opendss_folder': result,
+        'opendss_folder': result_folder,
         'geojson_file': _geojson,
         'ditto_folder': ditto_folder,
         'use_reopt': False
@@ -90,7 +109,18 @@ if all_required_inputs(ghenv.Component) and _run:
     with open(config_json, 'w') as fp:
         json.dump(config_dict, fp, indent=4)
 
+    # generate the default scenario report
+    run_default_report(_geojson, _scenario)
+
     # execute the Pyhon script to run everything through OpenDSS
     cmds = ['python', os.path.join(deps_folder, converter), config_json]
-    process = subprocess.Popen(cmds, stdout=subprocess.PIPE)
-    stdout = process.communicate()
+    process = subprocess.Popen(cmds, stderr=subprocess.PIPE)
+    stderr = process.communicate()
+
+    # gather together all of the result files
+    bldg_folder = os.path.join(result_folder, 'results', 'Features')
+    conn_folder = os.path.join(result_folder, 'results', 'Lines')
+    trans_folder = os.path.join(result_folder, 'results', 'Transformers')
+    buildings = [os.path.join(bldg_folder, file) for file in os.listdir(bldg_folder)]
+    connectors = [os.path.join(conn_folder, file) for file in os.listdir(conn_folder)]
+    transformers = [os.path.join(trans_folder, file) for file in os.listdir(trans_folder)]
