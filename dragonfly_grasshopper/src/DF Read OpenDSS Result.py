@@ -17,7 +17,11 @@ Parse any CSV file output from an OpenDSS simulation.
             information or transformers/connectors with loading information.
 
     Returns:
-        values: A list of data collections containing the numerical results in each CSV.
+        factors: A list of data collections containing the dimensionless fractional values
+            from the CSV results. For buildings, these represent the voltage
+            at a given timestep divided by the standard outlet voltage (120 V).
+            For transformers and connectors, these represent the power along
+            the wire or transformer divided by the kVA rating of the object.
         condition: A list of data collections noting the condition of a given object.
             For example, whether the object is over or under voltage (in the
             case of a building) or whether it is overloaded (in the case of
@@ -26,7 +30,7 @@ Parse any CSV file output from an OpenDSS simulation.
 
 ghenv.Component.Name = 'DF Read OpenDSS Result'
 ghenv.Component.NickName = 'OpenDSSResult'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -39,7 +43,7 @@ try:
     from ladybug.header import Header
     from ladybug.analysisperiod import AnalysisPeriod
     from ladybug.datatype.generic import GenericType
-    from ladybug.datatype.power import Power
+    from ladybug.datatype.fraction import Fraction
     from ladybug.futil import csv_to_matrix
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
@@ -70,12 +74,10 @@ is_over = GenericType('Is Overloaded', 'condition',
                       unit_descr={1: 'Overloaded', 0: 'Normal'})
 volt_cond = GenericType('Voltage Condition', 'condition',
                         unit_descr={-1: 'Undervoltage', 0: 'Normal', 1: 'Overvoltage'})
-voltage = GenericType('Voltage', 'kV')
-power = GenericType('Electric Load', 'kVA')
 
 
 if all_required_inputs(ghenv.Component):
-    values, condition = [], []
+    factors, condition = [], []
     for result_file in _dss_csv:
         # parse the data and figure out the timeseries properties
         data = csv_to_matrix(result_file)
@@ -86,21 +88,20 @@ if all_required_inputs(ghenv.Component):
         obj_name = os.path.basename(result_file).replace('.csv', '')
         if obj_name.startswith('Line.'):
             obj_name = obj_name.replace('Line.', '')
-            obj_type = 'Electrical Connector'
+            obj_type = 'Electrical Connector Loading'
         elif obj_name.startswith('Transformer.'):
             obj_name = obj_name.replace('Transformer.', '')
-            obj_type = 'Transformer'
+            obj_type = 'Transformer Loading'
         else:
-            obj_type = 'Building'
+            obj_type = 'Building Voltage'
         metadata = {'type': obj_type, 'name': obj_name}
 
-        # output the data collection of values
+        # output the data collection of factors
         result_vals = [float(data[i][1]) for i in range(len(data))]
-        data_t = voltage if 'voltage' in csv_header[1] else power
-        header = Header(data_t, data_t.units[0], a_period, metadata)
-        values.append(HourlyContinuousCollection(header, result_vals))
+        header = Header(Fraction(), 'fraction', a_period, metadata)
+        factors.append(HourlyContinuousCollection(header, result_vals))
 
-        # output the data collection of values
+        # output the data collection of conditions
         if len(data[0]) == 4:  # building voltage results
             cond_vals = []
             for row in data:

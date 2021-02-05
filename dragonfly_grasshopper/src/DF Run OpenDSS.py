@@ -36,11 +36,11 @@ pip install git+https://github.com/urbanopt/urbanopt-ditto-reader
             building in the dragonfly model. These can be imported with the
             "DF Read OpenDSS Result" component.
         connectors: A list of CSV result files containing the power line loading and
-            over/under loading results of the simulation at each timestep.
+            overloading results of the simulation at each timestep.
             There is one CSV per electrical connector in the network. These can
             be imported with the "DF Read OpenDSS Result" component.
         transformers: A list of CSV result files containing the transformer loading and
-            over/under loading results of the simulation at each timestep.
+            overloading results of the simulation at each timestep.
             There is one CSV per transformer in the network. These can be
             imported with the "DF Read OpenDSS Result" component.
 """
@@ -70,7 +70,7 @@ except ImportError as e:
 
 if all_required_inputs(ghenv.Component) and _run:
     # download the files that execute the translation
-    uod_url = 'https://github.com/urbanopt/urbanopt-ditto-reader/raw/develop/'
+    uod_url = 'https://github.com/urbanopt/urbanopt-ditto-reader/raw/consistency/'
     project_folder = os.path.dirname(_geojson)
     deps_folder = os.path.join(project_folder, 'deps_opendss')
     reader = 'urbanopt_ditto_reader.py'
@@ -121,6 +121,7 @@ if all_required_inputs(ghenv.Component) and _run:
     bldg_folder = os.path.join(result_folder, 'results', 'Features')
     conn_folder = os.path.join(result_folder, 'results', 'Lines')
     trans_folder = os.path.join(result_folder, 'results', 'Transformers')
-    buildings = [os.path.join(bldg_folder, file) for file in os.listdir(bldg_folder)]
-    connectors = [os.path.join(conn_folder, file) for file in os.listdir(conn_folder)]
-    transformers = [os.path.join(trans_folder, file) for file in os.listdir(trans_folder)]
+    if os.path.isdir(bldg_folder):
+        buildings = [os.path.join(bldg_folder, file) for file in os.listdir(bldg_folder)]
+        connectors = [os.path.join(conn_folder, file) for file in os.listdir(conn_folder)]
+        transformers = [os.path.join(trans_folder, file) for file in os.listdir(trans_folder)]
