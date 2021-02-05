@@ -1,0 +1,36 @@
+{
+  "version": "1.1.0", 
+  "nickname": "OpenDSSResult", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "values", 
+        "description": "A list of data collections containing the numerical results in each CSV.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "condition", 
+        "description": "A list of data collections noting the condition of a given object.\nFor example, whether the object is over or under voltage (in the\ncase of a building) or whether it is overloaded (in the case of\na transformer or electrical connector).", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_dss_csv", 
+      "description": "The file path of any CSV result file that has been generated from\nan OpenDSS simulation. This can be either a Building CSV with voltage\ninformation or transformers/connectors with loading information.", 
+      "type": "string", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\nimport os\nimport datetime\n\ntry:\n    from ladybug.datacollection import HourlyContinuousCollection\n    from ladybug.header import Header\n    from ladybug.analysisperiod import AnalysisPeriod\n    from ladybug.datatype.generic import GenericType\n    from ladybug.datatype.power import Power\n    from ladybug.futil import csv_to_matrix\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef date_str_to_datetime(date_str):\n    \"\"\"Get a datetime object from a string.\"\"\"\n    return datetime.datetime.strptime(date_str, '%Y/%m/%d %H:%M:%S')\n\n\ndef extract_analysis_period(data):\n    \"\"\"Extract an AnalysisPeriod from CSV data.\"\"\"\n    dts = [date_str_to_datetime(data[i][0]) for i in (0, 1, -2)]\n    timestep = int(3600/ (dts[1] - dts[0]).total_seconds())\n    leap_year = True if dts[0].year % 4 == 0 else False\n    a_period = AnalysisPeriod(\n        dts[0].month, dts[0].day, 0, dts[-1].month, dts[-1].day, 23,\n        timestep=timestep, is_leap_year=leap_year)\n    return a_period\n\n# data types for the various outputs from OpenDSS\nis_over = GenericType('Is Overloaded', 'condition',\n                      unit_descr={1: 'Overloaded', 0: 'Normal'})\nvolt_cond = GenericType('Voltage Condition', 'condition',\n                        unit_descr={-1: 'Undervoltage', 0: 'Normal', 1: 'Overvoltage'})\nvoltage = GenericType('Voltage', 'kV')\npower = GenericType('Electric Load', 'kVA')\n\n\nif all_required_inputs(ghenv.Component):\n    values, condition = [], []\n    for result_file in _dss_csv:\n        # parse the data and figure out the timeseries properties\n        data = csv_to_matrix(result_file)\n        csv_header = data.pop(0)\n        a_period = extract_analysis_period(data)\n\n        # figure out the type of object to write into the metadata\n        obj_name = os.path.basename(result_file).replace('.csv', '')\n        if obj_name.startswith('Line.'):\n            obj_name = obj_name.replace('Line.', '')\n            obj_type = 'Electrical Connector'\n        elif obj_name.startswith('Transformer.'):\n            obj_name = obj_name.replace('Transformer.', '')\n            obj_type = 'Transformer'\n        else:\n            obj_type = 'Building'\n        metadata = {'type': obj_type, 'name': obj_name}\n\n        # output the data collection of values\n        result_vals = [float(data[i][1]) for i in range(len(data))]\n        data_t = voltage if 'voltage' in csv_header[1] else power\n        header = Header(data_t, data_t.units[0], a_period, metadata)\n        values.append(HourlyContinuousCollection(header, result_vals))\n\n        # output the data collection of values\n        if len(data[0]) == 4:  # building voltage results\n            cond_vals = []\n            for row in data:\n                cond = 0 if row[2] == 'False' else 1\n                if cond != 1 and row[3] == 'True\\n':\n                    cond = -1\n                cond_vals.append(cond)\n            header = Header(volt_cond, volt_cond.units[0], a_period, metadata)\n            condition.append(HourlyContinuousCollection(header, cond_vals))\n        else:  # transformer or connector load\n            cond_vals = []\n            for row in data:\n                cond = 0 if row[2] == 'False\\n' else 1\n                cond_vals.append(cond)\n            header = Header(is_over, is_over.units[0], a_period, metadata)\n            condition.append(HourlyContinuousCollection(header, cond_vals))\n", 
+  "category": "Dragonfly", 
+  "name": "DF Read OpenDSS Result", 
+  "description": "Parse any CSV file output from an OpenDSS simulation.\n-"
+}
