@@ -27,9 +27,14 @@ https://docs.urbanopt.net/installation/installation.html
             into Grasshopper and assign input arguments. Measures can be
             downloaded from the NREL Building Components Library (BCL) at
             (https://bcl.nrel.gov/).
+        mappers_: An optional list of dragonfly MapperMeasure objects to be included
+            in the output osw. MapperMeasures are just like normal OpenStudio
+            measures except they can accept a list of values for their arguments
+            that align with the buildings in dragonfly Model. Each value in
+            the list will be mapped to a different building.
         report_: Boolean to note whether to include the URBANopt default feature reporting
             measure as part of the simulation. If True, the measure will be run
-            after all simulations are complete. (Default: True).
+            after all simulations are complete. (Default:True).
         _cpus_: A positive integer for the number of CPUs to use in the simulation.
             This should be changed based on the machine on which the simulation
             is being run in order to yield the fastest simulation (Default: 2).
@@ -60,7 +65,7 @@ https://docs.urbanopt.net/installation/installation.html
 
 ghenv.Component.Name = 'DF Run URBANopt'
 ghenv.Component.NickName = 'RunURBANopt'
-ghenv.Component.Message = '1.1.3'
+ghenv.Component.Message = '1.1.4'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -118,9 +123,11 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # write the base OSW to be used to translate all geoJSON features
     measures = None if len(measures_) == 0 or measures_[0] is None else measures_
+    mappers = None if len(mappers_) == 0 or mappers_[0] is None else mappers_
     skip_report = not report_ if report_ is not None else False
     base_honeybee_osw(
         directory, sim_par_json=sim_par_json, additional_measures=measures,
+        additional_mapper_measures=mappers,
         epw_file=_epw_file, skip_report=skip_report)
 
     # prepare the URBANopt folder and generate the scenario
