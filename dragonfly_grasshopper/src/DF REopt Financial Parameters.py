@@ -34,7 +34,7 @@ Customize the financial settings of a REopt analysis.
             Run REopt' component.
 """
 
-ghenv.Component.Name = 'LB REopt Financial Parameters'
+ghenv.Component.Name = 'DF REopt Financial Parameters'
 ghenv.Component.NickName = 'FinancialPar'
 ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = 'Dragonfly'

@@ -30,8 +30,8 @@ standards library.
             library (filtered by keywords_ if they are input).
 """
 
-ghenv.Component.Name = "HB OpenDSS Librarie"
-ghenv.Component.NickName = 'OpenDSSLib'
+ghenv.Component.Name = "DF Search OpenDSS"
+ghenv.Component.NickName = 'SearchOpenDSS'
 ghenv.Component.Message = '1.1.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'

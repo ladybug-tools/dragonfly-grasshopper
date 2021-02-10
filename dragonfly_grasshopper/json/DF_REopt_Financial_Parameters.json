@@ -73,6 +73,6 @@
   "subcategory": "3 :: Energy", 
   "code": "\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.reopt import REoptParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\n\nfinancial_par = REoptParameter()\n\nif _years_ is not None:\n    financial_par.financial_parameter.analysis_years = _years_\nif _escalation_ is not None:\n    financial_par.financial_parameter.escalation_rate = _escalation_\nif _tax_ is not None:\n    financial_par.financial_parameter.tax_rate = _tax_\nif _discount_ is not None:\n    financial_par.financial_parameter.discount_rate = _discount_\nif _wind_cost_ is not None:\n    financial_par.wind_parameter.dollars_per_kw = _wind_cost_\nif _pv_cost_ is not None:\n    financial_par.pv_parameter.dollars_per_kw = _pv_cost_\nif _storage_cost_ is not None:\n    financial_par.storage_parameter.dollars_per_kw = _storage_cost_\nif _gener_cost_ is not None:\n    financial_par.generator_parameter.dollars_per_kw = _gener_cost_\n", 
   "category": "Dragonfly", 
-  "name": "LB REopt Financial Parameters", 
+  "name": "DF REopt Financial Parameters", 
   "description": "Customize the financial settings of a REopt analysis.\n-"
 }

@@ -45,19 +45,50 @@ https://docs.urbanopt.net/installation/installation.html
 
     Returns:
         report: Reports, errors, warnings, etc.
-        scenario: File path to the URBANopt scenario CSV used as input for the
-            URBANopt CLI run.
-        csv: Path to a CSV file containing scenario optimization results.
-        json: Path to a JSON file containing scenario optimization results.
+        values: A list of numerical values from the REopt analysis, all related to
+            the cost and financial outcome of the optimization. These values
+            align with the parameters below.
+        parameters: A list of text that correspond to the numerical values above.
+            Each text item explains what the numerical value means.
+        wind: A number for the optimal capacity of wind power that should be installed
+            in kW. This will be null unless a non-zero value is specified for
+            the input _wind_.
+        pv: A number for the optimal capacity of photovlotaic power that should be
+            installed in kW.
+        storage: A list of two numbers ordered as follows.
+            _
+            - A number for the optimal dicharge capacity of battery storage
+            that should be installed in kW.
+            _
+            - A number for the optimal total capacity of battery storage
+            that should be installed in kWh.
+        generator: A number for the optimal capacity of generator power that should be
+            installed in kW. This will be null unless a non-zero value is
+            specified for the input _generator_.
+        data: A list of hourly continuous data collections containing the detailed
+            timeseties results of the REopt analysis.
 """
 
 ghenv.Component.Name = 'DF Run REopt'
 ghenv.Component.NickName = 'RunREopt'
-ghenv.Component.Message = '1.1.1'
+ghenv.Component.Message = '1.1.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
 
+import os
+import json
+import datetime
+
+try:
+    from ladybug.datacollection import HourlyContinuousCollection
+    from ladybug.header import Header
+    from ladybug.analysisperiod import AnalysisPeriod
+    from ladybug.datatype.power import Power
+    from ladybug.datatype.fraction import Fraction
+    from ladybug.futil import csv_to_matrix
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
 try:  # import the dragonfly_energy dependencies
     from dragonfly_energy.reopt import REoptParameter
@@ -69,6 +100,22 @@ try:
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
+
+def date_str_to_datetime(date_str):
+    """Get a datetime object from a string."""
+    return datetime.datetime.strptime(date_str, '%Y/%m/%d %H:%M:%S')
+
+
+def extract_analysis_period(data):
+    """Extract an AnalysisPeriod from CSV data."""
+    dts = [date_str_to_datetime(data[i][0]) for i in (0, 1, -2)]
+    timestep = int(3600/ (dts[1] - dts[0]).total_seconds())
+    leap_year = True if dts[0].year % 4 == 0 else False
+    a_period = AnalysisPeriod(
+        dts[0].month, dts[0].day, 0, dts[-1].month, dts[-1].day, 23,
+        timestep=timestep, is_leap_year=leap_year)
+    return a_period
 
 
 if all_required_inputs(ghenv.Component) and _run:
@@ -83,4 +130,47 @@ if all_required_inputs(ghenv.Component) and _run:
     _financial_par_.generator_parameter.max_kw = _wind_ if _wind_ is not None else 1000000000
 
     # execute the simulation with URBANopt CLI
-    csv, json = run_reopt(_geojson, _scenario, _urdb_label, _financial_par_)
+    re_csv, re_json = run_reopt(_geojson, _scenario, _urdb_label, _financial_par_)
+
+    # parse the JSON results of the simulation if successful
+    if os.path.isfile(re_json):
+        with open(re_json) as json_file:
+            re_data = json.load(json_file)
+        values, parameters = [], []
+        for key, val in re_data['scenario_report']['distributed_generation'].items():
+            if isinstance(val, (float, int)):
+                values.append(val)
+                parameters.append(key.replace('_', ' ').title())
+            elif key == 'wind' and len(val) != 0:
+                wind = val[0]['size_kw']
+            elif key == 'solar_pv' and len(val) != 0:
+                pv = val[0]['size_kw']
+            elif key == 'storage' and len(val) != 0:
+                storage = [val[0]['size_kw'], val[0]['size_kwh']]
+            elif key == 'generator' and len(val) != 0:
+                generator = val[0]['size_kw']
+
+    # parse the CSV results of the simulation if successful
+    if os.path.isfile(re_csv):
+        data = []  # final list of data to be collected
+        # parse the data and figure out the timeseries properties
+        csv_data = csv_to_matrix(re_csv)
+        csv_header = csv_data.pop(0)
+        a_period = extract_analysis_period(csv_data)
+        for col, col_name in zip(zip(*csv_data), csv_header):
+            if col_name.startswith('REopt:'):
+                # figure out the type of object to write into the metadata
+                base_name = col_name.replace('REopt:', '').split(':')
+                end_name, units_init = base_name[-1].split('(')
+                units_init = units_init.replace(')', '')
+                if units_init == 'kw':
+                    units, data_type = 'kW', Power()
+                elif units_init == 'pct':
+                    units, data_type = 'fraction', Fraction()
+                else:
+                    continue
+                metadata = {'type': ':'.join(base_name[:-1] + [end_name])}
+                # create the final data collections
+                result_vals = [float(val) for val in col]
+                header = Header(data_type, units, a_period, metadata)
+                data.append(HourlyContinuousCollection(header, result_vals))

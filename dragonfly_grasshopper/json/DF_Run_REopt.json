@@ -1,19 +1,54 @@
 {
-  "version": "1.1.1", 
+  "version": "1.1.2", 
   "nickname": "RunREopt", 
   "outputs": [
     [
       {
         "access": "None", 
-        "name": "csv", 
-        "description": "Path to a CSV file containing scenario optimization results.", 
+        "name": "values", 
+        "description": "A list of numerical values from the REopt analysis, all related to\nthe cost and financial outcome of the optimization. These values\nalign with the parameters below.", 
         "type": null, 
         "default": null
       }, 
       {
         "access": "None", 
-        "name": "json", 
-        "description": "Path to a JSON file containing scenario optimization results.", 
+        "name": "parameters", 
+        "description": "A list of text that correspond to the numerical values above.\nEach text item explains what the numerical value means.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "wind", 
+        "description": "A number for the optimal capacity of wind power that should be installed\nin kW. This will be null unless a non-zero value is specified for\nthe input _wind_.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "pv", 
+        "description": "A number for the optimal capacity of photovlotaic power that should be\ninstalled in kW.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "storage", 
+        "description": "A list of two numbers ordered as follows.\n_\n- A number for the optimal dicharge capacity of battery storage\nthat should be installed in kW.\n_\n- A number for the optimal total capacity of battery storage\nthat should be installed in kWh.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "generator", 
+        "description": "A number for the optimal capacity of generator power that should be\ninstalled in kW. This will be null unless a non-zero value is\nspecified for the input _generator_.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "data", 
+        "description": "A list of hourly continuous data collections containing the detailed\ntimeseties results of the REopt analysis.", 
         "type": null, 
         "default": null
       }
@@ -85,7 +120,7 @@
     }
   ], 
   "subcategory": "3 :: Energy", 
-  "code": "\n\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.reopt import REoptParameter\n    from dragonfly_energy.run import run_reopt\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # generate default REoptParameter if None are input to the component\n    if _financial_par_ is None:\n        _financial_par_ = REoptParameter()\n\n    # set the ax sizes for the variou energy sources\n    _financial_par_.wind_parameter.max_kw = _wind_ if _wind_ is not None else 0\n    _financial_par_.pv_parameter.max_kw = _wind_ if _wind_ is not None else 1000000000\n    _financial_par_.storage_parameter.max_kw = _wind_ if _wind_ is not None else 1000000\n    _financial_par_.generator_parameter.max_kw = _wind_ if _wind_ is not None else 1000000000\n\n    # execute the simulation with URBANopt CLI\n    csv, json = run_reopt(_geojson, _scenario, _urdb_label, _financial_par_)\n", 
+  "code": "\nimport os\nimport json\nimport datetime\n\ntry:\n    from ladybug.datacollection import HourlyContinuousCollection\n    from ladybug.header import Header\n    from ladybug.analysisperiod import AnalysisPeriod\n    from ladybug.datatype.power import Power\n    from ladybug.datatype.fraction import Fraction\n    from ladybug.futil import csv_to_matrix\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.reopt import REoptParameter\n    from dragonfly_energy.run import run_reopt\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef date_str_to_datetime(date_str):\n    \"\"\"Get a datetime object from a string.\"\"\"\n    return datetime.datetime.strptime(date_str, '%Y/%m/%d %H:%M:%S')\n\n\ndef extract_analysis_period(data):\n    \"\"\"Extract an AnalysisPeriod from CSV data.\"\"\"\n    dts = [date_str_to_datetime(data[i][0]) for i in (0, 1, -2)]\n    timestep = int(3600/ (dts[1] - dts[0]).total_seconds())\n    leap_year = True if dts[0].year % 4 == 0 else False\n    a_period = AnalysisPeriod(\n        dts[0].month, dts[0].day, 0, dts[-1].month, dts[-1].day, 23,\n        timestep=timestep, is_leap_year=leap_year)\n    return a_period\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # generate default REoptParameter if None are input to the component\n    if _financial_par_ is None:\n        _financial_par_ = REoptParameter()\n\n    # set the ax sizes for the variou energy sources\n    _financial_par_.wind_parameter.max_kw = _wind_ if _wind_ is not None else 0\n    _financial_par_.pv_parameter.max_kw = _wind_ if _wind_ is not None else 1000000000\n    _financial_par_.storage_parameter.max_kw = _wind_ if _wind_ is not None else 1000000\n    _financial_par_.generator_parameter.max_kw = _wind_ if _wind_ is not None else 1000000000\n\n    # execute the simulation with URBANopt CLI\n    re_csv, re_json = run_reopt(_geojson, _scenario, _urdb_label, _financial_par_)\n\n    # parse the JSON results of the simulation if successful\n    if os.path.isfile(re_json):\n        with open(re_json) as json_file:\n            re_data = json.load(json_file)\n        values, parameters = [], []\n        for key, val in re_data['scenario_report']['distributed_generation'].items():\n            if isinstance(val, (float, int)):\n                values.append(val)\n                parameters.append(key.replace('_', ' ').title())\n            elif key == 'wind' and len(val) != 0:\n                wind = val[0]['size_kw']\n            elif key == 'solar_pv' and len(val) != 0:\n                pv = val[0]['size_kw']\n            elif key == 'storage' and len(val) != 0:\n                storage = [val[0]['size_kw'], val[0]['size_kwh']]\n            elif key == 'generator' and len(val) != 0:\n                generator = val[0]['size_kw']\n\n    # parse the CSV results of the simulation if successful\n    if os.path.isfile(re_csv):\n        data = []  # final list of data to be collected\n        # parse the data and figure out the timeseries properties\n        csv_data = csv_to_matrix(re_csv)\n        csv_header = csv_data.pop(0)\n        a_period = extract_analysis_period(csv_data)\n        for col, col_name in zip(zip(*csv_data), csv_header):\n            if col_name.startswith('REopt:'):\n                # figure out the type of object to write into the metadata\n                base_name = col_name.replace('REopt:', '').split(':')\n                end_name, units_init = base_name[-1].split('(')\n                units_init = units_init.replace(')', '')\n                if units_init == 'kw':\n                    units, data_type = 'kW', Power()\n                elif units_init == 'pct':\n                    units, data_type = 'fraction', Fraction()\n                else:\n                    continue\n                metadata = {'type': ':'.join(base_name[:-1] + [end_name])}\n                # create the final data collections\n                result_vals = [float(val) for val in col]\n                header = Header(data_type, units, a_period, metadata)\n                data.append(HourlyContinuousCollection(header, result_vals))\n", 
   "category": "Dragonfly", 
   "name": "DF Run REopt", 
   "description": "Run a an URBANopt geoJSON and scenario through REopt using the URBANopt CLI.\n_\nThis component requires the URBANopt CLI to be installed in order to run.\nInstallation instructions for the URBANopt CLI can be found at:\nhttps://docs.urbanopt.net/installation/installation.html\n-"
