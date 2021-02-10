@@ -47,7 +47,7 @@ pip install git+https://github.com/urbanopt/urbanopt-ditto-reader
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.1.2'
+ghenv.Component.Message = '1.1.3'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -70,7 +70,7 @@ except ImportError as e:
 
 if all_required_inputs(ghenv.Component) and _run:
     # download the files that execute the translation
-    uod_url = 'https://github.com/urbanopt/urbanopt-ditto-reader/raw/consistency/'
+    uod_url = 'https://github.com/urbanopt/urbanopt-ditto-reader/raw/develop/'
     project_folder = os.path.dirname(_geojson)
     deps_folder = os.path.join(project_folder, 'deps_opendss')
     reader = 'urbanopt_ditto_reader.py'
