@@ -13,7 +13,8 @@ Apply a customized IdealAirSystem to Dragonfly Buildings, Stories or Room2Ds.
 
     Args:
         _df_objs: Dragonfly Buildings, Stories or Room2Ds to which the input ideal
-            air properties will be assigned.
+            air properties will be assigned. This can also be an etire
+            dragonfly Model.
         _economizer_: Text to indicate the type of air-side economizer used on
             the ideal air system. Economizers will mix in a greater amount of
             outdoor air to cool the zone (rather than running the cooling system)
@@ -50,7 +51,7 @@ Apply a customized IdealAirSystem to Dragonfly Buildings, Stories or Room2Ds.
 
 ghenv.Component.Name = "DF IdealAir"
 ghenv.Component.NickName = 'DFIdealAir'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.1.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -67,8 +68,10 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
+    from dragonfly.model import Model
     from dragonfly.building import Building
     from dragonfly.story import Story
+    from dragonfly.room2d import Room2D
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
@@ -98,7 +101,14 @@ def extract_room2ds(obj):
         return obj.unique_room_2ds
     elif isinstance(obj, Story):
         return obj.room_2ds
-    return [obj]  # assume that the object is already a Room2D
+    elif isinstance(obj, Room2D):
+        return [obj]
+    elif isinstance(obj, Model):
+        return [room for bldg in obj.buildings for room in bldg.unique_room_2ds]
+    else:
+        raise ValueError(
+            'Expected Dragonfly Room2D, Story, Building, or Model. '
+            'Got {}.'.format(type(hb_obj)))
 
 
 if all_required_inputs(ghenv.Component):

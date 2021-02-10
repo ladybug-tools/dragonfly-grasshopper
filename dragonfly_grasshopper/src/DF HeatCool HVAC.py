@@ -23,7 +23,8 @@ of occupancy is so low that infiltration is enough to meet fresh air demand.
         _df_objs: Dragonfly Buildings, Stories or Room2Ds to which the input template
             HVAC will be assigned. If a list of Room2Ds is input, all objects
             will receive the same HVAC instance. Otherwise, each object gets its
-            own instance (eg. each input Story will get its own HVAC).
+            own instance (eg. each input Story will get its own HVAC). This can
+            also be an etire dragonfly Model.
         _system_type: Text for the specific type of heating/cooling system and equipment.
             The "HB HeatCool HVAC Templates" component has a full list of the
             supported Heating/Cooling system templates.
@@ -41,7 +42,7 @@ of occupancy is so low that infiltration is enough to meet fresh air demand.
 
 ghenv.Component.Name = "DF HeatCool HVAC"
 ghenv.Component.NickName = 'DFHeatCoolHVAC'
-ghenv.Component.Message = '1.1.1'
+ghenv.Component.Message = '1.1.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -53,7 +54,6 @@ import uuid
 try:  # import the honeybee extension
     from honeybee.altnumber import autosize
     from honeybee.typing import clean_and_id_ep_string
-    from honeybee.model import Model
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
@@ -64,8 +64,10 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
+    from dragonfly.model import Model
     from dragonfly.building import Building
     from dragonfly.story import Story
+    from dragonfly.room2d import Room2D
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
@@ -134,5 +136,12 @@ if all_required_inputs(ghenv.Component):
     for obj in df_objs:
         if isinstance(obj, (Building, Story)):
             obj.properties.energy.set_all_room_2d_hvac(hvac)
-        elif obj.properties.energy.is_conditioned:  # assume it's a Room2D
+        elif isinstance(obj, Room2D) and obj.properties.energy.is_conditioned:
             obj.properties.energy.hvac = hvac
+        elif isinstance(obj, Model):
+            for bldg in obj.buildings:
+                bldg.properties.energy.set_all_room_2d_hvac(hvac)
+        else:
+            raise ValueError(
+                'Expected Dragonfly Room2D, Story, Building, or Model. '
+                'Got {}.'.format(type(hb_obj)))
