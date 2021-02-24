@@ -47,7 +47,7 @@ pip install git+https://github.com/urbanopt/urbanopt-ditto-reader
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.1.4'
+ghenv.Component.Message = '1.1.5'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -69,55 +69,26 @@ except ImportError as e:
 
 
 if all_required_inputs(ghenv.Component) and _run:
-    # download the files that execute the translation
-    uod_url = 'https://github.com/chriswmackey/urbanopt-ditto-reader/raw/consistency/'
-    project_folder = os.path.dirname(_geojson)
-    deps_folder = os.path.join(project_folder, 'deps_opendss')
-    reader = 'urbanopt_ditto_reader.py'
-    converter = 'convert.py'
-    read = 'read.py'
-    download_file_by_name(uod_url + reader, deps_folder, reader, True)
-    download_file_by_name(uod_url + converter, deps_folder, converter, True)
-    download_file_by_name(
-        uod_url + 'reader/' + read, os.path.join(deps_folder, 'reader'), read, True)
-
-    # get the path to the ditto folder
-    assert os.name == 'nt', 'Dragonfly OpenDSS workflows are currently windows-only'
-    home_folder = os.getenv('HOME') or os.path.expanduser('~')
-    python_folder = os.path.join(
-        home_folder, 'AppData', 'Local', 'Programs', 'Python', 'Python37', 
-        'Lib', 'site-packages')
-    ditto_folder = os.path.join(python_folder, 'ditto')
-    assert os.path.isdir(ditto_folder), 'Ditto is not currently installed. Use:\n' \
-        'pip install git+https://github.com/urbanopt/urbanopt-ditto-reader'
-
-    # write out a config file
-    scen_name = os.path.basename(_scenario).replace('.csv', '')
-    run_folder = os.path.join(project_folder, 'run', scen_name)
-    result_folder = os.path.join(run_folder, 'opendss')
-    if not os.path.isdir(result_folder):
-        os.mkdir(result_folder)
-    config_dict = {
-        'urbanopt_scenario': run_folder,
-        'equipment_file': os.path.join(project_folder, 'electrical_database.json'),
-        'opendss_folder': result_folder,
-        'geojson_file': _geojson,
-        'ditto_folder': ditto_folder,
-        'use_reopt': False
-    }
-    config_json = os.path.join(deps_folder, 'config.json')
-    with open(config_json, 'w') as fp:
-        json.dump(config_dict, fp, indent=4)
-
     # generate the default scenario report
     run_default_report(_geojson, _scenario)
 
-    # execute the Pyhon script to run everything through OpenDSS
-    cmds = ['python', os.path.join(deps_folder, converter), config_json]
-    process = subprocess.Popen(cmds, stderr=subprocess.PIPE)
+    # prepare the opendss-running command
+    command = 'ditto_reader_cli run-opendss -f "{feature_file}" ' \
+        '-s "{scenario_file}" -e "{equipment_file}" -t {time_pts}'.format(
+            feature_file=_geojson, scenario_file=_scenario,
+            equipment_file=os.path.join(os.path.dirname(_geojson), 'electrical_database.json'),
+            time_pts = 8760 * 6
+        )
+
+    # execute the command to run everything through OpenDSS
+    shell = False if os.name == 'nt' else True
+    process = subprocess.Popen(command, stderr=subprocess.PIPE, shell=shell)
     stderr = process.communicate()
 
     # gather together all of the result files
+    scen_name = os.path.basename(_scenario).replace('.csv', '')
+    run_folder = os.path.join(os.path.dirname(_geojson), 'run', scen_name)
+    result_folder = os.path.join(run_folder, 'opendss')
     bldg_folder = os.path.join(result_folder, 'results', 'Features')
     conn_folder = os.path.join(result_folder, 'results', 'Lines')
     trans_folder = os.path.join(result_folder, 'results', 'Transformers')
