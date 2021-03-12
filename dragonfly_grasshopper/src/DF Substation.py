@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2020, Ladybug Tools.
+# Copyright (c) 2021, Ladybug Tools.
 # You should have received a copy of the GNU General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -25,7 +25,7 @@ Create an OpenDSS Substation from its footprint geometry (horizontal Rhino surfa
 
 ghenv.Component.Name = 'DF Substation'
 ghenv.Component.NickName = 'Substation'
-ghenv.Component.Message = '1.1.0'
+ghenv.Component.Message = '1.2.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
