@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2020, Ladybug Tools.
+# Copyright (c) 2021, Ladybug Tools.
 # You should have received a copy of the GNU General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -38,7 +38,7 @@ Construct a design day from a set of parameters.
 
 ghenv.Component.Name = 'DF Construct Design Day'
 ghenv.Component.NickName = 'ConstrDesignDay'
-ghenv.Component.Message = '1.1.1'
+ghenv.Component.Message = '1.2.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
