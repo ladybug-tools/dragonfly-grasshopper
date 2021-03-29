@@ -25,7 +25,7 @@ Load, ProgramType, or Simulation object.
         _folder_: An optional directory into which the dragonfly objects will be
             written.  The default is set to the default simulation folder.
         indent_: An optional positive integer to set the indentation used in the
-            resulting JSON file. If None or 0, the JSON will be a single line.
+            resulting JSON file.
         abridged_: Set to "True" to serialize the object in its abridged form.
             Abridged objects cannot be reserialized back to dragonfly objects
             on their own but they are used throughout dragonfly to minimize
@@ -39,7 +39,7 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Dump Objects'
 ghenv.Component.NickName = 'DumpObjects'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.2.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -70,7 +70,6 @@ if all_required_inputs(ghenv.Component) and _dump:
         isinstance(_df_objs[0], Model) else '{}.dfjson'.format(name)
     folder = _folder_ if _folder_ is not None else folders.default_simulation_folder
     df_file = os.path.join(folder, file_name)
-    indent = indent_ if indent_ is not None else 0
     abridged = bool(abridged_)
 
     # create the dictionary to be written to a JSON file
@@ -89,4 +88,4 @@ if all_required_inputs(ghenv.Component) and _dump:
 
     # write the dictionary into a file
     with open(df_file, 'w') as fp:
-        json.dump(obj_dict, fp, indent=indent)
+        json.dump(obj_dict, fp, indent=indent_)
