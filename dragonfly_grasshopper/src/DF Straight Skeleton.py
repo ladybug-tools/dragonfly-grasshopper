@@ -17,8 +17,8 @@ to assist with the manual creation of core/perimeter offsets.
 -
 
     Args:
-        _floor_geo: A list of horizontal Rhino surfaces for which the straight
-            skeleton will be computed.
+        _floor_geo: Horizontal Rhino surfaces for which the straight skeleton
+            will be computed.
         offset_: An optional positive number that will be used to offset the
             perimeter of the geometry to output core/perimeter polygons.
             If a value is plugged in here and the straight skeleton is not
@@ -39,7 +39,7 @@ to assist with the manual creation of core/perimeter offsets.
 
 ghenv.Component.Name = 'DF Straight Skeleton'
 ghenv.Component.NickName = 'Skeleton'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.2.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
