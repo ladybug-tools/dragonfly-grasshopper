@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0", 
+  "version": "1.2.1", 
   "nickname": "Skeleton", 
   "outputs": [
     [
@@ -30,8 +30,8 @@
     {
       "access": "item", 
       "name": "_floor_geo", 
-      "description": "A list of horizontal Rhino surfaces for which the straight\nskeleton will be computed.", 
-      "type": "System.Object", 
+      "description": "Horizontal Rhino surfaces for which the straight skeleton\nwill be computed.", 
+      "type": "Brep", 
       "default": null
     }, 
     {
