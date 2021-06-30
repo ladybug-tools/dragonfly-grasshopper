@@ -35,7 +35,7 @@ to such stories.
 
 ghenv.Component.Name = 'DF Reassign Energy Properties'
 ghenv.Component.NickName = 'ReassignProp'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.2.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -52,7 +52,8 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 try:  # import the honeybee-energy extension
-    from honeybee_energy.lib.programtypes import program_type_by_identifier
+    from honeybee_energy.lib.programtypes import program_type_by_identifier, \
+        building_program_type_by_identifier
     from honeybee_energy.lib.constructionsets import construction_set_by_identifier
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy energy:\n\t{}'.format(e))
@@ -70,7 +71,10 @@ if all_required_inputs(ghenv.Component):
     # try to assign the program
     if program_ is not None:
         if isinstance(program_, str):
-            program_ = program_type_by_identifier(program_)
+            try:
+                program_ = building_program_type_by_identifier(program_)
+            except ValueError:
+                program_ = program_type_by_identifier(program_)
         if isinstance(df_obj, (Building, Story)):
             df_obj.properties.energy.set_all_room_2d_program_type(program_)
         else:  # it's a Room2D

@@ -55,7 +55,7 @@ Create Dragonfly Buildings from solid geometry (closed Rhino polysurfaces).
 
 ghenv.Component.Name = "DF Building from Solid"
 ghenv.Component.NickName = 'BuildingSolid'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.2.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
@@ -83,7 +83,8 @@ except ImportError as e:
 
 try:  # import the dragonfly-energy extension
     import dragonfly_energy
-    from honeybee_energy.lib.programtypes import program_type_by_identifier, office_program
+    from honeybee_energy.lib.programtypes import program_type_by_identifier, \
+        building_program_type_by_identifier, office_program
     from honeybee_energy.lib.constructionsets import construction_set_by_identifier
 except ImportError as e:
     if len(_program_) != 0:
@@ -134,7 +135,10 @@ if all_required_inputs(ghenv.Component) and _run:
         if len(_program_) != 0:
             program = longest_list(_program_, i)
             if isinstance(program, str):
-                program = program_type_by_identifier(program)
+                try:
+                    program = building_program_type_by_identifier(program)
+                except ValueError:
+                    program = program_type_by_identifier(program)
             building.properties.energy.set_all_room_2d_program_type(program)
         else:  # generic office program by default
             try:
