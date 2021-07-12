@@ -27,6 +27,9 @@ pip install git+https://github.com/urbanopt/urbanopt-ditto-reader
             in order to run correctly through OpenDSS.
         _scenario: The path to an URBANopt .csv file for the scenario. This CSV
             file can be obtained form the "DF Run URBANopt" component.
+        _run_period_: A ladybyg AnalysisPeriod object to describe the time period
+            over which to run the simulation. The default is to run the simulation
+            for the whole EnergyPlus run period.
         _run: Set to "True" to run the geojson and scenario through OpenDSS.
 
     Returns:
@@ -47,7 +50,7 @@ pip install git+https://github.com/urbanopt/urbanopt-ditto-reader
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.2.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -74,11 +77,15 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # prepare the opendss-running command
     command = 'ditto_reader_cli run-opendss -f "{feature_file}" ' \
-        '-s "{scenario_file}" -e "{equipment_file}" -t {time_pts}'.format(
+        '-s "{scenario_file}" -e "{equipment_file}"'.format(
             feature_file=_geojson, scenario_file=_scenario,
-            equipment_file=os.path.join(os.path.dirname(_geojson), 'electrical_database.json'),
-            time_pts = 8760 * 6
+            equipment_file=os.path.join(os.path.dirname(_geojson), 'electrical_database.json')
         )
+
+    if _run_period_ is not None:
+        st_dt = '2006/{}'.format(_run_period_.st_time.strftime('%m/%d %H:%M:%S'))
+        end_dt = '2006/{}'.format(_run_period_.end_time.strftime('%m/%d %H:%M:%S'))
+        command = '{} -b "{}" -n "{}"'.format(command, st_dt, end_dt)
 
     # execute the command to run everything through OpenDSS
     shell = False if os.name == 'nt' else True
