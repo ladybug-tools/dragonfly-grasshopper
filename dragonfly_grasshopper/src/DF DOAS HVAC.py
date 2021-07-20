@@ -36,7 +36,7 @@ like auditoriums, kitchens, laundromats, etc.
         _vintage_: Text for the vintage of the template system. This will be used
             to set efficiencies for various pieces of equipment within the system.
             The "HB Building Vintages" component has a full list of supported
-            HVAC vintages. (Default: ASHRAE_2013).
+            HVAC vintages. (Default: ASHRAE_2019).
         _name_: Text to set the name for the HVAC system and to be incorporated into
             unique HVAC identifier. If the name is not provided, a random name
             will be assigned.
@@ -64,7 +64,7 @@ like auditoriums, kitchens, laundromats, etc.
 
 ghenv.Component.Name = 'DF DOAS HVAC'
 ghenv.Component.NickName = 'DFDOASHVAC'
-ghenv.Component.Message = '1.2.1'
+ghenv.Component.Message = '1.2.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -110,6 +110,8 @@ vintages = {
     'ASHRAE_2007': 'ASHRAE_2007',
     'ASHRAE_2010': 'ASHRAE_2010',
     'ASHRAE_2013': 'ASHRAE_2013',
+    'ASHRAE_2016': 'ASHRAE_2016',
+    'ASHRAE_2019': 'ASHRAE_2019',
     'DOE Ref Pre-1980': 'DOE_Ref_Pre_1980',
     'DOE Ref 1980-2004': 'DOE_Ref_1980_2004',
     '90.1-2004': 'ASHRAE_2004',
@@ -122,8 +124,10 @@ vintages = {
     '2007': 'ASHRAE_2007',
     '2010': 'ASHRAE_2010',
     '2013': 'ASHRAE_2013',
-    None: 'ASHRAE_2013'
-    }
+    '2016': 'ASHRAE_2016',
+    '2019': 'ASHRAE_2019',
+    None: 'ASHRAE_2019'
+}
 
 # dictionary of HVAC template names
 ext_folder = folders.standards_extension_folders[0]

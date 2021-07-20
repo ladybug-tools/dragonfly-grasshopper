@@ -68,7 +68,7 @@ Weather Generator (UWG).
 
 ghenv.Component.Name = 'DF Assign Building UWG Properties'
 ghenv.Component.NickName = 'BuildingUWG'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.2.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -88,6 +88,8 @@ VINTAGE_MAP = {
     'New': 'New',
     '1980_Present': '1980_Present',
     'Pre1980': 'Pre1980',
+    '2019': '1980_Present',
+    '2016': '1980_Present',
     '2013': '1980_Present',
     '2010': '1980_Present',
     '2007': '1980_Present',
