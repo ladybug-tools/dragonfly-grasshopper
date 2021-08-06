@@ -69,11 +69,12 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.2.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
+import os
 
 try:  # import the ladybug_geometry dependencies
     from ladybug_geometry.geometry2d.pointvector import Point2D
@@ -82,8 +83,15 @@ except ImportError as e:
 
 try:  # import the ladybug dependencies
     from ladybug.location import Location
+    from ladybug.futil import nukedir
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
+
+try:  # import the ladybug dependencies
+    from honeybee.config import folders
+    from honeybee.typing import clean_and_id_string
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
     from dragonfly.model import Model
@@ -99,16 +107,18 @@ except ImportError as e:
 
 
 if all_required_inputs(ghenv.Component) and _write:
-    # set default inputs if not specified
-    point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)
-    use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True
-    add_plenum_ = add_plenum_ if add_plenum_ is not None else False
-
     # check the _model and _location input
     assert isinstance(_model, Model), \
         'Expected Dragonfly Model object. Got {}.'.format(type(_model))
     assert isinstance(_location, Location), \
         'Expected Ladybug Location object. Got {}.'.format(type(_location))
+
+    # set default inputs if not specified
+    point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)
+    use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True
+    add_plenum_ = add_plenum_ if add_plenum_ is not None else False
+    _folder_ = _folder_ if _folder_ is not None else os.path.join(
+        folders.default_simulation_folder, clean_and_id_string(_model.identifier))
 
     if _write == 2:
         geojson = _model.to_geojson(_location, point, _folder_, tolerance)
