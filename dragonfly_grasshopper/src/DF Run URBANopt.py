@@ -36,8 +36,12 @@ https://docs.urbanopt.net/installation/installation.html
             measure as part of the simulation. If True, the measure will be run
             after all simulations are complete. (Default:True).
         _cpus_: A positive integer for the number of CPUs to use in the simulation.
-            This should be changed based on the machine on which the simulation
-            is being run in order to yield the fastest simulation (Default: 2).
+            This number should not exceed the number of CPUs on the machine
+            running the simulation and should be lower if other tasks are
+            running while the simulation is running. If set to None, it
+            should automatically default to one less than the number of CPUs
+            currently available on the machine (or 1 if the machine has only
+            one processor). (Default: None).
         _run: Set to "True" to run the geojson through URBANopt.
             This will ensure that all result files appear in their respective
             outputs from this component. This input can also be the integer "2",
@@ -65,7 +69,7 @@ https://docs.urbanopt.net/installation/installation.html
 
 ghenv.Component.Name = 'DF Run URBANopt'
 ghenv.Component.NickName = 'RunURBANopt'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.2.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -131,7 +135,6 @@ if all_required_inputs(ghenv.Component) and _run:
         epw_file=_epw_file, skip_report=skip_report)
 
     # prepare the URBANopt folder and generate the scenario
-    _cpus_ = 2 if _cpus_ is None else _cpus_
     scenario = prepare_urbanopt_folder(_geojson, _cpus_)
 
     # execute the simulation with URBANopt CLI
