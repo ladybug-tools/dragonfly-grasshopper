@@ -28,13 +28,13 @@ for simulation.
 
 ghenv.Component.Name = 'DF Model'
 ghenv.Component.NickName = 'Model'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.2.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
 
 try:  # import the core honeybee dependencies
-    from honeybee.typing import clean_string
+    from honeybee.typing import clean_string, clean_and_id_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
@@ -52,11 +52,10 @@ except ImportError as e:
 
 if all_required_inputs(ghenv.Component):
     # set a default name
-    name = clean_string(_name_) if _name_ is not None else 'unnamed'
+    name = clean_string(_name_) if _name_ is not None else clean_and_id_string('unnamed')
     units = units_system()
 
     # create the model
     model = Model(name, _buildings, context_, units=units, tolerance=tolerance,
                   angle_tolerance=angle_tolerance)
-    if _name_ is not None:
-        model.display_name = _name_
+    model.display_name = _name_ if _name_ is not None else 'unnamed'
