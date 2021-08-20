@@ -69,12 +69,10 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.2.1'
+ghenv.Component.Message = '1.2.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
-
-import os
 
 try:  # import the ladybug_geometry dependencies
     from ladybug_geometry.geometry2d.pointvector import Point2D
@@ -117,8 +115,6 @@ if all_required_inputs(ghenv.Component) and _write:
     point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)
     use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True
     add_plenum_ = add_plenum_ if add_plenum_ is not None else False
-    _folder_ = _folder_ if _folder_ is not None else os.path.join(
-        folders.default_simulation_folder, clean_and_id_string(_model.identifier))
 
     if _write == 2:
         geojson = _model.to_geojson(_location, point, _folder_, tolerance)
