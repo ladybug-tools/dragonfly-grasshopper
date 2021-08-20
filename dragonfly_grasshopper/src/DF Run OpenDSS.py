@@ -17,7 +17,7 @@ This component also requires the urbanopt-ditto-reader to be installed.
 The urbanopt-ditto-reader can be installed by installing Python 3.7 and then
 running the following from command line;
 _
-pip install git+https://github.com/urbanopt/urbanopt-ditto-reader
+pip install urbanopt-ditto-reader==0.3.8
 -
 
     Args:
@@ -50,7 +50,7 @@ pip install git+https://github.com/urbanopt/urbanopt-ditto-reader
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.2.1'
+ghenv.Component.Message = '1.2.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
