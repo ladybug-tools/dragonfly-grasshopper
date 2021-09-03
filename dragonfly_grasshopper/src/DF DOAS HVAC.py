@@ -64,7 +64,7 @@ like auditoriums, kitchens, laundromats, etc.
 
 ghenv.Component.Name = 'DF DOAS HVAC'
 ghenv.Component.NickName = 'DFDOASHVAC'
-ghenv.Component.Message = '1.2.2'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

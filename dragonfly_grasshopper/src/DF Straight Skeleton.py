@@ -39,7 +39,7 @@ to assist with the manual creation of core/perimeter offsets.
 
 ghenv.Component.Name = 'DF Straight Skeleton'
 ghenv.Component.NickName = 'Skeleton'
-ghenv.Component.Message = '1.2.1'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

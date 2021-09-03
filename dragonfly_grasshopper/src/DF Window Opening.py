@@ -46,7 +46,7 @@ Story or Room2D.
 
 ghenv.Component.Name = 'DF Window Opening'
 ghenv.Component.NickName = 'DFWindowOpen'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
