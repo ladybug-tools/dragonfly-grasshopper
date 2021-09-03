@@ -68,7 +68,7 @@ Weather Generator (UWG).
 
 ghenv.Component.Name = 'DF Assign Building UWG Properties'
 ghenv.Component.NickName = 'BuildingUWG'
-ghenv.Component.Message = '1.2.1'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

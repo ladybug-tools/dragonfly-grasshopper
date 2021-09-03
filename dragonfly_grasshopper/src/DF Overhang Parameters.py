@@ -24,7 +24,7 @@ Create Dragonfly shading parameters with instructions for a single overhang
 
 ghenv.Component.Name = "DF Overhang Parameters"
 ghenv.Component.NickName = 'OverhangPar'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "6"

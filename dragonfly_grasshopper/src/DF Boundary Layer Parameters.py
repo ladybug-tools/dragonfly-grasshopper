@@ -41,7 +41,7 @@ layer in an Urban Weather Genrator (UWG) simulation.
 
 ghenv.Component.Name = "DF Boundary Layer Parameters"
 ghenv.Component.NickName = 'BoundaryLayer'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

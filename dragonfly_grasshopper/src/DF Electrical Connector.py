@@ -29,7 +29,7 @@ carried along it.
 
 ghenv.Component.Name = 'DF Electrical Connector'
 ghenv.Component.NickName = 'Connector'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

@@ -29,7 +29,7 @@ Get properties of any Dragonfly geometry object.
 
 ghenv.Component.Name = 'DF Geometry Properties'
 ghenv.Component.NickName = 'GeoProp'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

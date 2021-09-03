@@ -29,7 +29,7 @@ This can be used to group Room2Ds by program, whether rooms are conditioned, etc
 
 ghenv.Component.Name = 'DF Room2Ds by Attribute'
 ghenv.Component.NickName = 'Room2DsByAttr'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

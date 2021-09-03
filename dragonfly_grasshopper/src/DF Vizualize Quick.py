@@ -26,7 +26,7 @@ multipliers of objects.
 
 ghenv.Component.Name = 'DF Vizualize Quick'
 ghenv.Component.NickName = 'VizQuick'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'

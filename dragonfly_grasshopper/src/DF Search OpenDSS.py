@@ -32,7 +32,7 @@ standards library.
 
 ghenv.Component.Name = "DF Search OpenDSS"
 ghenv.Component.NickName = 'SearchOpenDSS'
-ghenv.Component.Message = '1.2.0'
+ghenv.Component.Message = '1.3.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
