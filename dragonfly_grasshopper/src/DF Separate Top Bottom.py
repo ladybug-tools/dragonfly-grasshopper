@@ -20,19 +20,24 @@ or bottom floors with the gound or outdoors.
     Args:
         _buildings: Dragonfly Building objects which will have their top and bottom
             stories separated into unique ones with a multiplier of 1.
-    
+        sep_mid_: Boolean to note whether all mid-level Stories with non-unity multipliers
+            should be separated into two or three Stories. This means that the
+            top of each unique story will have outdoor-exposed roofs when no Room2Ds
+            are sensed above a given room. (Default: False).
+
     Returns:
         buildings: The Building objects with their top and bottom floors separated.
 """
 
 ghenv.Component.Name = "DF Separate Top Bottom"
 ghenv.Component.NickName = 'TopBottom'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
 
 try:  # import the ladybug_rhino dependencies
+    from ladybug_rhino.config import tolerance
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -42,5 +47,8 @@ if all_required_inputs(ghenv.Component):
     buildings = []
     for bldg in _buildings:
         new_bldg = bldg.duplicate()
-        new_bldg.separate_top_bottom_floors()
+        if sep_mid_:
+            new_bldg.separate_mid_floors(tolerance)
+        else:
+            new_bldg.separate_top_bottom_floors()
         buildings.append(new_bldg)
