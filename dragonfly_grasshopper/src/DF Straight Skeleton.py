@@ -14,6 +14,14 @@ This is can also be used to generate core/perimeter sub-polygons if an offset is
 input AND the straight skeleton is not self-intersecting. In the event of a
 self-intersecting straight skeleton, the output line segments can still be used
 to assist with the manual creation of core/perimeter offsets.
+_
+This component uses a modified version of the the polyskel package
+(https://github.com/Botffy/polyskel) by Armin Scipiades (aka. @Bottfy),
+which is, itself, a Python implementation of the straight skeleton
+algorithm as described by Felkel and Obdrzalek in their 1998 conference paper
+Straight skeleton implementation
+(https://github.com/Botffy/polyskel/blob/master/doc/StraightSkeletonImplementation.pdf).
+
 -
 
     Args:
@@ -39,7 +47,7 @@ to assist with the manual creation of core/perimeter offsets.
 
 ghenv.Component.Name = 'DF Straight Skeleton'
 ghenv.Component.NickName = 'Skeleton'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
