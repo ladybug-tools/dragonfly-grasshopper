@@ -1,0 +1,36 @@
+{
+  "version": "1.3.0", 
+  "nickname": "DetailedWindows", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "df_objs", 
+        "description": "The input dragonfly objects with the input _windows added to it.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_df_objs", 
+      "description": "A Dragonfly Model, Building, Story or Room2D, to which the _windows\nshould be added.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_windows", 
+      "description": "A list of Breps that will be added to the input _df_objs as\ndetailed windows.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import DetailedWindows\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\n    from ladybug_{{cad}}.config import tolerance, angle_tolerance\n    from ladybug_{{cad}}.togeometry import to_face3d\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects and convert windows to Face3D\n    df_objs = [obj.duplicate() for obj in _df_objs]\n    win_geo = [f for geo in _windows for f in to_face3d(geo)]\n\n    # collect all of the Room2Ds in the connected dragonfly objects\n    room_2ds = []\n    for df_obj in df_objs:\n        if isinstance(df_obj, Model):\n            room_2ds.extend(df_obj.room_2ds)\n        elif isinstance(df_obj, Building):\n            room_2ds.extend(df_obj.unique_room_2ds)\n        elif isinstance(df_obj, Story):\n            room_2ds.extend(df_obj.room_2ds)\n        elif isinstance(df_obj, Room2D):\n            room_2ds.append(df_obj)\n\n    # assign the relevant geometries to the Room2Ds\n    for room in room_2ds:\n        new_win_pars = []\n        for seg, win_par in zip(room.floor_segments, room.window_parameters):\n            win_to_add = []\n            for geo in win_geo:\n                if DetailedWindows.is_face3d_in_segment_plane(\n                        geo, seg, room.floor_to_ceiling_height,\n                        tolerance, angle_tolerance):\n                    win_to_add.append(geo)\n            if len(win_to_add) != 0:\n                det_win = DetailedWindows.from_face3ds(win_to_add, seg)\n                new_win_pars.append(det_win)\n            else:\n                new_win_pars.append(win_par)\n        room.window_parameters = new_win_pars\n", 
+  "category": "Dragonfly", 
+  "name": "DF Detailed Windows", 
+  "description": "Add detailed window geometries to Dragonfly Room2Ds.\n-"
+}
