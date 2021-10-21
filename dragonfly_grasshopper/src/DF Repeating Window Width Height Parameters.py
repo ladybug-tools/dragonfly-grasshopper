@@ -38,7 +38,7 @@ and separation.
             If an array of values are input here, different separation distances
             will be assigned based on cardinal direction, starting with north
             and moving clockwise. Default: 3 meters.
-    
+
     Returns:
         win_par: Window Parameters that can be applied to a Dragonfly object
             using the "DF Apply Facade Parameters" component.
@@ -46,7 +46,7 @@ and separation.
 
 ghenv.Component.Name = "DF Repeating Window Width Height Parameters"
 ghenv.Component.NickName = 'RepeatingWHPar'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"
@@ -70,6 +70,8 @@ if all_required_inputs(ghenv.Component):
     _win_width_ = _win_width_ if _win_width_ is not None else 1.5 / conversion
     _sill_height_ = _sill_height_ if _sill_height_ is not None else 0.8 / conversion
     _horiz_separ_ = _horiz_separ_ if _horiz_separ_ is not None else 3.0 / conversion
-    
-    win_par = RepeatingWindowWidthHeight(
-        _win_height_, _win_width_, _sill_height_, _horiz_separ_)
+
+    # create the window parameters
+    if _win_height_ != 0 and _win_width_ != 0:
+        win_par = RepeatingWindowWidthHeight(
+            _win_height_, _win_width_, _sill_height_, _horiz_separ_)

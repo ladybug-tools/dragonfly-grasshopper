@@ -30,7 +30,7 @@ generate a ribboin window of the input height.
 
 ghenv.Component.Name = "DF Single Window Parameters"
 ghenv.Component.NickName = 'SingleWindowPar'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"
@@ -51,5 +51,7 @@ if all_required_inputs(ghenv.Component):
     # set defaults for any blank inputs
     conversion = conversion_to_meters()
     _sill_height_ = _sill_height_ if _sill_height_ is not None else 0.8 / conversion
-    
-    win_par = SingleWindow(_width, _height, _sill_height_)
+
+    # create the window parameters
+    if _width != 0 and _height != 0:
+        win_par = SingleWindow(_width, _height, _sill_height_)

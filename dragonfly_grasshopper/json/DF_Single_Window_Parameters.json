@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0", 
+  "version": "1.3.1", 
   "nickname": "SingleWindowPar", 
   "outputs": [
     [
@@ -36,7 +36,7 @@
     }
   ], 
   "subcategory": "0 :: Create", 
-  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import SingleWindow\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set defaults for any blank inputs\n    conversion = conversion_to_meters()\n    _sill_height_ = _sill_height_ if _sill_height_ is not None else 0.8 / conversion\n    \n    win_par = SingleWindow(_width, _height, _sill_height_)", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import SingleWindow\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set defaults for any blank inputs\n    conversion = conversion_to_meters()\n    _sill_height_ = _sill_height_ if _sill_height_ is not None else 0.8 / conversion\n\n    # create the window parameters\n    if _width != 0 and _height != 0:\n        win_par = SingleWindow(_width, _height, _sill_height_)", 
   "category": "Dragonfly", 
   "name": "DF Single Window Parameters", 
   "description": "Create Dragonfly window parameters with instructions for a single window in the\nface center defined by a width and height.\n_\nNote that, if these parameters are applied to a base face that is too short\nor too narrow for the input width and/or height, the generated window will\nautomatically be shortened when it is applied to the face. In this way,\nsetting the width to be a very high number will create parameters that always\ngenerate a ribboin window of the input height.\n-"
