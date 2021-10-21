@@ -55,7 +55,7 @@ derived from an area ratio with the base surface.
 
 ghenv.Component.Name = "DF Repeating Window Ratio Parameters"
 ghenv.Component.NickName = 'RepeatingRatioPar'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"
@@ -79,6 +79,8 @@ if all_required_inputs(ghenv.Component):
     _sill_height_ = _sill_height_ if _sill_height_ is not None else 0.8 / conversion
     _horiz_separ_ = _horiz_separ_ if _horiz_separ_ is not None else 3.0 / conversion
     vert_separ_ = vert_separ_ if vert_separ_ is not None else 0.0
-    
-    win_par = RepeatingWindowRatio(_ratio, _win_height_, _sill_height_,
-                                    _horiz_separ_, vert_separ_)
+
+    # create the window parameters
+    if _ratio != 0:
+        win_par = RepeatingWindowRatio(_ratio, _win_height_, _sill_height_,
+                                        _horiz_separ_, vert_separ_)

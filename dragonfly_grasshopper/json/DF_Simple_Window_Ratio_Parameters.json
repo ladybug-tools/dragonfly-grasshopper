@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0", 
+  "version": "1.3.1", 
   "nickname": "SimpleRatioPar", 
   "outputs": [
     [
@@ -22,7 +22,7 @@
     }
   ], 
   "subcategory": "0 :: Create", 
-  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import SimpleWindowRatio\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    win_par = SimpleWindowRatio(_ratio)", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import SimpleWindowRatio\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    if _ratio != 0:\n        win_par = SimpleWindowRatio(_ratio)", 
   "category": "Dragonfly", 
   "name": "DF Simple Window Ratio Parameters", 
   "description": "Create Dragonfly window parameters with instructions for a single window using\nan area ratio with the base surface.\n-"
