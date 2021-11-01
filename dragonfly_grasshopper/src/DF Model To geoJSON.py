@@ -32,6 +32,10 @@ key in the geoJSON.
             ceiling height and Story ceiling height. The height of the floor
             plenum will be autocalculated as the difference between the Room2D
             floor height and Story floor height. (Default: False).
+        ceil_adjacency_: Boolean to note whether adjacencies should be solved between
+            interior stories when Room2Ds perfectly match one another in
+            their floor plate. This ensures that Surface boundary conditions
+            are used instead of Adiabatic ones. (Default: False).
         shade_dist_: An optional number to note the distance beyond which other
             buildings' shade should not be exported into a given Model. This is
             helpful for reducing the simulation run time of each Model when other
@@ -69,7 +73,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -115,11 +119,13 @@ if all_required_inputs(ghenv.Component) and _write:
     point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)
     use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True
     add_plenum_ = add_plenum_ if add_plenum_ is not None else False
+    ceil_adjacency_ = ceil_adjacency_ if ceil_adjacency_ is not None else False
 
     if _write == 2:
         geojson = _model.to_geojson(_location, point, _folder_, tolerance)
     else:
         # create the geoJSON and honeybee Model JSONs
         geojson, hb_jsons, hb_models = _model.to.urbanopt(
-            _model, _location, point, shade_dist_, use_multiplier_, add_plenum_,
-            electrical_network=elec_network_, folder=_folder_, tolerance=tolerance)
+            _model, _location, point, shade_dist_, use_multiplier_,
+            add_plenum_, ceil_adjacency_, electrical_network=elec_network_,
+            folder=_folder_, tolerance=tolerance)
