@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0", 
+  "version": "1.3.1", 
   "nickname": "ToHoneybee", 
   "outputs": [
     [
@@ -43,6 +43,13 @@
     }, 
     {
       "access": "item", 
+      "name": "ceil_adjacency_", 
+      "description": "Boolean to note whether adjacencies should be solved between\ninterior stories when Room2Ds perfectly match one another in\ntheir floor plate. This ensures that Surface boundary conditions\nare used instead of Adiabatic ones. Note that this input\nhas no effect when the _obj_per_model_ is Story. (Default: False).", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
       "name": "cap_shades_", 
       "description": "Boolean to note whether building shade representations should be\ncapped with a top face. Usually, this is not necessary to account for\nblocked sun and is only needed when it's important to account for\nreflected sun off of roofs. (Default: False).", 
       "type": "bool", 
@@ -64,7 +71,7 @@
     }
   ], 
   "subcategory": "2 :: Serialize", 
-  "code": "\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_vector2d\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # set default inputs if not specified\n    use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True\n    add_plenum_ = add_plenum_ if add_plenum_ is not None else False\n    _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_\n\n    # check the _model input\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n\n    # create the model objects\n    hb_models = _model.to_honeybee(\n        _obj_per_model_, shade_dist_, use_multiplier_, add_plenum_, cap_shades_,\n        tolerance=tolerance)\n", 
+  "code": "\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_vector2d\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # set default inputs if not specified\n    use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True\n    add_plenum_ = add_plenum_ if add_plenum_ is not None else False\n    _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_\n    ceil_adjacency_ = ceil_adjacency_ if ceil_adjacency_ is not None else False\n\n    # check the _model input\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n\n    # create the model objects\n    hb_models = _model.to_honeybee(\n        _obj_per_model_, shade_dist_, use_multiplier_, add_plenum_, cap_shades_,\n        ceil_adjacency_, tolerance=tolerance)\n", 
   "category": "Dragonfly", 
   "name": "DF Model To Honeybee", 
   "description": "Convert a Dragonfly Model into a series of Honeybee Models.\n-"

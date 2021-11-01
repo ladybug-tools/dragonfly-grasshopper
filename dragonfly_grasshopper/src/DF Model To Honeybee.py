@@ -38,6 +38,11 @@ Convert a Dragonfly Model into a series of Honeybee Models.
             ceiling height and Story ceiling height. The height of the floor
             plenum will be autocalculated as the difference between the Room2D
             floor height and Story floor height. (Default: False).
+        ceil_adjacency_: Boolean to note whether adjacencies should be solved between
+            interior stories when Room2Ds perfectly match one another in
+            their floor plate. This ensures that Surface boundary conditions
+            are used instead of Adiabatic ones. Note that this input
+            has no effect when the _obj_per_model_ is Story. (Default: False).
         cap_shades_: Boolean to note whether building shade representations should be
             capped with a top face. Usually, this is not necessary to account for
             blocked sun and is only needed when it's important to account for
@@ -62,7 +67,7 @@ Convert a Dragonfly Model into a series of Honeybee Models.
 
 ghenv.Component.Name = 'DF Model To Honeybee'
 ghenv.Component.NickName = 'ToHoneybee'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -86,6 +91,7 @@ if all_required_inputs(ghenv.Component) and _run:
     use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True
     add_plenum_ = add_plenum_ if add_plenum_ is not None else False
     _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_
+    ceil_adjacency_ = ceil_adjacency_ if ceil_adjacency_ is not None else False
 
     # check the _model input
     assert isinstance(_model, Model), \
@@ -94,4 +100,4 @@ if all_required_inputs(ghenv.Component) and _run:
     # create the model objects
     hb_models = _model.to_honeybee(
         _obj_per_model_, shade_dist_, use_multiplier_, add_plenum_, cap_shades_,
-        tolerance=tolerance)
+        ceil_adjacency_, tolerance=tolerance)
