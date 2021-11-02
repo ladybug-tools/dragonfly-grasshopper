@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0", 
+  "version": "1.3.1", 
   "nickname": "DFWindowOpen", 
   "outputs": [
     [
@@ -23,7 +23,7 @@
     {
       "access": "list", 
       "name": "_df_objs", 
-      "description": "Dragonfly Buildings, Stories or Room2Ds to which window ventilation\nopening properties will be assigned. Note that this component\nassigns such properties to all Outdoor Apertures on the rooms.", 
+      "description": "Dragonfly Buildings, Stories or Room2Ds to which window ventilation\nopening properties will be assigned. Note that this component\nassigns such properties to all Outdoor Apertures on the rooms.\nThis can also be an entire Dragonfly Model.", 
       "type": "System.Object", 
       "default": null
     }, 
@@ -64,8 +64,8 @@
     }
   ], 
   "subcategory": "3 :: Energy", 
-  "code": "\ntry:\n    from honeybee_energy.ventcool.opening import VentilationOpening\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee_energy:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\n    from dragonfly.story import Story\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly-energy extension\n    import dragonfly_energy\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef extract_room2ds(obj):\n    \"\"\"Get all of the Room2Ds assinged to a given dragonfly object.\"\"\"\n    if isinstance(obj, Building):\n        return obj.unique_room_2ds\n    elif isinstance(obj, Story):\n        return obj.room_2ds\n    return [obj]  # assume that the object is already a Room2D\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    df_objs = [obj.duplicate() for obj in _df_objs]\n\n    # create the base ventilation opening\n    f_area = 0.5 if _fract_area_oper_ is None else _fract_area_oper_\n    f_height = 1.0 if _fract_height_oper_ is None else _fract_height_oper_\n    discharge = 0.45 if _discharge_coeff_ is None else _discharge_coeff_\n    cross_vent = False if _wind_cross_vent_ is None else _wind_cross_vent_\n    vent_open = VentilationOpening(f_area, f_height, discharge, cross_vent)\n\n    for obj in df_objs:\n        for room in extract_room2ds(obj):\n            room.properties.energy.window_vent_control = _vent_cntrl\n            room.properties.energy.window_vent_opening = vent_open", 
+  "code": "\ntry:\n    from honeybee_energy.ventcool.opening import VentilationOpening\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee_energy:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly-energy extension\n    import dragonfly_energy\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef extract_room2ds(obj):\n    \"\"\"Get all of the Room2Ds assinged to a given dragonfly object.\"\"\"\n    if isinstance(obj, Room2D):\n        return [obj]\n    elif isinstance(obj, Building):\n        return obj.unique_room_2ds\n    elif isinstance(obj, (Story, Model)):\n        return obj.room_2ds\n    else:\n        raise ValueError('Expected dragonfly Room2D, Story, Building or Model. '\n                         'Got {}.'.format(type(df_obj)))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    df_objs = [obj.duplicate() for obj in _df_objs]\n\n    # create the base ventilation opening\n    f_area = 0.5 if _fract_area_oper_ is None else _fract_area_oper_\n    f_height = 1.0 if _fract_height_oper_ is None else _fract_height_oper_\n    discharge = 0.45 if _discharge_coeff_ is None else _discharge_coeff_\n    cross_vent = False if _wind_cross_vent_ is None else _wind_cross_vent_\n    vent_open = VentilationOpening(f_area, f_height, discharge, cross_vent)\n\n    for obj in df_objs:\n        for room in extract_room2ds(obj):\n            room.properties.energy.window_vent_control = _vent_cntrl\n            room.properties.energy.window_vent_opening = vent_open", 
   "category": "Dragonfly", 
   "name": "DF Window Opening", 
-  "description": "Define the window opening properties for all apertures of a Dragonfly Building,\nStory or Room2D.\n-"
+  "description": "Define the window opening properties for all apertures of a Dragonfly Building,\nStory, Room2D or Model.\n-"
 }
