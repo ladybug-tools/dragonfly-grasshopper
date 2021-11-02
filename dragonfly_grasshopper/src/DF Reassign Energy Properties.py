@@ -8,7 +8,7 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 
 """
-Re-assign energy properties to any Dragonfly object (Building, Story, Room2D).
+Re-assign energy properties to any Dragonfly object (Building, Story, Room2D, Model).
 _
 This is useful for editing auto-generated child objects separately from their parent.
 For example, if you want to assign all of the ground floors of a given auto-generated
@@ -18,7 +18,7 @@ to such stories.
 
     Args:
         _df_obj: A Dragonfly Building, Story or Room2D which is to have its energy
-            properties re-assigned.
+            properties re-assigned. This can also be an entire Dragonfly Model.
         program_: Text to reassign the program of the input objects (to be looked
             up in the ProgramType library) such as that output from the "HB List
             Programs" component. This can also be a custom ProgramType object.
@@ -35,14 +35,16 @@ to such stories.
 
 ghenv.Component.Name = 'DF Reassign Energy Properties'
 ghenv.Component.NickName = 'ReassignProp'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
 try:  # import the core dragonfly dependencies
+    from dragonfly.model import Model
     from dragonfly.building import Building
     from dragonfly.story import Story
+    from dragonfly.room2d import Room2D
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
@@ -77,11 +79,21 @@ if all_required_inputs(ghenv.Component):
                 program_ = program_type_by_identifier(program_)
         if isinstance(df_obj, (Building, Story)):
             df_obj.properties.energy.set_all_room_2d_program_type(program_)
-        else:  # it's a Room2D
+        elif isinstance(df_obj, Room2D):
             df_obj.properties.energy.program_type = program_
+        elif isinstance(df_obj, Model):
+            for bldg in df_obj.buildings:
+                bldg.properties.energy.set_all_room_2d_program_type(program_)
+        else:
+            raise ValueError('Expected dragonfly Room2D, Story, Building or Model. '
+                             'Got {}.'.format(type(df_obj)))
 
     # try to assign the construction set
     if constr_set_ is not None:
         if isinstance(constr_set_, str):
             constr_set_ = construction_set_by_identifier(constr_set_)
-        df_obj.properties.energy.construction_set = constr_set_
+        if isinstance(df_obj, Model):
+            for bldg in df_obj.buildings:
+                bldg.properties.energy.construction_set = constr_set_
+        else:
+            df_obj.properties.energy.construction_set = constr_set_

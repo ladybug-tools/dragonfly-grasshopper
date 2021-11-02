@@ -66,10 +66,10 @@ schedule_offset (1/3 ahead and another 1/3 behind).
 
 ghenv.Component.Name = 'DF Diversify Building Programs'
 ghenv.Component.NickName = 'DiversifyBldg'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
-ghenv.Component.AdditionalHelpFromDocStrings = '4'
+ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
 import random
 

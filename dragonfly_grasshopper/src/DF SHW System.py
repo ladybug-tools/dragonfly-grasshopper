@@ -45,10 +45,10 @@ or Room2Ds.
 
 ghenv.Component.Name = "DF SHW System"
 ghenv.Component.NickName = 'SHW'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
-ghenv.Component.AdditionalHelpFromDocStrings = '0'
+ghenv.Component.AdditionalHelpFromDocStrings = '4'
 
 try:  # import the honeybee extension
     from honeybee.typing import clean_and_id_ep_string, clean_ep_string
@@ -67,6 +67,11 @@ try:  # import the core dragonfly dependencies
     from dragonfly.room2d import Room2D
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
+
+try:  # import the dragonfly-energy extension
+    import dragonfly_energy
+except ImportError as e:
+    raise ImportError('\nFailed to import dragonfly_energy energy:\n\t{}'.format(e))
 
 try:
     from ladybug_rhino.grasshopper import all_required_inputs

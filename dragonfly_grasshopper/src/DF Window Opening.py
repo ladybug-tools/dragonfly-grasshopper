@@ -9,13 +9,14 @@
 
 """
 Define the window opening properties for all apertures of a Dragonfly Building,
-Story or Room2D.
+Story, Room2D or Model.
 -
 
     Args:
         _df_objs: Dragonfly Buildings, Stories or Room2Ds to which window ventilation
             opening properties will be assigned. Note that this component
             assigns such properties to all Outdoor Apertures on the rooms.
+            This can also be an entire Dragonfly Model.
         _vent_cntrl: A Ventilation Control object from the "HB Ventilation Control"
             component, which dictates the opening behaviour of the Room's apertures.
         _fract_area_oper_: A number between 0.0 and 1.0 for the fraction of the
@@ -46,7 +47,7 @@ Story or Room2D.
 
 ghenv.Component.Name = 'DF Window Opening'
 ghenv.Component.NickName = 'DFWindowOpen'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -57,8 +58,10 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
+    from dragonfly.model import Model
     from dragonfly.building import Building
     from dragonfly.story import Story
+    from dragonfly.room2d import Room2D
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
@@ -75,11 +78,15 @@ except ImportError as e:
 
 def extract_room2ds(obj):
     """Get all of the Room2Ds assinged to a given dragonfly object."""
-    if isinstance(obj, Building):
+    if isinstance(obj, Room2D):
+        return [obj]
+    elif isinstance(obj, Building):
         return obj.unique_room_2ds
-    elif isinstance(obj, Story):
+    elif isinstance(obj, (Story, Model)):
         return obj.room_2ds
-    return [obj]  # assume that the object is already a Room2D
+    else:
+        raise ValueError('Expected dragonfly Room2D, Story, Building or Model. '
+                         'Got {}.'.format(type(df_obj)))
 
 
 if all_required_inputs(ghenv.Component):
