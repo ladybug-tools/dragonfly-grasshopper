@@ -49,7 +49,7 @@ Create Dragonfly Buildings from footprint geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = 'DF Building from Footprint'
 ghenv.Component.NickName = 'BuildingFootprint'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -117,6 +117,10 @@ if all_required_inputs(ghenv.Component) and _run:
                 except ValueError:
                     program = program_type_by_identifier(program)
             building.properties.energy.set_all_room_2d_program_type(program)
+            try:
+                building.properties.uwg.infer_program_from_energy_program()
+            except  (NameError, AttributeError):
+                pass  # dragonfly-uwg is not installed
         else:  # generic office program by default
             try:
                 building.properties.energy.set_all_room_2d_program_type(office_program)
