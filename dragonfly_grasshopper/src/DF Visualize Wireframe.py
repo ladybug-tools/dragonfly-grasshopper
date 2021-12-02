@@ -21,9 +21,9 @@ scene, including all stories represented by multipliers
             visible in the Rhino scene.
 """
 
-ghenv.Component.Name = 'DF Vizualize Wireframe'
+ghenv.Component.Name = 'DF Visualize Wireframe'
 ghenv.Component.NickName = 'VizWireF'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
