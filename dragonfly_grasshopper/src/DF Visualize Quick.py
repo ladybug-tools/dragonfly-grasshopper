@@ -8,8 +8,11 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 
 """
-Preview any Dragonfly geometry object within the Rhino scene, including all stories
-represented by multipliers
+Quickly preview any Dragonfly geometry object within the Rhino scene.
+_
+Any stories represented by multipliers will not be included in the output, allowing
+for a faster preview of large lists of objects but without the ability to check the
+multipliers of objects.
 -
 
     Args:
@@ -21,9 +24,9 @@ represented by multipliers
             visible in the Rhino scene.
 """
 
-ghenv.Component.Name = 'DF Vizualize All'
-ghenv.Component.NickName = 'VizAll'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Name = 'DF Visualize Quick'
+ghenv.Component.NickName = 'VizQuick'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -62,13 +65,10 @@ if all_required_inputs(ghenv.Component):
     # loop through all objects and add them
     for df_obj in _df_objs:
         if isinstance(df_obj, Model):
-            rooms = []
-            for bldg in df_obj.buildings:
-                rooms.extend(bldg.all_room_2ds())
-            geo.extend(room_2d_geometry(rooms))
+            geo.extend(room_2d_geometry(df_obj.room_2ds))
             geo.extend(context_shade_geometry(df_obj.context_shades))
         elif isinstance(df_obj, Building):
-            geo.extend(room_2d_geometry(df_obj.all_room_2ds()))
+            geo.extend(room_2d_geometry(df_obj.unique_room_2ds))
         elif isinstance(df_obj, Story):
             geo.extend(room_2d_geometry(df_obj.room_2ds))
         elif isinstance(df_obj, Room2D):

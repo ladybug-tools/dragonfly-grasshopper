@@ -8,25 +8,22 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 
 """
-Quickly preview any Dragonfly geometry object within the Rhino scene.
-_
-Any stories represented by multipliers will not be included in the output, allowing
-for a faster preview of large lists of objects but without the ability to check the
-multipliers of objects.
+Preview any Dragonfly geometry object as floor plates within the Rhino scene,
+including all stories represented by multipliers
 -
 
     Args:
         _df_objs: A Dragonfly Model, Building, Story, Room2D, or ContextShade to
-            be previewed in the Rhino scene.
+            be previewed as a list of floor plates in the Rhino scene.
     
     Returns:
         geo: The Rhino version of the Dragonfly geometry object, which will be
             visible in the Rhino scene.
 """
 
-ghenv.Component.Name = 'DF Vizualize Quick'
-ghenv.Component.NickName = 'VizQuick'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Name = 'DF Visualize Floors'
+ghenv.Component.NickName = 'VizFloors'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -41,7 +38,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.fromgeometry import from_face3d, from_face3d_to_solid
+    from ladybug_rhino.fromgeometry import from_face3d
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -49,13 +46,13 @@ except ImportError as e:
 
 def room_2d_geometry(room_2ds):
     """Get Rhino geometry from a list of Room2Ds."""
-    return [from_face3d_to_solid(room.floor_geometry, room.floor_to_ceiling_height)
-            for room in room_2ds]
+    return [from_face3d(room.floor_geometry) for room in room_2ds]
 
 
 def context_shade_geometry(context_shades):
     """Get Rhino geometry from a list of ContextShades."""
-    return [from_face3d(fc) for shd_geo in context_shades for fc in shd_geo.geometry]
+    return [from_face3d(fc) for shd_geo in context_shades
+            for fc in shd_geo.geometry]
 
 
 if all_required_inputs(ghenv.Component):
@@ -65,10 +62,13 @@ if all_required_inputs(ghenv.Component):
     # loop through all objects and add them
     for df_obj in _df_objs:
         if isinstance(df_obj, Model):
-            geo.extend(room_2d_geometry(df_obj.room_2ds))
+            rooms = []
+            for bldg in df_obj.buildings:
+                rooms.extend(bldg.all_room_2ds())
+            geo.extend(room_2d_geometry(rooms))
             geo.extend(context_shade_geometry(df_obj.context_shades))
         elif isinstance(df_obj, Building):
-            geo.extend(room_2d_geometry(df_obj.unique_room_2ds))
+            geo.extend(room_2d_geometry(df_obj.all_room_2ds()))
         elif isinstance(df_obj, Story):
             geo.extend(room_2d_geometry(df_obj.room_2ds))
         elif isinstance(df_obj, Room2D):

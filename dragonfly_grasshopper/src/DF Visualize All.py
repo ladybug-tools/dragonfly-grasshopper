@@ -8,22 +8,22 @@
 # @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 
 """
-Preview any Dragonfly geometry object as floor plates within the Rhino scene,
-including all stories represented by multipliers
+Preview any Dragonfly geometry object within the Rhino scene, including all stories
+represented by multipliers
 -
 
     Args:
         _df_objs: A Dragonfly Model, Building, Story, Room2D, or ContextShade to
-            be previewed as a list of floor plates in the Rhino scene.
+            be previewed in the Rhino scene.
     
     Returns:
         geo: The Rhino version of the Dragonfly geometry object, which will be
             visible in the Rhino scene.
 """
 
-ghenv.Component.Name = 'DF Vizualize Floors'
-ghenv.Component.NickName = 'VizFloors'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Name = 'DF Visualize All'
+ghenv.Component.NickName = 'VizAll'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -38,7 +38,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.fromgeometry import from_face3d
+    from ladybug_rhino.fromgeometry import from_face3d, from_face3d_to_solid
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -46,13 +46,13 @@ except ImportError as e:
 
 def room_2d_geometry(room_2ds):
     """Get Rhino geometry from a list of Room2Ds."""
-    return [from_face3d(room.floor_geometry) for room in room_2ds]
+    return [from_face3d_to_solid(room.floor_geometry, room.floor_to_ceiling_height)
+            for room in room_2ds]
 
 
 def context_shade_geometry(context_shades):
     """Get Rhino geometry from a list of ContextShades."""
-    return [from_face3d(fc) for shd_geo in context_shades
-            for fc in shd_geo.geometry]
+    return [from_face3d(fc) for shd_geo in context_shades for fc in shd_geo.geometry]
 
 
 if all_required_inputs(ghenv.Component):
