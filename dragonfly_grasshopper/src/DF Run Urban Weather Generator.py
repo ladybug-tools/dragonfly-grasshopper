@@ -47,7 +47,7 @@ Microclimate Group (http://urbanmicroclimate.scripts.mit.edu/publications.php).
 
 ghenv.Component.Name = 'DF Run Urban Weather Generator'
 ghenv.Component.NickName = 'RunUWG'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -68,7 +68,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_uwg:\n\t{}'.format(e))
 
 try:
-    from ladybug_rhino.grasshopper import all_required_inputs, give_warning
+    from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -84,10 +84,6 @@ if all_required_inputs(ghenv.Component) and _write:
     if run_ is not None and run_ > 0:  # write and simulate the UWG JSON
         silent = True if run_ > 1 else False
         uwg_json, urban_epw = run_uwg(_model, _epw_file, _sim_par_, _folder_, silent)
-        if urban_epw is None:
-            msg = 'The Urban Weather Generator Failed to run.'
-            print(msg)
-            give_warning(ghenv.Component, msg)
     else:  # only write the UWG JSON but don't run it
         # get the directory into which the urban epw will be written
         if _folder_ is None:
