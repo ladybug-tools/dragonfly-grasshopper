@@ -12,12 +12,6 @@ Run a an URBANopt geoJSON and scenario through OpenDSS.
 _
 The geoJSON must have a valid Electrical Network assigned to it in order to
 run correctly through OpenDSS.
-_
-This component also requires the urbanopt-ditto-reader to be installed.
-The urbanopt-ditto-reader can be installed by installing Python 3.7 and then
-running the following from command line;
-_
-pip install urbanopt-ditto-reader==0.3.8
 -
 
     Args:
@@ -50,7 +44,7 @@ pip install urbanopt-ditto-reader==0.3.8
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.3.0'
+ghenv.Component.Message = '1.3.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -58,6 +52,11 @@ ghenv.Component.AdditionalHelpFromDocStrings = '0'
 import os
 import subprocess
 import json
+
+try:
+    from honeybee.config import folders
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the dragonfly_energy dependencies
     from dragonfly_energy.run import run_default_report
@@ -72,23 +71,31 @@ except ImportError as e:
 
 
 if all_required_inputs(ghenv.Component) and _run:
+    # check to see if the urbanopt-ditto-reader is installed
+    shell = False if os.name == 'nt' else True
+    ext = '.exe' if os.name == 'nt' else ''
+    uo_ditto = '{}/ditto_reader_cli{}'.format(folders.python_scripts_path, ext)
+    if not os.path.isfile(uo_ditto):  # run the pip install command
+        pip_cmd = '"{py_exe}" -m pip install urbanopt-ditto-reader==0.3.8'.format(
+            py_exe=folders.python_exe_path)
+        process = subprocess.Popen(pip_cmd, stderr=subprocess.PIPE, shell=shell)
+        stderr = process.communicate()
+
     # generate the default scenario report
     run_default_report(_geojson, _scenario)
 
     # prepare the opendss-running command
-    command = 'ditto_reader_cli run-opendss -f "{feature_file}" ' \
+    command = '"{uo_ditto}" run-opendss -f "{feature_file}" ' \
         '-s "{scenario_file}" -e "{equipment_file}"'.format(
-            feature_file=_geojson, scenario_file=_scenario,
+            uo_ditto=uo_ditto, feature_file=_geojson, scenario_file=_scenario,
             equipment_file=os.path.join(os.path.dirname(_geojson), 'electrical_database.json')
         )
-
     if _run_period_ is not None:
         st_dt = '2006/{}'.format(_run_period_.st_time.strftime('%m/%d %H:%M:%S'))
         end_dt = '2006/{}'.format(_run_period_.end_time.strftime('%m/%d %H:%M:%S'))
         command = '{} -b "{}" -n "{}"'.format(command, st_dt, end_dt)
 
     # execute the command to run everything through OpenDSS
-    shell = False if os.name == 'nt' else True
     process = subprocess.Popen(command, stderr=subprocess.PIPE, shell=shell)
     stderr = process.communicate()
 
