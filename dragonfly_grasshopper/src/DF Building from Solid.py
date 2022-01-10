@@ -55,7 +55,7 @@ Create Dragonfly Buildings from solid geometry (closed Rhino polysurfaces).
 
 ghenv.Component.Name = "DF Building from Solid"
 ghenv.Component.NickName = 'BuildingSolid'
-ghenv.Component.Message = '1.3.1'
+ghenv.Component.Message = '1.3.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
@@ -114,7 +114,7 @@ if all_required_inputs(ghenv.Component) and _run:
         # interpret the input _floor_to_floor information
         min, max = geo_min_max_height(geo)
         floor_heights, interpreted_f2f = interpret_floor_height_subdivide(
-            _floor_to_floor, max, min)
+            _floor_to_floor, max, min + tolerance)
 
         # get the floor geometries of the building
         floor_breps = split_solid_to_floors(geo, floor_heights)
