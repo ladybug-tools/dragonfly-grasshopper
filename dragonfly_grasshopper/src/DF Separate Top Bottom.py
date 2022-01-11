@@ -1,11 +1,11 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2021, Ladybug Tools.
-# You should have received a copy of the GNU General Public License
+# Copyright (c) 2022, Ladybug Tools.
+# You should have received a copy of the GNU Affero General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
-# @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
+# @license AGPL-3.0-or-later <https://spdx.org/licenses/AGPL-3.0-or-later>
 
 """
 Separate the top and bottom floors of a Building into unique Stories with a multiplier
@@ -31,7 +31,7 @@ top or bottom floors with the gound or outdoors.
 
 ghenv.Component.Name = "DF Separate Top Bottom"
 ghenv.Component.NickName = 'TopBottom'
-ghenv.Component.Message = '1.3.2'
+ghenv.Component.Message = '1.4.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"

@@ -1,11 +1,11 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2021, Ladybug Tools.
-# You should have received a copy of the GNU General Public License
+# Copyright (c) 2022, Ladybug Tools.
+# You should have received a copy of the GNU Affero General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
-# @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
+# @license AGPL-3.0-or-later <https://spdx.org/licenses/AGPL-3.0-or-later>
 
 """
 Convert a Dragonfly Model into an URBANopt-compatible geoJSON with linked Honeybee
@@ -73,7 +73,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.3.1'
+ghenv.Component.Message = '1.4.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
