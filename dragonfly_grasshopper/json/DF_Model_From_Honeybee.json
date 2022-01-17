@@ -1,0 +1,43 @@
+{
+  "version": "1.4.0", 
+  "nickname": "FromHoneybee", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "df_model", 
+        "description": "A list of dragonfly objects that have been re-serialized from\nthe input file.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_hb_models", 
+      "description": "A Honeybee Model or list of Honeybee Models to be converted\nto a Dragonfly Model.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "incl_shades_", 
+      "description": "Boolean to note whether orphaned shades should be included\nas dragonfly ContextShades. (Default: False).", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_load", 
+      "description": "Set to \"True to load the objects from the _df_file.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "2 :: Serialize", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the core ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _load:\n    if incl_shades_:\n        df_model = Model.from_honeybee(_hb_models[0])\n        for h_model in _hb_models[1:]:\n            df_model.add_model(Model.from_honeybee(h_model))\n    else:\n        bldgs = [Building.from_honeybee(h_model) for h_model in _hb_models]\n        base = _hb_models[0]\n        df_model = Model(\n            base.identifier, bldgs, units=base.units, tolerance=base.tolerance,\n            angle_tolerance=base.angle_tolerance)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Model From Honeybee", 
+  "description": "Create a Dragonfly Model from a Honeybee Model.\n-"
+}
