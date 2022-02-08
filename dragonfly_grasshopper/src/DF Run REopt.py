@@ -33,8 +33,10 @@ https://docs.urbanopt.net/installation/installation.html
             Financial Parameters" component. If None, some default parameters
             will be generated for a typical analysis. (Default: None).
         _wind_: A number for the maximum installed kilowatts of wind power. (Default: 0).
-        _pv_: A number for the maximum installed kilowatts of photovoltaic
+        _pv_: A number for the maximum installed kilowatts of roof-mounted photovoltaic
             power. (Default: 1000000000).
+        _pv_ground_: A number for the maximum installed kilowatts of ground-mounted
+            photovoltaic power. (Default: 1000000000).
         _storage_: A number for the maximum installed kilowatts of electrical
             storage. (Default: 1000000).
         _generator_: A number for the maximum installed kilowatts of generator power.
@@ -53,8 +55,10 @@ https://docs.urbanopt.net/installation/installation.html
         wind: A number for the optimal capacity of wind power that should be installed
             in kW. This will be null unless a non-zero value is specified for
             the input _wind_.
-        pv: A number for the optimal capacity of photovlotaic power that should be
-            installed in kW.
+        pv: A number for the optimal capacity of roof-mounted photovlotaic power that
+            should be installed in kW.
+        pv_ground: A number for the optimal capacity of ground-mounted photovlotaic power
+            that should be installed in kW.
         storage: A list of two numbers ordered as follows.
             _
             - A number for the optimal dicharge capacity of battery storage
@@ -71,7 +75,7 @@ https://docs.urbanopt.net/installation/installation.html
 
 ghenv.Component.Name = 'DF Run REopt'
 ghenv.Component.NickName = 'RunREopt'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -125,9 +129,10 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # set the ax sizes for the variou energy sources
     _financial_par_.wind_parameter.max_kw = _wind_ if _wind_ is not None else 0
-    _financial_par_.pv_parameter.max_kw = _wind_ if _wind_ is not None else 1000000000
-    _financial_par_.storage_parameter.max_kw = _wind_ if _wind_ is not None else 1000000
-    _financial_par_.generator_parameter.max_kw = _wind_ if _wind_ is not None else 1000000000
+    _financial_par_.pv_parameter.max_kw = _pv_ if _pv_ is not None else 1000000000
+    _financial_par_.pv_parameter.max_kw_ground = _pv_ground_ if _pv_ground_ is not None else 1000000000
+    _financial_par_.storage_parameter.max_kw = _storage_ if _storage_ is not None else 1000000
+    _financial_par_.generator_parameter.max_kw = _generator_ if _generator_ is not None else 1000000000
 
     # execute the simulation with URBANopt CLI
     re_csv, re_json = run_reopt(_geojson, _scenario, _urdb_label, _financial_par_)
@@ -145,6 +150,7 @@ if all_required_inputs(ghenv.Component) and _run:
                 wind = val[0]['size_kw']
             elif key == 'solar_pv' and len(val) != 0:
                 pv = val[0]['size_kw']
+                pv_ground = val[1]['size_kw']
             elif key == 'storage' and len(val) != 0:
                 storage = [val[0]['size_kw'], val[0]['size_kwh']]
             elif key == 'generator' and len(val) != 0:

@@ -24,6 +24,8 @@ Customize the financial settings of a REopt analysis.
             per kW. (Default: 3013).
         _pv_cost_: A number for the installation cost of photovoltaic power in US
             dollars per kW. (Default: 1600).
+        _pv_grnd_cost_: A number for the installation cost of photovoltaic power in US
+            dollars per kW. (Default: 2200).
         _storage_cost_: A number for the installation cost of power storage in US
             dollars per kW. (Default: 840).
         _gener_cost_: A number for the installation cost of generators in US dollars
@@ -36,7 +38,7 @@ Customize the financial settings of a REopt analysis.
 
 ghenv.Component.Name = 'DF REopt Financial Parameters'
 ghenv.Component.NickName = 'FinancialPar'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -61,6 +63,8 @@ if _wind_cost_ is not None:
     financial_par.wind_parameter.dollars_per_kw = _wind_cost_
 if _pv_cost_ is not None:
     financial_par.pv_parameter.dollars_per_kw = _pv_cost_
+if _pv_grnd_cost_ is not None:
+    financial_par.pv_parameter.dollars_per_kw_ground = _pv_grnd_cost_
 if _storage_cost_ is not None:
     financial_par.storage_parameter.dollars_per_kw = _storage_cost_
 if _gener_cost_ is not None:

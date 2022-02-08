@@ -47,6 +47,9 @@ key in the geoJSON.
             with the input Dragonfly Model and will be written into the
             geoJSON. An input here is required to perform an OpenDSS
             simulation after running URBANopt.
+        ground_pv_:  An optional list of REopt GroundMountPV objects representing
+            ground-mounted photovoltaic fields to be included in a REopt
+            simulation after running URBANopt.
         _folder_: Text for the full path to the folder where the geojson will be
             written along with all of the Honeybee Model JSONs. If None, the
             honeybee default simulation folder is used.
@@ -73,7 +76,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -127,5 +130,6 @@ if all_required_inputs(ghenv.Component) and _write:
         # create the geoJSON and honeybee Model JSONs
         geojson, hb_jsons, hb_models = _model.to.urbanopt(
             _model, _location, point, shade_dist_, use_multiplier_,
-            add_plenum_, ceil_adjacency_, electrical_network=elec_network_,
+            add_plenum_, ceil_adjacency_,
+            electrical_network=elec_network_, ground_pv=ground_pv_,
             folder=_folder_, tolerance=tolerance)

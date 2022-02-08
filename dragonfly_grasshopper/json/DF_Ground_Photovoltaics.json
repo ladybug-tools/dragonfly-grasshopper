@@ -1,0 +1,43 @@
+{
+  "version": "1.4.0", 
+  "nickname": "GroundPV", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "ground_pv", 
+        "description": "A Dragonfly ground-mounted PV system object that can be exported to\na GeoJSON in order to account for ground-mounted photovoltaics in\na REopt simulation.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_geo", 
+      "description": "A horizontal Rhino surface (or closed polyline) representing a footprint\nto be converted into a ground-mounted photovoltaic system.", 
+      "type": "Curve", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_name_", 
+      "description": "Text to set the name for the PV system, which will also be incorporated\ninto unique PV system identifier.  If the name is not provided,\na random one will be assigned.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "bldg_", 
+      "description": "An optional Dragonfly Building with which the photovoltaic system is\nassociated. If None, the PV system will be assumed to be a\ncommunity PV field that isn't associated with a particular\nbuilding meter.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.reopt import GroundMountPV\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:  # import ladybug-{{cad}}\n    from ladybug_{{cad}}.togeometry import to_polygon2d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    name = clean_string(_name_) if _name_ is not None else 'unnamed'\n    ground_pv = GroundMountPV(name, to_polygon2d(_geo))\n    if _name_ is not None:\n        ground_pv.display_name = _name_\n    if bldg_ is not None:\n        assert isinstance(bldg_, Building), \\\n            'Expected Dragonfly Building. Got {}.'.format(type(bldg_))\n        ground_pv.building_identifier = bldg_.identifier\n", 
+  "category": "Dragonfly", 
+  "name": "DF Ground Photovoltaics", 
+  "description": "Create a REopt ground-mounted photovoltaic system from its footprint geometry\n(horizontal Rhino surfaces).\n-"
+}

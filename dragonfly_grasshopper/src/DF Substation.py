@@ -25,13 +25,13 @@ Create an OpenDSS Substation from its footprint geometry (horizontal Rhino surfa
 
 ghenv.Component.Name = 'DF Substation'
 ghenv.Component.NickName = 'Substation'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
 
 try:  # import the core honeybee dependencies
-    from honeybee.typing import clean_ep_string
+    from honeybee.typing import clean_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
