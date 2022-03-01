@@ -38,7 +38,7 @@ different Room2Ds.
 
 ghenv.Component.Name = 'DF Color Room2D Attributes'
 ghenv.Component.NickName = 'ColorRoom2DAttr'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -85,5 +85,5 @@ if all_required_inputs(ghenv.Component):
     for room in rooms:
         wire_frame.extend(from_face3d_to_wireframe(room.floor_geometry))
     legend = legend_objects(graphic.legend)
-    values = color_obj.attributes
+    values = color_obj.attributes_original
     colors = [color_to_color(col) for col in graphic.value_colors]
