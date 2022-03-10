@@ -49,7 +49,7 @@ hourly data.
 
 ghenv.Component.Name = 'DF Create EPW'
 ghenv.Component.NickName = 'CreateEPW'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -166,4 +166,4 @@ if all_required_inputs(ghenv.Component) and _run:
                 _direct_normal_ill_, _diffuse_horiz_ill_):
             sun = sp.calculate_sun_from_date_time(dt)
             glob_horiz.append(dhi + dni * math.sin(math.radians(sun.altitude)))
-        epw_obj.global_horizontal_radiation.values = glob_horiz
+        epw_obj.global_horizontal_illuminance.values = glob_horiz
