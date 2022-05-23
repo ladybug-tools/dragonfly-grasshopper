@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0", 
+  "version": "1.4.1", 
   "nickname": "Context", 
   "outputs": [
     [
@@ -44,7 +44,7 @@
     {
       "access": "item", 
       "name": "uwg_is_veg_", 
-      "description": "Boolean to note whether the shade represents a tree canopy within\nsimulations with the Urban Weather Generator (UWG), in which case,\nit will be incorporated into the simulation as tree cover. (Default: False).", 
+      "description": "Boolean to note whether the shade represents a tree canopy within\nsimulations with the Urban Weather Generator (UWG), in which case,\nit will be incorporated into the simulation as tree cover. NOTE that,\nwhen using this option, only the tops and sides of the tree canopy\ngeometry should be modeled. Modeling the bottom of the tree canopy\nwill result in double-counting the horizontal area of the canopy and\nwill also create extra unnessary geometry in EnergyPlus or Radiance\ncalculations using the dragonfly model. (Default: False).", 
       "type": "bool", 
       "default": null
     }
