@@ -25,7 +25,12 @@ Create Dragonfly ContextShade.
             will be always opaque.
         uwg_is_veg_: Boolean to note whether the shade represents a tree canopy within
             simulations with the Urban Weather Generator (UWG), in which case,
-            it will be incorporated into the simulation as tree cover. (Default: False).
+            it will be incorporated into the simulation as tree cover. NOTE that,
+            when using this option, only the tops and sides of the tree canopy
+            geometry should be modeled. Modeling the bottom of the tree canopy
+            will result in double-counting the horizontal area of the canopy and
+            will also create extra unnessary geometry in EnergyPlus or Radiance
+            calculations using the dragonfly model. (Default: False).
 
     Returns:
         report: Reports, errors, warnings, etc.
@@ -34,7 +39,7 @@ Create Dragonfly ContextShade.
 
 ghenv.Component.Name = 'DF ContextShade'
 ghenv.Component.NickName = 'Context'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '7'
