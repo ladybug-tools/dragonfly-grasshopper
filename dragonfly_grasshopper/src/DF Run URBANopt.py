@@ -69,7 +69,7 @@ https://docs.urbanopt.net/installation/installation.html
 
 ghenv.Component.Name = 'DF Run URBANopt'
 ghenv.Component.NickName = 'RunURBANopt'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -87,7 +87,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:
-    from ladybug_rhino.grasshopper import all_required_inputs
+    from ladybug_rhino.grasshopper import all_required_inputs, recommended_processor_count
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -135,8 +135,9 @@ if all_required_inputs(ghenv.Component) and _run:
         epw_file=_epw_file, skip_report=skip_report)
 
     # prepare the URBANopt folder and generate the scenario
+    _cpus_ = _cpus_ if _cpus_ is not None else recommended_processor_count()
     scenario = prepare_urbanopt_folder(_geojson, _cpus_)
 
     # execute the simulation with URBANopt CLI
     if _run == 1:
-        osm, idf, sql, zsz, rdd, html, err = run_urbanopt(_geojson, scenario)
+        osm, idf, sql, zsz, rdd, html, err = run_urbanopt(_geojson, scenario, _cpus_)
