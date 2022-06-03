@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0", 
+  "version": "1.4.1", 
   "nickname": "Connector", 
   "outputs": [
     [
@@ -21,9 +21,9 @@
       "default": null
     }, 
     {
-      "access": "list", 
-      "name": "_wires", 
-      "description": "A list of text for the wires carried along the electrical connector,\nwhich will be looked up in the Wires library (the output from the\n\"DF OpenDSS Libraries\" component). This can also be a list of\ncustom Wire objects.", 
+      "access": "item", 
+      "name": "_power_line", 
+      "description": "Text for the ID of a PowerLine carried along the electrical connector,\nwhich will be looked up in the Power Lines library (the output from the\n\"DF OpenDSS Libraries\" component). This can also be a custom\nPowerLine object created using the Ladybug Tools SDK.", 
       "type": "System.Object", 
       "default": null
     }, 
@@ -36,8 +36,8 @@
     }
   ], 
   "subcategory": "3 :: Energy", 
-  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_and_id_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.opendss.lib.wires import wire_by_identifier\n    from dragonfly_energy.opendss.connector import ElectricalConnector\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:  # import ladybug-{{cad}}\n    from ladybug_{{cad}}.togeometry import to_linesegment2d, to_polyline2d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, longest_list, \\\n        document_counter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # get the wires carried along the connector\n    wire_objs = []\n    for wire in _wires:\n        if isinstance(wire, str):\n            wire_objs.append(wire_by_identifier(wire))\n        else:\n            wire_objs.append(wire)\n\n    # convert {{cad}} geometry to ladybug geometry\n    lines = []\n    for geo in _geo:\n        try:\n            lines.append(to_polyline2d(geo))\n        except AttributeError:\n            lines.append(to_linesegment2d(geo))\n\n    connector = []  # list of connectors that will be returned\n    for i, geo in enumerate(lines):\n        # get the name for the ElectricalConnector\n        if len(_name_) == 0:  # make a default ElectricalConnector name\n            display_name = 'ElectricalConnector_{}'.format(\n                document_counter('e_connector_count'))\n        else:\n            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1) \\\n                if len(_name_) != len(lines) else longest_list(_name_, i)\n        name = clean_and_id_ep_string(display_name)\n\n        # create the ElectricalConnector\n        conn = ElectricalConnector(name, geo, wire_objs)\n        conn.display_name = display_name\n        connector.append(conn)\n", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_and_id_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.opendss.lib.powerlines import power_line_by_identifier\n    from dragonfly_energy.opendss.connector import ElectricalConnector\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:  # import ladybug-{{cad}}\n    from ladybug_{{cad}}.togeometry import to_linesegment2d, to_polyline2d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, longest_list, \\\n        document_counter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # get the power line object used by the connector\n    if isinstance(_power_line, str):\n        _power_line = power_line_by_identifier(_power_line)\n\n    # convert {{cad}} geometry to ladybug geometry\n    lines = []\n    for geo in _geo:\n        try:\n            lines.append(to_polyline2d(geo))\n        except AttributeError:\n            lines.append(to_linesegment2d(geo))\n\n    connector = []  # list of connectors that will be returned\n    for i, geo in enumerate(lines):\n        # get the name for the ElectricalConnector\n        if len(_name_) == 0:  # make a default ElectricalConnector name\n            display_name = 'ElectricalConnector_{}'.format(\n                document_counter('e_connector_count'))\n        else:\n            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1) \\\n                if len(_name_) != len(lines) else longest_list(_name_, i)\n        name = clean_and_id_string(display_name)\n\n        # create the ElectricalConnector\n        conn = ElectricalConnector(name, geo, _power_line)\n        conn.display_name = display_name\n        connector.append(conn)\n", 
   "category": "Dragonfly", 
   "name": "DF Electrical Connector", 
-  "description": "Create an OpenDSS Electrical Connector from its linear geometry and the wires\ncarried along it.\n-"
+  "description": "Create an OpenDSS Electrical Connector from linear geometry and power line\nproperties, which include the wires and their geometrical arrangement.\n-"
 }

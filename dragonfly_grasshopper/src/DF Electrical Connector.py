@@ -8,16 +8,16 @@
 # @license AGPL-3.0-or-later <https://spdx.org/licenses/AGPL-3.0-or-later>
 
 """
-Create an OpenDSS Electrical Connector from its linear geometry and the wires
-carried along it.
+Create an OpenDSS Electrical Connector from linear geometry and power line
+properties, which include the wires and their geometrical arrangement.
 -
 
     Args:
         _geo: A line or polyline representing an Electrical Connector.
-        _wires: A list of text for the wires carried along the electrical connector,
-            which will be looked up in the Wires library (the output from the
-            "DF OpenDSS Libraries" component). This can also be a list of
-            custom Wire objects.
+        _power_line: Text for the ID of a PowerLine carried along the electrical connector,
+            which will be looked up in the Power Lines library (the output from the
+            "DF OpenDSS Libraries" component). This can also be a custom
+            PowerLine object created using the Ladybug Tools SDK.
         _name_: Text to set the base name for the Electrical Connector, which will also
             be incorporated into unique ElectricalConnector identifier. If the
             name is not provided, a random one will be assigned.
@@ -29,18 +29,18 @@ carried along it.
 
 ghenv.Component.Name = 'DF Electrical Connector'
 ghenv.Component.NickName = 'Connector'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
 
 try:  # import the core honeybee dependencies
-    from honeybee.typing import clean_and_id_ep_string
+    from honeybee.typing import clean_and_id_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the core dragonfly_energy dependencies
-    from dragonfly_energy.opendss.lib.wires import wire_by_identifier
+    from dragonfly_energy.opendss.lib.powerlines import power_line_by_identifier
     from dragonfly_energy.opendss.connector import ElectricalConnector
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
@@ -54,13 +54,9 @@ except ImportError as e:
 
 
 if all_required_inputs(ghenv.Component):
-    # get the wires carried along the connector
-    wire_objs = []
-    for wire in _wires:
-        if isinstance(wire, str):
-            wire_objs.append(wire_by_identifier(wire))
-        else:
-            wire_objs.append(wire)
+    # get the power line object used by the connector
+    if isinstance(_power_line, str):
+        _power_line = power_line_by_identifier(_power_line)
 
     # convert rhino geometry to ladybug geometry
     lines = []
@@ -79,9 +75,9 @@ if all_required_inputs(ghenv.Component):
         else:
             display_name = '{}_{}'.format(longest_list(_name_, i), i + 1) \
                 if len(_name_) != len(lines) else longest_list(_name_, i)
-        name = clean_and_id_ep_string(display_name)
+        name = clean_and_id_string(display_name)
 
         # create the ElectricalConnector
-        conn = ElectricalConnector(name, geo, wire_objs)
+        conn = ElectricalConnector(name, geo, _power_line)
         conn.display_name = display_name
         connector.append(conn)

@@ -24,6 +24,9 @@ run correctly through OpenDSS.
         _run_period_: A ladybyg AnalysisPeriod object to describe the time period
             over which to run the simulation. The default is to run the simulation
             for the whole EnergyPlus run period.
+        autosize_: A boolean to note whether undersized transformers should be
+            automatically resized to meet demand over the course of
+            the simulation. (Default: False).
         _run: Set to "True" to run the geojson and scenario through OpenDSS.
 
     Returns:
@@ -44,7 +47,7 @@ run correctly through OpenDSS.
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -52,6 +55,11 @@ ghenv.Component.AdditionalHelpFromDocStrings = '0'
 import os
 import subprocess
 import json
+
+try:
+    from ladybug.config import folders as lb_folders
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:
     from honeybee.config import folders
@@ -69,20 +77,37 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
+UO_DITTO_VERSION = '0.4.0'
+
 
 if all_required_inputs(ghenv.Component) and _run:
     # check to see if the urbanopt-ditto-reader is installed
-    shell = False if os.name == 'nt' else True
     ext = '.exe' if os.name == 'nt' else ''
     uo_ditto = '{}/ditto_reader_cli{}'.format(folders.python_scripts_path, ext)
-    if not os.path.isfile(uo_ditto):  # run the pip install command
-        pip_cmd = '"{py_exe}" -m pip install urbanopt-ditto-reader==0.3.8'.format(
-            py_exe=folders.python_exe_path)
+    uo_ditto_pack = '{}/urbanopt_ditto_reader-{}.dist-info'.format(
+        folders.python_package_path, UO_DITTO_VERSION)
+    if not os.path.isfile(uo_ditto) or not os.path.isdir(uo_ditto_pack):
+        executor_path = os.path.join(
+            lb_folders.ladybug_tools_folder, 'grasshopper',
+            'ladybug_grasshopper_dotnet', 'Ladybug.Executor.exe')
+        if os.name == 'nt' and os.path.isfile(executor_path) and \
+                'Program Files' in executor_path:
+            pip_cmd = [
+                executor_path, folders.python_exe_path,
+                '-m pip install urbanopt-ditto-reader==0.4.0'
+            ]
+        else:
+            pip_cmd = '"{py_exe}" -m pip install urbanopt-ditto-reader==0.4.0'.format(
+                py_exe=folders.python_exe_path)
+        shell = True if os.name == 'nt' else False
         process = subprocess.Popen(pip_cmd, stderr=subprocess.PIPE, shell=shell)
         stderr = process.communicate()
 
     # generate the default scenario report
-    run_default_report(_geojson, _scenario)
+    def_report = os.path.join(os.path.dirname(_geojson), 'run',
+                              'honeybee_scenario', 'default_scenario_report.csv')
+    if not os.path.isfile(def_report):
+        run_default_report(_geojson, _scenario)
 
     # prepare the opendss-running command
     command = '"{uo_ditto}" run-opendss -f "{feature_file}" ' \
@@ -91,11 +116,15 @@ if all_required_inputs(ghenv.Component) and _run:
             equipment_file=os.path.join(os.path.dirname(_geojson), 'electrical_database.json')
         )
     if _run_period_ is not None:
-        st_dt = '2006/{}'.format(_run_period_.st_time.strftime('%m/%d %H:%M:%S'))
-        end_dt = '2006/{}'.format(_run_period_.end_time.strftime('%m/%d %H:%M:%S'))
-        command = '{} -b "{}" -n "{}"'.format(command, st_dt, end_dt)
+        st_dt = '2006/{}'.format(_run_period_.st_time.strftime('%m/%d'))
+        end_dt = '2006/{}'.format(_run_period_.end_time.add_hour(24).strftime('%m/%d'))
+        command = '{} -a "{}" -n "{}"'.format(command, st_dt, end_dt)
+        command = '{} -b 01:00:00 -d 00:00:00'.format(command)
+    if autosize_:
+        command = '{} --upgrade'.format(command)
 
     # execute the command to run everything through OpenDSS
+    shell = False if os.name == 'nt' else True
     process = subprocess.Popen(command, stderr=subprocess.PIPE, shell=shell)
     stderr = process.communicate()
 
