@@ -28,13 +28,13 @@ Create an OpenDSS Transformer from its footprint geometry (horizontal Rhino surf
 
 ghenv.Component.Name = 'DF Transformer'
 ghenv.Component.NickName = 'Transformer'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.4.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
 
 try:  # import the core honeybee dependencies
-    from honeybee.typing import clean_and_id_ep_string
+    from honeybee.typing import clean_and_id_string
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
@@ -62,7 +62,7 @@ if all_required_inputs(ghenv.Component):
         else:
             display_name = '{}_{}'.format(longest_list(_name_, i), i + 1) \
                 if len(_name_) != len(polygons) else longest_list(_name_, i)
-        name = clean_and_id_ep_string(display_name)
+        name = clean_and_id_string(display_name)
 
         # get the properties for the transformer
         props = longest_list(_properties, i)
