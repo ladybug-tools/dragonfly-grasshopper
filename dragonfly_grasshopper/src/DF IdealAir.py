@@ -51,7 +51,7 @@ Apply a customized IdealAirSystem to Dragonfly Buildings, Stories or Room2Ds.
 
 ghenv.Component.Name = "DF IdealAir"
 ghenv.Component.NickName = 'DFIdealAir'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

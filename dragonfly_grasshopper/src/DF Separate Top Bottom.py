@@ -31,7 +31,7 @@ top or bottom floors with the gound or outdoors.
 
 ghenv.Component.Name = "DF Separate Top Bottom"
 ghenv.Component.NickName = 'TopBottom'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"

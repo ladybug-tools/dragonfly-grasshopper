@@ -33,7 +33,7 @@ into a new Building.
 
 ghenv.Component.Name = "DF Deconstruct All Object"
 ghenv.Component.NickName = 'DecnstrAllDF'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'

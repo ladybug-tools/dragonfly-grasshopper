@@ -49,7 +49,7 @@ hourly data.
 
 ghenv.Component.Name = 'DF Create EPW'
 ghenv.Component.NickName = 'CreateEPW'
-ghenv.Component.Message = '1.4.1'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

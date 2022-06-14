@@ -55,7 +55,7 @@ derived from an area ratio with the base surface.
 
 ghenv.Component.Name = "DF Repeating Window Ratio Parameters"
 ghenv.Component.NickName = 'RepeatingRatioPar'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"

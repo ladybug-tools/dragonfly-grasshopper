@@ -35,7 +35,7 @@ to such stories.
 
 ghenv.Component.Name = 'DF Reassign Energy Properties'
 ghenv.Component.NickName = 'ReassignProp'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
