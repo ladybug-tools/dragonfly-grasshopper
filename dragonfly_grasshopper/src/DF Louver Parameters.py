@@ -37,7 +37,7 @@ Shades over a Wll.
 
 ghenv.Component.Name = "DF Louver Parameters"
 ghenv.Component.NickName = 'LouverPar'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "6"

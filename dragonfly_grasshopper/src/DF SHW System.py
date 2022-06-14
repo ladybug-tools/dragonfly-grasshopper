@@ -45,7 +45,7 @@ or Room2Ds.
 
 ghenv.Component.Name = "DF SHW System"
 ghenv.Component.NickName = 'SHW'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'

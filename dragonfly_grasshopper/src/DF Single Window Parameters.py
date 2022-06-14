@@ -30,7 +30,7 @@ generate a ribboin window of the input height.
 
 ghenv.Component.Name = "DF Single Window Parameters"
 ghenv.Component.NickName = 'SingleWindowPar'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"

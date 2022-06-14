@@ -39,7 +39,7 @@ Create Dragonfly ContextShade.
 
 ghenv.Component.Name = 'DF ContextShade'
 ghenv.Component.NickName = 'Context'
-ghenv.Component.Message = '1.4.1'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '7'

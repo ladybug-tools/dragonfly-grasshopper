@@ -47,7 +47,7 @@ Microclimate Group (http://urbanmicroclimate.scripts.mit.edu/publications.php).
 
 ghenv.Component.Name = 'DF Run Urban Weather Generator'
 ghenv.Component.NickName = 'RunUWG'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'

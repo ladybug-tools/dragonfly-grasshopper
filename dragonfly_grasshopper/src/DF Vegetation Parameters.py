@@ -45,7 +45,7 @@ urban area.
 
 ghenv.Component.Name = "DF Vegetation Parameters"
 ghenv.Component.NickName = 'VegetationPar'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

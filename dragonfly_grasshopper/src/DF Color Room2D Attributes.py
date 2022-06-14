@@ -38,7 +38,7 @@ different Room2Ds.
 
 ghenv.Component.Name = 'DF Color Room2D Attributes'
 ghenv.Component.NickName = 'ColorRoom2DAttr'
-ghenv.Component.Message = '1.4.1'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

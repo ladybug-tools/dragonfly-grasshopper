@@ -24,7 +24,7 @@ Add detailed window geometries to Dragonfly Room2Ds.
 
 ghenv.Component.Name = "DF Detailed Windows"
 ghenv.Component.NickName = 'DetailedWindows'
-ghenv.Component.Message = '1.4.0'
+ghenv.Component.Message = '1.5.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"
