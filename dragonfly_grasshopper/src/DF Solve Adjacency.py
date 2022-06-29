@@ -26,6 +26,9 @@ rooms have matching segments.
             by this component set to an AirBoundary type. Note that AirBoundary
             types are not allowed if interior windows are assigned to interior
             walls. (Default: False).
+        overwrite_: Boolean to note whether existing Surface boundary conditions
+            should be overwritten. If False or None, only newly-assigned
+            adjacencies will be updated.
         _run: Set to True to run the component and solve adjacencies.
 
     Returns:
@@ -36,7 +39,7 @@ rooms have matching segments.
 
 ghenv.Component.Name = "DF Solve Adjacency"
 ghenv.Component.NickName = 'SolveAdj2D'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
@@ -59,10 +62,18 @@ except ImportError as e:
 
 
 if all_required_inputs(ghenv.Component) and _run:
-    adj_room2ds = [room.duplicate() for room in _room2ds] # duplicate the initial objects
+    adj_room2ds = [] # duplicate the initial objects
+    for room in _room2ds:
+        assert isinstance(room, Room2D), 'Expected Room2D. Got {}.'.format(type(room))
+        adj_room2ds.append(room.duplicate())
 
-    # solve adjacency
-    adj_info = Room2D.solve_adjacency(adj_room2ds, tolerance)
+    # solve adjacnecy
+    if overwrite_:  # find adjscencies and re-assign them
+        adj_info = Room2D.find_adjacency(adj_room2ds, tolerance)
+        for wp in adj_info:
+            wp[0][0].set_adjacency(wp[1][0], wp[0][1], wp[1][1])
+    else:
+        adj_info = Room2D.solve_adjacency(adj_room2ds, tolerance)
 
     # set adiabatic boundary conditions if requested
     if adiabatic_:
