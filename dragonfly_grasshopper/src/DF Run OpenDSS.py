@@ -47,7 +47,7 @@ run correctly through OpenDSS.
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -94,11 +94,11 @@ if all_required_inputs(ghenv.Component) and _run:
                 'Program Files' in executor_path:
             pip_cmd = [
                 executor_path, folders.python_exe_path,
-                '-m pip install urbanopt-ditto-reader==0.4.0'
+                '-m pip install urbanopt-ditto-reader=={}'.format(UO_DITTO_VERSION)
             ]
         else:
-            pip_cmd = '"{py_exe}" -m pip install urbanopt-ditto-reader==0.4.0'.format(
-                py_exe=folders.python_exe_path)
+            pip_cmd = '"{py_exe}" -m pip install urbanopt-ditto-reader=={uo_ver}'.format(
+                py_exe=folders.python_exe_path, uo_ver=UO_DITTO_VERSION)
         shell = True if os.name == 'nt' else False
         process = subprocess.Popen(pip_cmd, stderr=subprocess.PIPE, shell=shell)
         stderr = process.communicate()
