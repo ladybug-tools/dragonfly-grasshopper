@@ -1,0 +1,43 @@
+{
+  "version": "1.5.0", 
+  "nickname": "RunRNM", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "results", 
+        "description": "Path to a folder that contains all of the RNM output files.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_geojson", 
+      "description": "The path to an URBANopt-compatible geoJSON file. This geoJSON\nfile can be obtained form the \"DF Model to geoJSON\" component.\nThe geoJSON must have a valid Road Network assigned to it\nin order to run correctly through RNM.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_scenario", 
+      "description": "The path to an URBANopt .csv file for the scenario. This CSV\nfile can be obtained form the \"DF Run URBANopt\" component.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_run", 
+      "description": "Set to \"True\" to run the geojson and scenario through RNM.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\nimport os\n\ntry:\n    from ladybug.config import folders as lb_folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:\n    from honeybee.config import folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.run import run_default_report, run_rnm\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # generate the default scenario report\n    def_report = os.path.join(os.path.dirname(_geojson), 'run',\n                              'honeybee_scenario', 'default_scenario_report.csv')\n    if not os.path.isfile(def_report):\n        run_default_report(_geojson, _scenario)\n\n    # execute the simulation with URBANopt CLI\n    results = run_rnm(_geojson, _scenario)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Run RNM", 
+  "description": "Run a an URBANopt geoJSON and scenario through RNM.\n_\nThe geoJSON must have a valid Road Network assigned to it in order to run\ncorrectly through RNM.\n-"
+}

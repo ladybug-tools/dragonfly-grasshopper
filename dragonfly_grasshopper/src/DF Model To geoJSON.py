@@ -43,10 +43,10 @@ key in the geoJSON.
             the results. If None, all other buildings will be included as context
             shade in each and every Model. Set to 0 to exclude all neighboring
             buildings from the resulting models. Default: None.
-        elec_network_: An optional OpenDSS ElectricalNetwork that's associated
-            with the input Dragonfly Model and will be written into the
-            geoJSON. An input here is required to perform an OpenDSS
-            simulation after running URBANopt.
+        network_: An optional OpenDSS ElectricalNetwork or RNM RoadNetwork that's
+            associated with the input Dragonfly Model and will be written into
+            the geoJSON. An input here is required to perform an OpenDSS
+            or RNM simulation after running URBANopt.
         ground_pv_:  An optional list of REopt GroundMountPV objects representing
             ground-mounted photovoltaic fields to be included in a REopt
             simulation after running URBANopt.
@@ -76,7 +76,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -103,6 +103,11 @@ try:  # import the core dragonfly dependencies
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
+try:  # import the dragonfly_energy dependencies
+    from dragonfly_energy.opendss.network import ElectricalNetwork, RoadNetwork
+except ImportError as e:
+    raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
+
 try:
     from ladybug_rhino.togeometry import to_point2d
     from ladybug_rhino.config import tolerance
@@ -128,8 +133,15 @@ if all_required_inputs(ghenv.Component) and _write:
         geojson = _model.to_geojson(_location, point, _folder_, tolerance)
     else:
         # create the geoJSON and honeybee Model JSONs
+        if network_ is None:
+            elec_network, road_network = None, None
+        elif isinstance(network_, ElectricalNetwork):
+            elec_network, road_network = network_, None
+        elif isinstance(network_, RoadNetwork):
+            elec_network, road_network = None, network_
         geojson, hb_jsons, hb_models = _model.to.urbanopt(
             _model, _location, point, shade_dist_, use_multiplier_,
             add_plenum_, ceil_adjacency_,
-            electrical_network=elec_network_, ground_pv=ground_pv_,
+            electrical_network=elec_network, road_network=road_network,
+            ground_pv=ground_pv_,
             folder=_folder_, tolerance=tolerance)
