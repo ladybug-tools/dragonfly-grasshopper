@@ -34,12 +34,13 @@ to connect these objects to Dragonfly Buildings.
     Returns:
         report: Reports, errors, warnings, etc.
         network: A Dragonfly Electrical Newtork object possessing all electrical
-            infrastructure for an OpenDSS simulation.
+            infrastructure for an OpenDSS simulation. This should be connected
+            to the network_ input of the "DF Model to GeoJSON" component.
 """
 
 ghenv.Component.Name = 'DF Electrical Network'
 ghenv.Component.NickName = 'Network'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -64,7 +65,7 @@ if all_required_inputs(ghenv.Component):
     # set a default name
     name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'
 
-    # create the model
+    # create the network
     network = ElectricalNetwork(name, _substation, _transformers, _connectors)
     if _name_ is not None:
         network.display_name = _name_
