@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0", 
+  "version": "1.5.1", 
   "nickname": "ColorRoom2DAttr", 
   "outputs": [
     [
@@ -51,7 +51,7 @@
     {
       "access": "item", 
       "name": "_attribute", 
-      "description": "Text for the name of the Room2D attribute by which the Room2Ds\nshould be separated. The \"DF Room2D Attributes\" component lists\nall of the attributes of the Room2D.", 
+      "description": "Text for the name of the Room2D attribute with which the Room2Ds\nshould be colored. The \"DF Room2D Attributes\" component lists\nall of the attributes of the Room2D.", 
       "type": "string", 
       "default": null
     }, 

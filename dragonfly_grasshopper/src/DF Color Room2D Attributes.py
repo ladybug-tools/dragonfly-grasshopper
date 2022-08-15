@@ -17,8 +17,8 @@ different Room2Ds.
     Args:
         _df_obj: A Dragonfly Model, Building, Story or Room2D to be colored
             with their attributes in the Rhino scene.
-        _attribute: Text for the name of the Room2D attribute by which the Room2Ds
-            should be separated. The "DF Room2D Attributes" component lists
+        _attribute: Text for the name of the Room2D attribute with which the Room2Ds
+            should be colored. The "DF Room2D Attributes" component lists
             all of the attributes of the Room2D.
         legend_par_: An optional LegendParameter object to change the display
             of the colored Room2Ds. (Default: None).
@@ -38,7 +38,7 @@ different Room2Ds.
 
 ghenv.Component.Name = 'DF Color Room2D Attributes'
 ghenv.Component.NickName = 'ColorRoom2DAttr'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
