@@ -1,0 +1,64 @@
+{
+  "version": "1.5.0", 
+  "nickname": "ColorNetAttr", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "vis_geo", 
+        "description": "Meshes and line segments colored according to their attributes.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "legend", 
+        "description": "Geometry representing the legend for colored objects.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "values", 
+        "description": "A list of values that align with the input substation, transformers\nand electrical connectors. These note the attribute assigned\nto each object.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "colors", 
+        "description": "A list of colors that align with the input substation, transformers\nand electrical connectors. These note the color of each object in\nthe Rhino scene.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_network", 
+      "description": "A Dragonfly Electrical Newtork object to be colored with its\nattributes in the Rhino scene.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_attribute", 
+      "description": "Text for the name of the equipment attribute with which the Newtork\nshould be colored. The \"DF Network Attributes\" component lists\nall of the attributes of the equipment of an ElectricalNetwork.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "legend_par_", 
+      "description": "An optional LegendParameter object to change the display\nof the colored output. (Default: None).", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "1 :: Visualize", 
+  "code": "\ntry:  # import the ladybug_geometry dependencies\n    from ladybug_geometry.geometry2d import Polygon2D, Polyline2D, LineSegment2D\n    from ladybug_geometry.geometry3d import Face3D, Point3D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly_energy.opendss.colorobj import ColorNetwork\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.fromgeometry import from_face3ds_to_colored_mesh, \\\n        from_polyline2d, from_linesegment2d\n    from ladybug_{{cad}}.colorize import ColoredPolyline, ColoredLine\n    from ladybug_{{cad}}.fromobjects import legend_objects\n    from ladybug_{{cad}}.color import color_to_color\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, schedule_solution\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # create the ColorNetwork visualization object and output geometry\n    color_obj = ColorNetwork(_network, _attribute, legend_par_)\n    graphic = color_obj.graphic_container\n    vis_geo = []\n    for geo_obj, col in zip(color_obj.geometries, graphic.value_colors):\n        if isinstance(geo_obj, Polygon2D):\n            face_obj = Face3D([Point3D(pt.x, pt.y, 0) for pt in geo_obj.vertices])\n            vis_geo.append(from_face3ds_to_colored_mesh([face_obj], col))\n        elif isinstance(geo_obj, Polyline2D):\n            col_line = ColoredPolyline(from_polyline2d(geo_obj))\n            col_line.color = color_to_color(col)\n            col_line.thickness = 3\n            vis_geo.append(col_line)\n        elif isinstance(geo_obj, LineSegment2D):\n            col_line = ColoredLine(from_linesegment2d(geo_obj))\n            col_line.color = color_to_color(col)\n            col_line.thickness = 3\n            vis_geo.append(col_line)\n    legend = legend_objects(graphic.legend)\n    values = color_obj.attributes_original\n    colors = [color_to_color(col) for col in graphic.value_colors]\n    schedule_solution(ghenv.Component, 2)", 
+  "category": "Dragonfly", 
+  "name": "DF Color Network Attributes", 
+  "description": "Color a Dragonfly ElectricalNewtwork in the Rhino scene using its attributes.\n_\nThis can be used as a means to check that correct properties are assigned to\ndifferent Transformers and ElectricalConnectors.\n-"
+}

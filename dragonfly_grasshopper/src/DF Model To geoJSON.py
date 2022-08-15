@@ -66,6 +66,10 @@ key in the geoJSON.
             (floor area, number of stories, etc.). The polygons will also possess
             detailed_model_filename keys that align with where the Honeybee Model
             JSONs are written.
+        net_json: A JSON file containing a representation of the electrical or street
+            network. This can be loaded back to the original object using the
+            "DF Load Objects" component. This will be None if no network_ is
+            connected.
         hb_jsons: A list of file paths to honeybee Model JSONS that correspond to
             the detailed_model_filename keys in the geojson.
         hb_models: A list of honeybee Model objects that were generated in process
@@ -76,10 +80,13 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.5.1'
+ghenv.Component.Message = '1.5.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
+
+import os
+import json
 
 try:  # import the ladybug_geometry dependencies
     from ladybug_geometry.geometry2d.pointvector import Point2D
@@ -132,16 +139,23 @@ if all_required_inputs(ghenv.Component) and _write:
     if _write == 2:
         geojson = _model.to_geojson(_location, point, _folder_, tolerance)
     else:
-        # create the geoJSON and honeybee Model JSONs
+        # process any input electrical or road networks
         if network_ is None:
             elec_network, road_network = None, None
         elif isinstance(network_, ElectricalNetwork):
             elec_network, road_network = network_, None
         elif isinstance(network_, RoadNetwork):
             elec_network, road_network = None, network_
+        # create the geoJSON and honeybee Model JSONs
         geojson, hb_jsons, hb_models = _model.to.urbanopt(
             _model, _location, point, shade_dist_, use_multiplier_,
             add_plenum_, ceil_adjacency_,
             electrical_network=elec_network, road_network=road_network,
             ground_pv=ground_pv_,
             folder=_folder_, tolerance=tolerance)
+        # write the network to a JSON so that it can be loaded in the future
+        if network_ is not None:
+            proj_folder = os.path.dirname(geojson)
+            net_json = os.path.join(proj_folder, 'network.json')
+            with open(net_json, 'w') as nj:
+                json.dump(network_.to_dict(), nj)

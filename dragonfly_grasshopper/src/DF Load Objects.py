@@ -30,7 +30,7 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Load Objects'
 ghenv.Component.NickName = 'LoadObjects'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -41,6 +41,11 @@ try:  # import the core dragonfly dependencies
     from dragonfly.config import folders
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
+
+try:  # import the dragonfly_energy dependencies
+    from dragonfly_energy.opendss.network import ElectricalNetwork, RoadNetwork
+except ImportError as e:
+    raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:  # import the core honeybee_energy dependencies
     import honeybee_energy.dictutil as energy_dict_util
@@ -59,6 +64,33 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 import json
+
+
+def df_energy_dict_to_object(df_energy_dict, raise_exception=True):
+    """Re-serialize a dictionary of an object within dragonfly_energy.
+
+    Args:
+        df_energy_dict: A dictionary of a Dragonfly energy object. Note
+            that this should be a non-abridged dictionary to be valid.
+        raise_exception: Boolean to note whether an exception should be raised
+            if the object is not identified as a part of dragonfly_energy.
+
+    Returns:
+        A Python object derived from the input df_energy_dict.
+    """
+    try:  # get the type key from the dictionary
+        obj_type = df_energy_dict['type']
+    except KeyError:
+        raise ValueError('Dragonfly_energy dictionary lacks required "type" key.')
+
+    if obj_type == 'ElectricalNetwork':
+        return ElectricalNetwork.from_dict(df_energy_dict)
+    elif obj_type == 'RoadNetwork':
+        return RoadNetwork.from_dict(df_energy_dict)
+    elif raise_exception:
+        raise ValueError(
+            '{} is not a recognized dragonfly energy object'.format(obj_type)
+        )
 
 
 def model_units_tolerance_check(model):
@@ -118,9 +150,11 @@ if all_required_inputs(ghenv.Component) and _load:
     try:
         df_objs = df_dict_util.dict_to_object(data, False)  # re-serialize as a core object
         if df_objs is None:  # try to re-serialize it as an energy object
-            df_objs = energy_dict_util.dict_to_object(data, False)
-            if df_objs is None:  # try to re-serialize it as a radiance object
-                df_objs = radiance_dict_util.dict_to_object(data, False)
+            df_objs = df_energy_dict_to_object(data, False)
+            if df_objs is None:
+                df_objs = energy_dict_util.dict_to_object(data, False)
+                if df_objs is None:  # try to re-serialize it as a radiance object
+                    df_objs = radiance_dict_util.dict_to_object(data, False)
         elif isinstance(df_objs, Model):
             model_units_tolerance_check(df_objs)
     except ValueError:  # no 'type' key; assume that its a group of objects
@@ -128,7 +162,9 @@ if all_required_inputs(ghenv.Component) and _load:
         for df_dict in data.values():
             df_obj = df_dict_util.dict_to_object(df_dict, False)  # re-serialize as a core object
             if df_obj is None:  # try to re-serialize it as an energy object
-                df_obj = energy_dict_util.dict_to_object(df_dict, False)
-                if df_obj is None:  # try to re-serialize it as a radiance object
-                    df_obj = radiance_dict_util.dict_to_object(df_dict, False)
+                df_objs = df_energy_dict_to_object(data, False)
+                if df_obj is None:
+                    df_obj = energy_dict_util.dict_to_object(df_dict, False)
+                    if df_obj is None:  # try to re-serialize it as a radiance object
+                        df_obj = radiance_dict_util.dict_to_object(df_dict, False)
             df_objs.append(df_obj)
