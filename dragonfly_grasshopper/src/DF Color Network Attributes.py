@@ -36,7 +36,7 @@ different Transformers and ElectricalConnectors.
 
 ghenv.Component.Name = 'DF Color Network Attributes'
 ghenv.Component.NickName = 'ColorNetAttr'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'
@@ -70,7 +70,7 @@ if all_required_inputs(ghenv.Component):
     vis_geo = []
     for geo_obj, col in zip(color_obj.geometries, graphic.value_colors):
         if isinstance(geo_obj, Polygon2D):
-            face_obj = Face3D([Point3D(pt.x, pt.y, 0) for pt in geo_obj.vertices])
+            face_obj = Face3D([Point3D(pt.x, pt.y, 0.1) for pt in geo_obj.vertices])
             vis_geo.append(from_face3ds_to_colored_mesh([face_obj], col))
         elif isinstance(geo_obj, Polyline2D):
             col_line = ColoredPolyline(from_polyline2d(geo_obj))

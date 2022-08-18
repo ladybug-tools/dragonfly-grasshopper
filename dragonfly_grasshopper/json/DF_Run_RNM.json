@@ -1,12 +1,19 @@
 {
-  "version": "1.5.0", 
+  "version": "1.5.1", 
   "nickname": "RunRNM", 
   "outputs": [
     [
       {
         "access": "None", 
-        "name": "results", 
-        "description": "Path to a folder that contains all of the RNM output files.", 
+        "name": "network", 
+        "description": "The ElectricalNetwork object output from the RNM simulation. The\nproperties of this object can be visualized with the \"DF Color\nNetwork Attributes\" component. However, the network can not be\nused for OpenDSS simulation (the dss_files below should be used\nfor this purpose).", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "dss_results", 
+        "description": "Path to the folder containing all of the OpenDSS files.", 
         "type": null, 
         "default": null
       }
@@ -29,6 +36,27 @@
     }, 
     {
       "access": "item", 
+      "name": "_ug_ratio_", 
+      "description": "A number between 0 and 1 for the ratio of overall cables that are\nunderground vs. overhead in the analysis. (Default: 0.9).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "include_hv_", 
+      "description": "A boolean to note whether high voltage consumers should be\nincluded in the analysis. (Default: False).", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "nodes_per_bldg_", 
+      "description": "A positive integer for the maximum number of low voltage\nnodes to represent a single building. (Default: 1).", 
+      "type": "int", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
       "name": "_run", 
       "description": "Set to \"True\" to run the geojson and scenario through RNM.", 
       "type": "bool", 
@@ -36,7 +64,7 @@
     }
   ], 
   "subcategory": "3 :: Energy", 
-  "code": "\nimport os\n\ntry:\n    from ladybug.config import folders as lb_folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:\n    from honeybee.config import folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.run import run_default_report, run_rnm\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # generate the default scenario report\n    def_report = os.path.join(os.path.dirname(_geojson), 'run',\n                              'honeybee_scenario', 'default_scenario_report.csv')\n    if not os.path.isfile(def_report):\n        run_default_report(_geojson, _scenario)\n\n    # execute the simulation with URBANopt CLI\n    results = run_rnm(_geojson, _scenario)\n", 
+  "code": "\nimport os\n\ntry:\n    from ladybug.config import folders as lb_folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:\n    from honeybee.config import folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.run import run_default_report, run_rnm\n    from dragonfly_energy.opendss.network import ElectricalNetwork\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\n    from ladybug_{{cad}}.config import units_system\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # set default values\n    ug_ratio = 0.9 if _ug_ratio_ is None else _ug_ratio_\n    lv_only = True if include_hv_ is None else not include_hv_\n    nodes_per_bldg = 1 if nodes_per_bldg_ is None else nodes_per_bldg_\n\n    # generate the default scenario report\n    def_report = os.path.join(os.path.dirname(_geojson), 'run',\n                              'honeybee_scenario', 'default_scenario_report.csv')\n    if not os.path.isfile(def_report):\n        run_default_report(_geojson, _scenario)\n\n    # execute the simulation with URBANopt CLI\n    results = run_rnm(_geojson, _scenario, ug_ratio, lv_only, nodes_per_bldg)\n\n    # add the kVA to the output GeoJSON file\n    if results is not None:\n        dss_results = os.path.join(results, 'OpenDSS')\n        geo_file = os.path.join(results, 'GeoJSON', 'Distribution_system.json')\n        network = ElectricalNetwork.from_rnm_geojson(geo_file, units=units_system())\n", 
   "category": "Dragonfly", 
   "name": "DF Run RNM", 
   "description": "Run a an URBANopt geoJSON and scenario through RNM.\n_\nThe geoJSON must have a valid Road Network assigned to it in order to run\ncorrectly through RNM.\n-"
