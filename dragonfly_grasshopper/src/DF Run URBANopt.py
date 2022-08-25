@@ -35,6 +35,14 @@ https://docs.urbanopt.net/installation/installation.html
         report_: Boolean to note whether to include the URBANopt default feature reporting
             measure as part of the simulation. If True, the measure will be run
             after all simulations are complete. (Default:True).
+        emiss_yr_: An optional integer to set the year for which carbon emissions
+            will be computed. Values must be an even number and be between
+            2020 and 2050. If unspecified, no carbon emission calculations
+            will be included in the simulation. After the simulation is run,
+            the hourly carbon emissions can be imported from the output
+            sql files by using the "HB Read Custom Result" component and
+            plugging in the following output name:
+                Future_Hourly_Electricity_Emissions
         _cpus_: A positive integer for the number of CPUs to use in the simulation.
             This number should not exceed the number of CPUs on the machine
             running the simulation and should be lower if other tasks are
@@ -69,7 +77,7 @@ https://docs.urbanopt.net/installation/installation.html
 
 ghenv.Component.Name = 'DF Run URBANopt'
 ghenv.Component.NickName = 'RunURBANopt'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -131,8 +139,8 @@ if all_required_inputs(ghenv.Component) and _run:
     skip_report = not report_ if report_ is not None else False
     base_honeybee_osw(
         directory, sim_par_json=sim_par_json, additional_measures=measures,
-        additional_mapper_measures=mappers,
-        epw_file=_epw_file, skip_report=skip_report)
+        additional_mapper_measures=mappers, epw_file=_epw_file,
+        skip_report=skip_report, emissions_year=emiss_yr_)
 
     # prepare the URBANopt folder and generate the scenario
     _cpus_ = _cpus_ if _cpus_ is not None else recommended_processor_count()
