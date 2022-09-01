@@ -49,7 +49,7 @@ hourly data.
 
 ghenv.Component.Name = 'DF Create EPW'
 ghenv.Component.NickName = 'CreateEPW'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -105,7 +105,7 @@ if all_required_inputs(ghenv.Component) and _run:
         else:
             leap_yr = False
         epw_obj = EPW.from_missing_values(is_leap_year=leap_yr)
-    
+
     # assign data to the EPW
     epw_obj.location = _location
     if _dry_bulb_temp_:
@@ -147,8 +147,8 @@ if all_required_inputs(ghenv.Component) and _run:
         epw_obj.ceiling_height.values = check_data(
             '_ceiling_height_', _ceiling_height_, Distance, 'm', leap_yr)
     if _model_year_:
-        epw_obj.years.values = _model_year_.values
-    
+        epw_obj.years.values = [int(val) for val in _model_year_.values]
+
     # calculate properties that are derived from other inputs
     if _dry_bulb_temp_ and _dew_point_temp_:
         rel_humid = HourlyContinuousCollection.compute_function_aligned(
