@@ -47,7 +47,7 @@ run correctly through OpenDSS.
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.5.1'
+ghenv.Component.Message = '1.5.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -111,10 +111,20 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # prepare the opendss-running command
     command = '"{uo_ditto}" run-opendss -f "{feature_file}" ' \
-        '-s "{scenario_file}" -e "{equipment_file}"'.format(
-            uo_ditto=uo_ditto, feature_file=_geojson, scenario_file=_scenario,
-            equipment_file=os.path.join(os.path.dirname(_geojson), 'electrical_database.json')
-        )
+        '-s "{scenario_file}"'.format(
+            uo_ditto=uo_ditto, feature_file=_geojson, scenario_file=_scenario)
+    
+    # check if this is an RNM simulation
+    rnm_results = os.path.join(
+        os.path.dirname(_geojson), 'run', 'honeybee_scenario', 'rnm-us',
+        'results', 'GeoJSON', 'Distribution_system.json')
+    if os.path.isfile(rnm_results):
+        command = '{} --rnm'.format(command)
+    else:  # include the equipment file written by dragonfly-energy
+        command = '{} -e "{}"'.format(
+            command, os.path.join(os.path.dirname(_geojson), 'electrical_database.json'))
+
+    # add the other options into the command
     if _run_period_ is not None:
         st_dt = '2006/{}'.format(_run_period_.st_time.strftime('%m/%d'))
         end_dt = '2006/{}'.format(_run_period_.end_time.add_hour(24).strftime('%m/%d'))
