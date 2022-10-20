@@ -47,7 +47,7 @@ run correctly through OpenDSS.
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.5.3'
+ghenv.Component.Message = '1.5.4'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -57,6 +57,7 @@ import subprocess
 import json
 
 try:
+    from ladybug.futil import nukedir
     from ladybug.config import folders as lb_folders
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
@@ -109,6 +110,12 @@ if all_required_inputs(ghenv.Component) and _run:
     if not os.path.isfile(def_report):
         run_default_report(_geojson, _scenario)
 
+    # delete any existing files in the result folder
+    scen_name = os.path.basename(_scenario).replace('.csv', '')
+    run_folder = os.path.join(os.path.dirname(_geojson), 'run', scen_name)
+    result_folder = os.path.join(run_folder, 'opendss')
+    nukedir(result_folder)
+
     # prepare the opendss-running command
     command = '"{uo_ditto}" run-opendss -f "{feature_file}" ' \
         '-s "{scenario_file}"'.format(
@@ -154,9 +161,6 @@ if all_required_inputs(ghenv.Component) and _run:
     stderr = process.communicate()
 
     # gather together all of the result files
-    scen_name = os.path.basename(_scenario).replace('.csv', '')
-    run_folder = os.path.join(os.path.dirname(_geojson), 'run', scen_name)
-    result_folder = os.path.join(run_folder, 'opendss')
     bldg_folder = os.path.join(result_folder, 'results', 'Features')
     conn_folder = os.path.join(result_folder, 'results', 'Lines')
     trans_folder = os.path.join(result_folder, 'results', 'Transformers')
