@@ -47,7 +47,7 @@ run correctly through OpenDSS.
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.5.2'
+ghenv.Component.Message = '1.5.3'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -113,7 +113,7 @@ if all_required_inputs(ghenv.Component) and _run:
     command = '"{uo_ditto}" run-opendss -f "{feature_file}" ' \
         '-s "{scenario_file}"'.format(
             uo_ditto=uo_ditto, feature_file=_geojson, scenario_file=_scenario)
-    
+
     # check if this is an RNM simulation
     rnm_results = os.path.join(
         os.path.dirname(_geojson), 'run', 'honeybee_scenario', 'rnm-us',
@@ -126,10 +126,25 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # add the other options into the command
     if _run_period_ is not None:
+        # first, format the run period dates for the command
         st_dt = '2006/{}'.format(_run_period_.st_time.strftime('%m/%d'))
         end_dt = '2006/{}'.format(_run_period_.end_time.add_hour(24).strftime('%m/%d'))
         command = '{} -a "{}" -n "{}"'.format(command, st_dt, end_dt)
-        command = '{} -b 01:00:00 -d 00:00:00'.format(command)
+        # try to sense the timestep from the simulation parameter file
+        timestep = 6  # assume the default timestep in case no file is found
+        sim_par_json = os.path.join(os.path.dirname(_geojson), 'simulation_parameter.json')
+        if os.path.isfile(sim_par_json):
+            with open(sim_par_json, 'r') as spj:
+                sim_par = json.load(spj)
+            if 'timestep' in sim_par:
+                timestep = sim_par['timestep']
+        # using the simulation timestep, specify the correct start and end time
+        if timestep == 1:
+            command = '{} -b 01:00:00 -d 00:00:00'.format(command)
+        else:
+            st_min = str(int(60 / timestep))
+            st_min = '0{}'.format(st_min) if len(st_min) == 1 else st_min
+            command = '{} -b 00:():00 -d 00:00:00'.format(command, st_min)
     if autosize_:
         command = '{} --upgrade'.format(command)
 
@@ -149,3 +164,10 @@ if all_required_inputs(ghenv.Component) and _run:
         buildings = [os.path.join(bldg_folder, file) for file in os.listdir(bldg_folder)]
         connectors = [os.path.join(conn_folder, file) for file in os.listdir(conn_folder)]
         transformers = [os.path.join(trans_folder, file) for file in os.listdir(trans_folder)]
+    else:
+        msg = 'Failed to run the OpenDSS simulation.\nMake sure that your ' \
+            'GeoJSON has an Electrical Network object in it\nor, if the GeoJSON has '\
+            'a Road Network object in it, the "Run RNM" component\ncan be used to ' \
+            'generate an Electrical Network that can be simulated in OpenDSS.'
+        print(msg)
+        raise ValueError(msg)
