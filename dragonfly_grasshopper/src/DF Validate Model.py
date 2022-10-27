@@ -30,7 +30,7 @@ This includes checks for basic properties like adjacency as well as geometry che
 
 ghenv.Component.Name = 'DF Validate Model'
 ghenv.Component.NickName = 'DFValidateModel'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -54,7 +54,7 @@ if all_required_inputs(ghenv.Component) and _validate:
     if isinstance(_model, Model):
         parsed_model = _model
     elif isinstance(_model, str) and os.path.isfile(_model):
-        parsed_model = Model.from_hbjson(_model)
+        parsed_model = Model.from_dfjson(_model)
     else:
         raise ValueError(
             'Expected Dragonfly Model object or path to a DFJSON file. '
