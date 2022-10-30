@@ -47,13 +47,13 @@ Create TrafficParameters representing the traffic within an urban area.
 
 ghenv.Component.Name = 'DF Traffic Parameters'
 ghenv.Component.NickName = 'Traffic'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
 try:  # import the dragonfly_uwg dependencies
-    from dragonfly_uwg.traffic import TrafficPararameter
+    from dragonfly_uwg.traffic import TrafficParameter
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_uwg:\n\t{}'.format(e))
 
@@ -70,5 +70,5 @@ if all_required_inputs(ghenv.Component):
     _sunday_sch_ = _sunday_sch_ if len(_sunday_sch_) != 0 else None
 
     # create the traffic parameters
-    traffic = TrafficPararameter(
+    traffic = TrafficParameter(
         _watts_per_area, _weekday_sch_, _saturday_sch_, _sunday_sch_)
