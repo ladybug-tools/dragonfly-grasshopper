@@ -37,10 +37,10 @@ have an Adiabatic or Ground boundary condition.
 
 ghenv.Component.Name = 'DF BC by Orientation'
 ghenv.Component.NickName = 'BCByOrient'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.5.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = '4'
+ghenv.Component.AdditionalHelpFromDocStrings = '0'
 
 try:  # import the core honeybee dependencies
     from honeybee.boundarycondition import boundary_conditions, Outdoors
