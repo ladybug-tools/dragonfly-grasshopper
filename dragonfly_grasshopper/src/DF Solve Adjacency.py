@@ -29,6 +29,8 @@ rooms have matching segments.
         overwrite_: Boolean to note whether existing Surface boundary conditions
             should be overwritten. If False or None, only newly-assigned
             adjacencies will be updated.
+        skip_intersect_: Boolean for whether the intersection process should be
+            skipped before solving adjacency. (Default: False).
         _run: Set to True to run the component and solve adjacencies.
 
     Returns:
@@ -39,7 +41,7 @@ rooms have matching segments.
 
 ghenv.Component.Name = "DF Solve Adjacency"
 ghenv.Component.NickName = 'SolveAdj2D'
-ghenv.Component.Message = '1.5.1'
+ghenv.Component.Message = '1.5.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
@@ -66,6 +68,12 @@ if all_required_inputs(ghenv.Component) and _run:
     for room in _room2ds:
         assert isinstance(room, Room2D), 'Expected Room2D. Got {}.'.format(type(room))
         adj_room2ds.append(room.duplicate())
+
+    # run the intersection process
+    if not skip_intersect_:
+        for room in adj_room2ds:
+            room.remove_colinear_vertices(tolerance)
+        adj_room2ds = Room2D.intersect_adjacency(adj_room2ds, tolerance)
 
     # solve adjacnecy
     if overwrite_:  # find adjscencies and re-assign them

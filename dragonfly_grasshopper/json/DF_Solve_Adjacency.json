@@ -1,5 +1,5 @@
 {
-  "version": "1.5.1", 
+  "version": "1.5.2", 
   "nickname": "SolveAdj2D", 
   "outputs": [
     [
@@ -43,6 +43,13 @@
     }, 
     {
       "access": "item", 
+      "name": "skip_intersect_", 
+      "description": "Boolean for whether the intersection process should be\nskipped before solving adjacency. (Default: False).", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
       "name": "_run", 
       "description": "Set to True to run the component and solve adjacencies.", 
       "type": "bool", 
@@ -50,7 +57,7 @@
     }
   ], 
   "subcategory": "0 :: Create", 
-  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.boundarycondition import boundary_conditions\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the core ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    adj_room2ds = [] # duplicate the initial objects\n    for room in _room2ds:\n        assert isinstance(room, Room2D), 'Expected Room2D. Got {}.'.format(type(room))\n        adj_room2ds.append(room.duplicate())\n\n    # solve adjacnecy\n    if overwrite_:  # find adjscencies and re-assign them\n        adj_info = Room2D.find_adjacency(adj_room2ds, tolerance)\n        for wp in adj_info:\n            wp[0][0].set_adjacency(wp[1][0], wp[0][1], wp[1][1])\n    else:\n        adj_info = Room2D.solve_adjacency(adj_room2ds, tolerance)\n\n    # set adiabatic boundary conditions if requested\n    if adiabatic_:\n        for room_pair in adj_info:\n            for room_adj in room_pair:\n                room, wall_i = room_adj\n                room.set_boundary_condition(wall_i, boundary_conditions.adiabatic)\n\n    # set air boundary type if requested\n    if air_boundary_:\n        for room_pair in adj_info:\n            for room_adj in room_pair:\n                room, wall_i = room_adj\n                room.set_air_boundary(wall_i)\n", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.boundarycondition import boundary_conditions\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the core ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    adj_room2ds = [] # duplicate the initial objects\n    for room in _room2ds:\n        assert isinstance(room, Room2D), 'Expected Room2D. Got {}.'.format(type(room))\n        adj_room2ds.append(room.duplicate())\n\n    # run the intersection process\n    if not skip_intersect_:\n        for room in adj_room2ds:\n            room.remove_colinear_vertices(tolerance)\n        adj_room2ds = Room2D.intersect_adjacency(adj_room2ds, tolerance)\n\n    # solve adjacnecy\n    if overwrite_:  # find adjscencies and re-assign them\n        adj_info = Room2D.find_adjacency(adj_room2ds, tolerance)\n        for wp in adj_info:\n            wp[0][0].set_adjacency(wp[1][0], wp[0][1], wp[1][1])\n    else:\n        adj_info = Room2D.solve_adjacency(adj_room2ds, tolerance)\n\n    # set adiabatic boundary conditions if requested\n    if adiabatic_:\n        for room_pair in adj_info:\n            for room_adj in room_pair:\n                room, wall_i = room_adj\n                room.set_boundary_condition(wall_i, boundary_conditions.adiabatic)\n\n    # set air boundary type if requested\n    if air_boundary_:\n        for room_pair in adj_info:\n            for room_adj in room_pair:\n                room, wall_i = room_adj\n                room.set_air_boundary(wall_i)\n", 
   "category": "Dragonfly", 
   "name": "DF Solve Adjacency", 
   "description": "Solve adjacencies between a series of dragonfly Room2Ds.\n_\nNote that rooms must have matching edge segments in order for them to be discovered\nas adjacent. The \"DF Intersect Room2Ds\" component can be used to ensure adjacent\nrooms have matching segments.\n-"
