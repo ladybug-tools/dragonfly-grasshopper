@@ -47,7 +47,7 @@ run correctly through OpenDSS.
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.5.5'
+ghenv.Component.Message = '1.5.6'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -78,7 +78,7 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-UO_DITTO_VERSION = '0.5.0'
+UO_DITTO_VERSION = '0.5.1'
 
 
 if all_required_inputs(ghenv.Component) and _run:
