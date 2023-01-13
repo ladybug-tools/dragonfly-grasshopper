@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2022, Ladybug Tools.
+# Copyright (c) 2023, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -63,7 +63,7 @@ https://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly
 
 ghenv.Component.Name = 'DF Import NOAA File'
 ghenv.Component.NickName = 'ImportNOAA'
-ghenv.Component.Message = '1.5.0'
+ghenv.Component.Message = '1.6.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'
