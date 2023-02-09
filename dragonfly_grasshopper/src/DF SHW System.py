@@ -34,7 +34,7 @@ or Room2Ds.
                 * Gas_TanklessHeater - 0.8
                 * Electric_TanklessHeater - 1.0
         _condition_: A number for the ambient temperature in which the hot water tank
-            is located [C]. This can also be a Room in which the tank is
+            is located [C]. This can also be a Room2D in which the tank is
             located. (Default: 22).
         _loss_coeff_: A number for the loss of heat from the water heater tank to the
             surrounding ambient conditions [W/K]. (Default: 6 W/K).
@@ -45,7 +45,7 @@ or Room2Ds.
 
 ghenv.Component.Name = "DF SHW System"
 ghenv.Component.NickName = 'SHW'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'
@@ -88,14 +88,14 @@ if all_required_inputs(ghenv.Component):
         else clean_ep_string(_name_)
     if _condition_ is None:
         _condition_ = 22
-    elif isinstance(_condition_, Room):
+    elif isinstance(_condition_, Room2D):
         _condition_ = _condition_.identifier
     else:
         try:
             _condition_ = float(_condition_)
         except Exception:
             raise ValueError(
-                'Input _condition_ must be a Room in which the system is located '
+                'Input _condition_ must be a Room2D in which the system is located '
                 'or a number\nfor the ambient temperature in which the hot water '
                 'tank is located [C].\nGot {}.'.format(type(_condition_))
             )
