@@ -25,7 +25,8 @@ Story, Room2D).
             parameters will remain unchanged across the input object. If an array
             of values are input here, different ShadingParameters will be assigned
             based on cardinal direction, starting with north and moving clockwise.
-    
+        skylight_: A SkylightParameters object describing how to generate skylights.
+
     Returns:
         df_obj: The input Dragonfly object with the WindowParameters and/or
             ShadingParameters assigned to it.
@@ -33,7 +34,7 @@ Story, Room2D).
 
 ghenv.Component.Name = "DF Apply Facade Parameters"
 ghenv.Component.NickName = 'ApplyFacadePar'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"
@@ -73,7 +74,7 @@ def extract_room_2ds(df_objs):
 if all_required_inputs(ghenv.Component):
     # duplicate the initial objects
     df_obj = [obj.duplicate() for obj in _df_obj]
-    
+
     # add the window parameters
     if len(_win_par_) == 1:  # one window parameter for all
         for obj in df_obj:
@@ -88,7 +89,7 @@ if all_required_inputs(ghenv.Component):
                 win_p = _win_par_[orient_i] if isinstance(bc, Outdoors) else None
                 room_win_par.append(win_p)
             room.window_parameters = room_win_par
-    
+
     # add the shading parameters
     if len(_shd_par_) == 1:  # one shading parameter for all
         for obj in df_obj:
@@ -103,3 +104,9 @@ if all_required_inputs(ghenv.Component):
                 shd_p = _shd_par_[orient_i] if isinstance(bc, Outdoors) else None
                 room_shd_par.append(shd_p)
             room.shading_parameters = room_shd_par
+
+    # add the skylight parameters
+    if skylight_ is not None:
+        rooms = extract_room_2ds(df_obj)
+        for room in rooms:
+            room.skylight_parameters = skylight_
