@@ -1,0 +1,36 @@
+{
+  "version": "1.6.0", 
+  "nickname": "GridSkyPar", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "skylight", 
+        "description": "Skylight Parameters that can be applied to a Dragonfly object\nusing the \"DF Apply Facade Parameters\" component.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_ratio", 
+      "description": "A number between 0 and 0.75 for the ratio between the skylight\narea and the total Roof face area.", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "spacing_", 
+      "description": "A number for the spacing between the centers of each grid cell.\nThis should be less than half of the dimension of the Roof geometry\nif multiple, evenly-spaced skylights are desired. If None, a spacing\nof one half the smaller dimension of the parent Roof will be automatically\nassumed. (Default: None).", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.skylightparameter import GriddedSkylightRatio\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    if _ratio != 0:\n        skylight = GriddedSkylightRatio(_ratio, spacing_)", 
+  "category": "Dragonfly", 
+  "name": "DF Gridded Skylight Parameters", 
+  "description": "Create Dragonfly skylight parameters with instructions for generating skylights\naccording to a ratio with the base Roof surface.\n-"
+}
