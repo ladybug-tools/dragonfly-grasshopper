@@ -31,10 +31,15 @@ top or bottom floors with the gound or outdoors.
 
 ghenv.Component.Name = "DF Separate Top Bottom"
 ghenv.Component.NickName = 'TopBottom'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
+
+try:  # import the core honeybee dependencies
+    from honeybee.units import parse_distance_string
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
     from dragonfly.model import Model
@@ -42,10 +47,13 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.config import tolerance
+    from ladybug_rhino.config import units_system
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
+# tolerance for computing the pole of inaccessibility
+p_tol = parse_distance_string('0.01m', units_system())
 
 
 if all_required_inputs(ghenv.Component):
@@ -55,8 +63,8 @@ if all_required_inputs(ghenv.Component):
         if sep_mid_:
             if isinstance(bldg, Model):
                 for b in bldg.buildings:
-                    b.separate_mid_floors(tolerance)
+                    b.separate_mid_floors(p_tol)
             else:
-                bldg.separate_mid_floors(tolerance)
+                bldg.separate_mid_floors(p_tol)
         else:
             bldg.separate_top_bottom_floors()
