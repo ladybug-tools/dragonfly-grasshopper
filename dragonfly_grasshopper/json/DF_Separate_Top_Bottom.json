@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0", 
+  "version": "1.6.1", 
   "nickname": "TopBottom", 
   "outputs": [
     [
@@ -29,7 +29,7 @@
     }
   ], 
   "subcategory": "0 :: Create", 
-  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # get the building objects from the input ones\n    buildings = [bldg.duplicate() for bldg in _buildings]\n    for bldg in buildings:\n        if sep_mid_:\n            if isinstance(bldg, Model):\n                for b in bldg.buildings:\n                    b.separate_mid_floors(tolerance)\n            else:\n                bldg.separate_mid_floors(tolerance)\n        else:\n            bldg.separate_top_bottom_floors()\n", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.units import parse_distance_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import units_system\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n# tolerance for computing the pole of inaccessibility\np_tol = parse_distance_string('0.01m', units_system())\n\n\nif all_required_inputs(ghenv.Component):\n    # get the building objects from the input ones\n    buildings = [bldg.duplicate() for bldg in _buildings]\n    for bldg in buildings:\n        if sep_mid_:\n            if isinstance(bldg, Model):\n                for b in bldg.buildings:\n                    b.separate_mid_floors(p_tol)\n            else:\n                bldg.separate_mid_floors(p_tol)\n        else:\n            bldg.separate_top_bottom_floors()\n", 
   "category": "Dragonfly", 
   "name": "DF Separate Top Bottom", 
   "description": "Separate the top and bottom floors of a Building into unique Stories with a multiplier\nof 1 and automatically assign the first story Room2Ds to have a ground contact\nfloor and the top story Room2Ds to have an outdoor-exposed roof.\n_\nThis is particularly helpful when trying to account for the heat exchange of the\ntop or bottom floors with the gound or outdoors.\n-"
