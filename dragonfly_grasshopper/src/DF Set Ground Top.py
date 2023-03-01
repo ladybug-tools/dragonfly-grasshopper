@@ -29,10 +29,10 @@ their roofs in contact with the outdoors.
 
 ghenv.Component.Name = 'DF Set Ground Top'
 ghenv.Component.NickName = 'SetGrndTop'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = '3'
+ghenv.Component.AdditionalHelpFromDocStrings = '0'
 
 try:  # import the core dragonfly dependencies
     from dragonfly.story import Story
