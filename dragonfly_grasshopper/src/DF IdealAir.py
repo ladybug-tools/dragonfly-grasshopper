@@ -1,9 +1,9 @@
-# Honeybee: A Plugin for Environmental Analysis (GPL)
-# This file is part of Honeybee.
+# Dragonfly: A Plugin for Environmental Analysis (GPL)
+# This file is part of Dragonfly.
 #
 # Copyright (c) 2023, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
-# along with Honeybee; If not, see <http://www.gnu.org/licenses/>.
+# along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
 # @license AGPL-3.0-or-later <https://spdx.org/licenses/AGPL-3.0-or-later>
 
@@ -51,7 +51,7 @@ Apply a customized IdealAirSystem to Dragonfly Buildings, Stories or Room2Ds.
 
 ghenv.Component.Name = "DF IdealAir"
 ghenv.Component.NickName = 'DFIdealAir'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

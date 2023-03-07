@@ -1,9 +1,9 @@
-# Honeybee: A Plugin for Environmental Analysis (GPL)
-# This file is part of Honeybee.
+# Dragonfly: A Plugin for Environmental Analysis (GPL)
+# This file is part of Dragonfly.
 #
 # Copyright (c) 2023, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
-# along with Honeybee; If not, see <http://www.gnu.org/licenses/>.
+# along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
 # @license AGPL-3.0-or-later <https://spdx.org/licenses/AGPL-3.0-or-later>
 
@@ -63,7 +63,7 @@ than systems that separate ventilation from the meeting of thermal loads.
 
 ghenv.Component.Name = "DF All-Air HVAC"
 ghenv.Component.NickName = 'DFAllAirHVAC'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
