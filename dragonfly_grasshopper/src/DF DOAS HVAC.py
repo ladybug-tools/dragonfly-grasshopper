@@ -64,7 +64,7 @@ like auditoriums, kitchens, laundromats, etc.
 
 ghenv.Component.Name = 'DF DOAS HVAC'
 ghenv.Component.NickName = 'DFDOASHVAC'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.6.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -166,12 +166,13 @@ if all_required_inputs(ghenv.Component):
     for obj in df_objs:
         if isinstance(obj, (Building, Story)):
             obj.properties.energy.set_all_room_2d_hvac(hvac)
-        elif isinstance(obj, Room2D) and obj.properties.energy.is_conditioned:
-            obj.properties.energy.hvac = hvac
+        elif isinstance(obj, Room2D):
+            if obj.properties.energy.is_conditioned:
+                obj.properties.energy.hvac = hvac
         elif isinstance(obj, Model):
             for bldg in obj.buildings:
                 bldg.properties.energy.set_all_room_2d_hvac(hvac)
         else:
             raise ValueError(
                 'Expected Dragonfly Room2D, Story, Building, or Model. '
-                'Got {}.'.format(type(hb_obj)))
+                'Got {}.'.format(type(obj)))
