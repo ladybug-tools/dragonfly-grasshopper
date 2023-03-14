@@ -1,0 +1,36 @@
+{
+  "version": "1.6.0", 
+  "nickname": "DecnstrRoof", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "stories", 
+        "description": "The unique Story objects that make up the input _df_obj. This\nis typically a data tree with branches coordinated with the\nroof_geo below.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "roof_geo", 
+        "description": "A list of Breps representing the geometry of the Roof.\nThis is often a data tree with one branch for each story, which\nis coordinated with the stories above.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_df_obj", 
+      "description": "A Dragonfly Model, Building, Story for which the roof geometry will\nbe extracted.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.fromgeometry import from_face3d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, list_to_data_tree\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef deconstruct_story(story, stories, roofs):\n    \"\"\"Deconstruct Story object.\"\"\"\n    stories.append([story])\n    if story.roof is not None:\n        roofs.append([from_face3d(geo) for geo in story.roof])\n    else:\n        roofs.append([])\n\ndef deconstruct_building(bldg, stories, roofs):\n    \"\"\"Deconstruct Building object.\"\"\"\n    for story in bldg.unique_stories:\n        deconstruct_story(story, stories, roofs)\n\n\nif all_required_inputs(ghenv.Component):\n    # lists of to be filled with constituent objects\n    stories = []\n    roof_geo = []\n\n    # get the roof geometry\n    if isinstance(_df_obj, Model):\n        for bldg in _df_obj.buildings:\n            deconstruct_building(bldg, stories, roof_geo)\n    elif isinstance(_df_obj, Building):\n        deconstruct_building(_df_obj, stories, roof_geo)\n    elif isinstance(_df_obj, Story):\n        deconstruct_story(_df_obj, stories, roof_geo)\n    else:\n        raise TypeError(\n            'Unrecognized dragonfly object type: {}'.format(type(_df_obj)))\n\n    # translate lists to data trees\n    stories = list_to_data_tree(stories)\n    roof_geo = list_to_data_tree(roof_geo)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Deconstruct Roof", 
+  "description": "Deconstruct any Dragonfly Story, Building or Model to get the Roof geometry.\n_\nThis is useful for checking the roof geometry assigned to sotries and possbily\nediting it so that it can be re-assigned with \"DF Apply Roof\" component.\n-"
+}

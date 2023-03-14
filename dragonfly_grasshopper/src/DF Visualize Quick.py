@@ -26,7 +26,7 @@ multipliers of objects.
 
 ghenv.Component.Name = 'DF Visualize Quick'
 ghenv.Component.NickName = 'VizQuick'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -41,7 +41,8 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.fromgeometry import from_face3d, from_face3d_to_solid
+    from ladybug_rhino.fromgeometry import from_face3d, from_face3d_to_solid , \
+        from_polyface3d
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -49,8 +50,15 @@ except ImportError as e:
 
 def room_2d_geometry(room_2ds):
     """Get Rhino geometry from a list of Room2Ds."""
-    return [from_face3d_to_solid(room.floor_geometry, room.floor_to_ceiling_height)
-            for room in room_2ds]
+    room_geo = []
+    for room in room_2ds:
+        if room.has_parent and room.parent.roof is not None:
+            hb_rm, adj_info = room.to_honeybee()
+            room_geo.append(from_polyface3d(hb_rm.geometry))
+        else:
+            room_geo.append(
+                from_face3d_to_solid(room.floor_geometry, room.floor_to_ceiling_height))
+    return room_geo
 
 
 def context_shade_geometry(context_shades):
