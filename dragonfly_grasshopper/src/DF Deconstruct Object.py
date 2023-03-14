@@ -33,7 +33,7 @@ into a new Building.
 
 ghenv.Component.Name = "DF Deconstruct Object"
 ghenv.Component.NickName = 'DecnstrDF'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -71,7 +71,7 @@ if all_required_inputs(ghenv.Component):
         deconstruct_building(_df_obj, stories, room2ds)
     elif isinstance(_df_obj, Story):
         deconstruct_story(_df_obj, stories, room2ds)
-    elif isinstance(_df_obj, Story):
+    elif isinstance(_df_obj, Room2D):
         room2ds.append(_df_obj)
     else:
         raise TypeError(
