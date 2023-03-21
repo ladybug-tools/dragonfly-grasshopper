@@ -1,0 +1,43 @@
+{
+  "version": "1.6.0", 
+  "nickname": "Align", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "df_obj", 
+        "description": "The input Dragonfly objects with Room2Ds that have been aligned to\nthe input lines.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_df_obj", 
+      "description": "A Dregonfly Story, Building or Model to be aligned to the input lines.\nFor Buildings and Models, all Room2Ds across the object will be aligned.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_lines", 
+      "description": "A list of straignt lines to which the Room2D vertices will be aligned.", 
+      "type": "Curve", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_distance_", 
+      "description": "The maximum distance between a vertex and a line where the vertex\nwill be moved to lie on the line. Vertices beyond this distance will\nbe left as they are. The default is 0.5 meters.", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import tolerance, conversion_to_meters\n    from ladybug_{{cad}}.togeometry import to_linesegment2d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set the default alignment distance\n    dist = _distance_ if _distance_ is not None else 0.5 / conversion_to_meters()\n\n    # translate the lines and \n    line_rays = [to_linesegment2d(line) for line in _lines]\n\n    # duplicate the input object and gather all of the stories\n    df_obj = _df_obj.duplicate()\n    if isinstance(df_obj, Story):\n        stories = [df_obj]\n    elif isinstance(df_obj, Building):\n        stories = df_obj.unique_stories\n    elif isinstance(df_obj, Model):\n        stories = df_obj.stories\n    else:\n        msg = 'Expected Dragonfly Story, Building, or Model. Got {}'.format(type(df_obj))\n        print(msg)\n        raise ValueError(msg)\n\n    # align all of the stories to the lines\n    del_rooms = []\n    for story in stories:\n        for line in line_rays:\n            story.align(line, dist, tolerance)\n        del_rooms.extend(\n            story.remove_room_2d_duplicate_vertices(tolerance, delete_degenerate=True))\n        del_rooms.extend(story.delete_degenerate_room_2ds())\n        story.rebuild_detailed_windows(tolerance)\n\n    # give a warning about any degenerate rooms that were deleted\n    if len(del_rooms) != 0:\n        del_ids = [r.display_name for r in del_rooms]\n        msg = 'The following Room2Ds were degenerate after the operation and ' \\\n            'were deleted:\\n{}'.format('\\n'.join(del_ids))\n        print(msg)\n        give_warning(ghenv.Component, msg)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Align", 
+  "description": "Move Room2D vertices within a given distance of a line to be on that line.\n_\nThis is particularly useful for cleaning up models with extra unwanted\ncorrugations in them around columns and other \"room bounding\" elements.\n_\nNote that, when there are small Room2Ds next to the input lines, this component\nmay completely remove the small Room2D if it becomes degenerate.\n-"
+}
