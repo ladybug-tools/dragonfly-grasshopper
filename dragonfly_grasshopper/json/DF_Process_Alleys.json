@@ -1,0 +1,43 @@
+{
+  "version": "1.6.0", 
+  "nickname": "Alleys", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "buildings", 
+        "description": "The Building objects with their windows removed from any detected alleys.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_buildings", 
+      "description": "Dragonfly Building objects which will have their windows removed\nif their walls lie within the distance of another building.\nThis can also be an entire Dragonfly Model.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_distance_", 
+      "description": "A number for the maximum distance of an alleyway in Rhino model\nunits. If a wall is closer to another Building than this distance,\nthe windows will be removed. (Default: 1.0 meters).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "adiabatic_", 
+      "description": "A boolean to note whether the walls that have their windows removed\nshould also receive an Adiabatic boundary condition. This is useful\nwhen the alleyways are more like parti walls than distinct pathways\nthat someone could traverse.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import tolerance, conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects and set a default distance\n    buildings = [obj.duplicate() for obj in _buildings]\n    dist = _distance_ if _distance_ is not None else 1 / conversion_to_meters()\n\n    # extract the Buildings from any input Models\n    bldgs = []\n    for obj in buildings:\n        if isinstance(obj, Building):\n            bldgs.append(obj)\n        elif isinstance(obj, Model):\n            bldgs.extend(obj.buildings)\n        else:\n            msg = 'Expected Dragonfly Building or Model. Got {}.'.format(type(obj))\n            raise ValueError(msg)\n\n    # process the alleyways\n    Building.process_alleys(bldgs, dist, adiabatic_, tolerance)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Process Alleys", 
+  "description": "Remove windows from any walls that are within a certain distance of other buildings.\n_\nThe component can also optionally set the boundary conditions of these walls to\nadiabatic. This is helpful when attempting to account for alleys or parti walls\nthat may exist between buildings of a denser urban district.\n-"
+}
