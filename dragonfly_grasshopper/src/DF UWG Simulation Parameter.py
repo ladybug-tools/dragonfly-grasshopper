@@ -35,10 +35,10 @@ Weather Generator" component.
 
 ghenv.Component.Name = 'DF UWG Simulation Parameter'
 ghenv.Component.NickName = 'UWGSimPar'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
-ghenv.Component.AdditionalHelpFromDocStrings = '0'
+ghenv.Component.AdditionalHelpFromDocStrings = '1'
 
 try:  # import the dragonfly uwg dependencies
     from dragonfly_uwg.simulation.runperiod import UWGRunPeriod

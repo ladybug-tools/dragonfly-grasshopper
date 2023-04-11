@@ -45,10 +45,10 @@ or Room2Ds.
 
 ghenv.Component.Name = "DF SHW System"
 ghenv.Component.NickName = 'SHW'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.6.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
-ghenv.Component.AdditionalHelpFromDocStrings = '4'
+ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
 try:  # import the honeybee extension
     from honeybee.typing import clean_and_id_ep_string, clean_ep_string

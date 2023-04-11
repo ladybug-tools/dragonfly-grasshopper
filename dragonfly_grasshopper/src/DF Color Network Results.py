@@ -41,9 +41,9 @@ results.
 
 ghenv.Component.Name = 'DF Color Network Results'
 ghenv.Component.NickName = 'ColorNetResults'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '3 :: Energy'
+ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
 
 try:  # import the ladybug_geometry dependencies

@@ -1,0 +1,50 @@
+{
+  "version": "1.6.0", 
+  "nickname": "GHELoop", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "des_loop", 
+        "description": "A Dragonfly Thermal Loop object possessing all infrastructure for a\nDistrict Energy Simulation (DES) simulation. This should be connected\nto the loop_ input of the \"DF Model to GeoJSON\" component.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_ghe", 
+      "description": "A GroundHeatExchanger object representing the field\nof boreholes that supplies the loop with thermal capacity.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_connectors", 
+      "description": "An array of ThermalConnector objects that are included\nwithin the thermal loop. In order for a given connector to be\nvalid within the loop, each end of the connector must touch either\nanother connector, a building footprint, or the ground_heat_exchanger. In\norder for the loop as a whole to be valid, the connectors must form a\nsingle continuous loop when passed through the buildings and the heat\nexchanger field.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_clockwise_", 
+      "description": "A boolean to note whether the direction of flow through the\nloop is clockwise (True) when viewed from above in the GeoJSON or it\nis counterclockwise (False). (Default: False).", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_name_", 
+      "description": "Text to be used for the name and identifier of the Thermal Loop.\nIf no name is provided, it will be \"unnamed\".", 
+      "type": "string", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.loop import {{PLGN}}EThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\n\n    # create the loop\n    des_loop = {{PLGN}}EThermalLoop(name, _ghe, _connectors, _clockwise_)\n    if _name_ is not None:\n        des_loop.display_name = _name_\n", 
+  "category": "Dragonfly", 
+  "name": "DF GHE Thermal Loop", 
+  "description": "Create an Ground Heat Exchanger Thermal Loop, which represents all infrastructure\nfor a District Energy Simulation (DES) simulation.\n_\nThis includes a ground heat exchanger and all thermal connectors needed\nto connect these objects to Dragonfly Buildings.\n-"
+}
