@@ -43,6 +43,8 @@ key in the geoJSON.
             the results. If None, all other buildings will be included as context
             shade in each and every Model. Set to 0 to exclude all neighboring
             buildings from the resulting models. Default: None.
+        des_loop_: An optional District Energy System (DES) ThermalLoop that's
+            associated with the dragonfly Model.
         network_: An optional OpenDSS ElectricalNetwork or RNM RoadNetwork that's
             associated with the input Dragonfly Model and will be written into
             the geoJSON. An input here is required to perform an OpenDSS
@@ -80,7 +82,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -149,10 +151,9 @@ if all_required_inputs(ghenv.Component) and _write:
         # create the geoJSON and honeybee Model JSONs
         geojson, hb_jsons, hb_models = _model.to.urbanopt(
             _model, _location, point, shade_dist_, use_multiplier_,
-            add_plenum_, ceil_adjacency_,
+            add_plenum_, ceil_adjacency_, des_loop=des_loop_,
             electrical_network=elec_network, road_network=road_network,
-            ground_pv=ground_pv_,
-            folder=_folder_, tolerance=tolerance)
+            ground_pv=ground_pv_, folder=_folder_, tolerance=tolerance)
         # write the network to a JSON so that it can be loaded in the future
         if network_ is not None:
             proj_folder = os.path.dirname(geojson)

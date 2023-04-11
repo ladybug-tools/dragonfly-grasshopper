@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0", 
+  "version": "1.6.1", 
   "nickname": "ColorNetResults", 
   "outputs": [
     [
@@ -77,7 +77,7 @@
       "default": null
     }
   ], 
-  "subcategory": "3 :: Energy", 
+  "subcategory": "1 :: Visualize", 
   "code": "\ntry:  # import the ladybug_geometry dependencies\n    from ladybug_geometry.geometry2d import Polygon2D, Polyline2D, LineSegment2D\n    from ladybug_geometry.geometry3d import Face3D, Point3D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly_energy.opendss.colorobj import ColorNetworkResults\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.fromgeometry import from_face3ds_to_colored_mesh, \\\n        from_polyline2d, from_linesegment2d\n    from ladybug_{{cad}}.colorize import ColoredPolyline, ColoredLine\n    from ladybug_{{cad}}.text import text_objects\n    from ladybug_{{cad}}.fromobjects import legend_objects\n    from ladybug_{{cad}}.color import color_to_color\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, schedule_solution\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # apply analysis period to the data if connected\n    if period_ is not None:\n        _data = [coll.filter_by_analysis_period(period_) for coll in _data]\n\n    # create the ColorNetwork visualization object and output geometry\n    sim_step = 'max' if sim_step_ is None else sim_step_\n    color_obj = ColorNetworkResults(_data, _network, legend_par_, sim_step)\n    graphic = color_obj.graphic_container\n    vis_geo = []\n    for geo_obj, col in zip(color_obj.matched_geometries, graphic.value_colors):\n        if isinstance(geo_obj, Polygon2D):\n            face_obj = Face3D([Point3D(pt.x, pt.y, 0) for pt in geo_obj.vertices])\n            vis_geo.append(from_face3ds_to_colored_mesh([face_obj], col))\n        elif isinstance(geo_obj, Polyline2D):\n            col_line = ColoredPolyline(from_polyline2d(geo_obj))\n            col_line.color = color_to_color(col)\n            col_line.thickness = 3\n            vis_geo.append(col_line)\n        elif isinstance(geo_obj, LineSegment2D):\n            col_line = ColoredLine(from_linesegment2d(geo_obj))\n            col_line.color = color_to_color(col)\n            col_line.thickness = 3\n            vis_geo.append(col_line)\n    legend = legend_objects(graphic.legend)\n    title = text_objects(color_obj.title_text, graphic.lower_title_location,\n                         graphic.legend_parameters.text_height,\n                         graphic.legend_parameters.font)\n    values = color_obj.matched_values\n    colors = [color_to_color(col) for col in graphic.value_colors]\n    schedule_solution(ghenv.Component, 2)", 
   "category": "Dragonfly", 
   "name": "DF Color Network Results", 
