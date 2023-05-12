@@ -1,0 +1,36 @@
+{
+  "version": "1.6.0", 
+  "nickname": "DecnstrDSS", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "values", 
+        "description": "List of values for the attributes that define the OpenDSS object.", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "attr_names", 
+        "description": "List of text that is the same length as the values, which\nnotes the attribute name for each value.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_dss_obj", 
+      "description": "An OpenDSS Wire, PowerLine, or Transformer Properties to be deconstructed.\nThis can also be text for a Wire, PowerLine, or Transformer to be\nlooked up in the library.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.opendss.lib.wires import wire_by_identifier\n    from dragonfly_energy.opendss.lib.powerlines import power_line_by_identifier\n    from dragonfly_energy.opendss.lib.transformers import transformer_prop_by_identifier\n    from dragonfly_energy.opendss.wire import Wire\n    from dragonfly_energy.opendss.powerline import PowerLine\n    from dragonfly_energy.opendss.transformerprop import TransformerProperties\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:  # import ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\nWIRE_PROPS = (\n    'display_name', 'ampacity', 'geometrical_mean_radius', 'resistance',\n    'diameter', 'voltage_level', 'wire_type', 'concentric_properties')\nLINE_PROPS = (\n    'display_name', 'wire_count', 'wire_ids', 'heights', 'relative_xs',\n    'phases', 'phase_count', 'nominal_voltage')\nXFORM_PROPS = (\n    'display_name', 'kva', 'resistance', 'reactance', 'phase_count',\n    'high_voltage', 'low_voltage', 'is_center_tap', 'connection')\n\n\nif all_required_inputs(ghenv.Component):\n    # check the input\n    if isinstance(_dss_obj, str):\n        try:\n            _dss_obj = transformer_prop_by_identifier(_dss_obj)\n        except ValueError:\n            try:\n                _dss_obj = power_line_by_identifier(_dss_obj)\n            except ValueError:\n                _dss_obj = wire_by_identifier(_dss_obj)\n\n    # get the attributes and values\n    values, attr_names = [], []\n    if isinstance(_dss_obj, Wire):\n        for atr in WIRE_PROPS:\n            values.append(getattr(_dss_obj, atr))\n            attr_names.append(atr.replace('_', ' ').title())\n    elif isinstance(_dss_obj, PowerLine):\n        for atr in LINE_PROPS:\n            values.append(str(getattr(_dss_obj, atr)))\n            attr_names.append(atr.replace('_', ' ').title())\n    elif isinstance(_dss_obj, TransformerProperties):\n        for atr in XFORM_PROPS:\n            values.append(getattr(_dss_obj, atr))\n            attr_names.append(atr.replace('_', ' ').title())\n", 
+  "category": "Dragonfly", 
+  "name": "DF Deconstruct OpenDSS", 
+  "description": "Deconstruct an OpenDSS Wire, PowerLine, or Transformer Properties into its constituient\nattributes and values.\n-"
+}
