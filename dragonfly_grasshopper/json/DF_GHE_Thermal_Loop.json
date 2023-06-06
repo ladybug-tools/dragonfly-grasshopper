@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0", 
+  "version": "1.6.1", 
   "nickname": "GHELoop", 
   "outputs": [
     [
@@ -14,24 +14,66 @@
   ], 
   "inputs": [
     {
-      "access": "item", 
-      "name": "_ghe", 
-      "description": "A GroundHeatExchanger object representing the field\nof boreholes that supplies the loop with thermal capacity.", 
-      "type": "System.Object", 
+      "access": "list", 
+      "name": "_ghe_geo", 
+      "description": "Horizontal Rhino surfaces representing the footprints of ground heat\nexchangers. These ground heat exchanging fields contain the\nboreholes that supply the loop with thermal capacity. Multiple\nborehole fields can be located along the loop created by the\n_connector_geo.", 
+      "type": "Curve", 
       "default": null
     }, 
     {
       "access": "list", 
-      "name": "_connectors", 
-      "description": "An array of ThermalConnector objects that are included\nwithin the thermal loop. In order for a given connector to be\nvalid within the loop, each end of the connector must touch either\nanother connector, a building footprint, or the ground_heat_exchanger. In\norder for the loop as a whole to be valid, the connectors must form a\nsingle continuous loop when passed through the buildings and the heat\nexchanger field.", 
-      "type": "System.Object", 
+      "name": "_connector_geo", 
+      "description": "An array of lines or polylines representing the thermal connectors\nwithin the thermal loop. In order for a given connector to be valid\nwithin the loop, each end of the connector must touch either another\nconnector, a building footprint, or a ground heat exchanger. In\norder for the loop as a whole to be valid, the connectors must form a\nsingle continuous loop when passed through the buildings and the heat\nexchanger field.", 
+      "type": "Curve", 
       "default": null
     }, 
     {
       "access": "item", 
       "name": "_clockwise_", 
       "description": "A boolean to note whether the direction of flow through the\nloop is clockwise (True) when viewed from above in the GeoJSON or it\nis counterclockwise (False). (Default: False).", 
-      "type": "System.Object", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_bore_depth_", 
+      "description": "A number for the maximum depth of the heat-exchanging part of the\nboreholes in meters. This can also be a domain (aka interval) that\nsets the minimum and maximum depths of the boreholes (when the\ndefault minimum depth of 60 meters is not desirable). When the\nsystem demand cannot be met using boreholes with the minimum depth,\nthe boreholes will be extended until either the loads or met or\nthey reach the maximum depth specified here. So this typically\nrepresents the depth of bedrock or the point at which drilling\ndeeper ceases to be practical. (Default: 135 meters).", 
+      "type": "Interval", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_bore_spacing_", 
+      "description": "A number for the minimum spacing between boreholes in meters.\nThis can also be a domain (aka interval) that sets the minimum\nand maximum spacing of the boreholes (when the default maximum\nspacing of 10 meters is not desirable). When the system demand\ncannot be met using boreholes with the maximum spacing, the\nborehole spacing will be reduced until either the loads or met\nor they reach this minimum spacing. So this typically represents\nthe spacing at which each borehole will interfere with neighboring\nones so much that it is not worthwhile to decrease the spacing\nfurther. (Default: 3 meters).", 
+      "type": "Interval", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_soil_conduct_", 
+      "description": "A number for the soil conductivity in W/m-K. (Default: 2.3).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_soil_heat_cap_", 
+      "description": "A number for the volumetric heat capacity of the soil\nin J/m3-K. (Default: 2,343,500).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_fluid_type_", 
+      "description": "Text to indicate the type of fluid circulating through the\nground heat exchanger loop. Choose from the options\nbelow. (Default: Water).\n_\n* Water\n* EthylAlcohol\n* EthyleneGlycol\n* MethylAlcohol\n* PropyleneGlycol", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "concentration_", 
+      "description": "A number between 0 and 60 for the concentration of the\nfluid_type in water in percent. Note that this variable has no effect\nwhen the fluid_type is Water. (Default: 35).", 
+      "type": "double", 
       "default": null
     }, 
     {
@@ -43,7 +85,7 @@
     }
   ], 
   "subcategory": "3 :: Energy", 
-  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.loop import {{PLGN}}EThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\n\n    # create the loop\n    des_loop = {{PLGN}}EThermalLoop(name, _ghe, _connectors, _clockwise_)\n    if _name_ is not None:\n        des_loop.display_name = _name_\n", 
+  "code": "\nimport math\n\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.connector import ThermalConnector\n    from dragonfly_energy.des.ghe import GroundHeatExchanger\n    from dragonfly_energy.des.loop import {{PLGN}}EThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_linesegment2d, to_polyline2d\n    from ladybug_{{cad}}.togeometry import to_polygon2d\n    from ladybug_{{cad}}.config import angle_tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\n\n    # create the {{PLGN}}E fields and the Thermal Connectors\n    lines = []\n    for geo in _connector_geo:\n        try:\n            lines.append(to_polyline2d(geo))\n        except AttributeError:\n            lines.append(to_linesegment2d(geo))\n    connectors = []\n    for i, lin in enumerate(lines):\n        connectors.append(ThermalConnector('{}_ThermalConnector_{}'.format(name, i), lin))\n    ghes = []\n    for i, geo in enumerate(_ghe_geo):\n        gp = to_polygon2d(geo)\n        if not gp.is_rectangle(math.radians(angle_tolerance)):\n            msg = 'The ground heat exchanger with index {} is not a perfect rectangle ' \\\n                'but it will be approximated as such in the DES simulation.'.format(i)\n            print(msg)\n            give_warning(ghenv.Component, msg)\n        ghes.append(GroundHeatExchanger('{}_{{PLGN}}E_{}'.format(name, i), gp))\n\n    # create the loop\n    des_loop = {{PLGN}}EThermalLoop(name, ghes, connectors, _clockwise_)\n    if _name_ is not None:\n        des_loop.display_name = _name_\n\n    # assign the properties to the loop\n    if _bore_depth_ is not None:\n        d_min, d_max = _bore_depth_\n        if d_min != 0:\n            des_loop.borehole_parameters.min_depth = d_min\n        elif d_max < 60:\n            des_loop.borehole_parameters.min_depth = d_max\n        des_loop.borehole_parameters.max_depth = d_max\n    if _bore_spacing_ is not None:\n        s_min, s_max = _bore_spacing_\n        if s_min != 0:\n            des_loop.borehole_parameters.max_spacing = s_max\n            des_loop.borehole_parameters.min_spacing = s_min\n        elif s_max > 10:\n            des_loop.borehole_parameters.max_spacing = s_max\n            des_loop.borehole_parameters.min_spacing = s_max\n        else:\n            des_loop.borehole_parameters.min_spacing = s_max\n    if _soil_conduct_:\n        des_loop.soil_parameters.conductivity = _soil_conduct_\n    if _soil_heat_cap_:\n        des_loop.soil_parameters.heat_capacity = _soil_heat_cap_\n    if _fluid_type_:\n        des_loop.fluid_parameters.fluid_type = _fluid_type_.replace(' ', '')\n    if concentration_:\n        des_loop.fluid_parameters.concentration = concentration_\n", 
   "category": "Dragonfly", 
   "name": "DF GHE Thermal Loop", 
   "description": "Create an Ground Heat Exchanger Thermal Loop, which represents all infrastructure\nfor a District Energy Simulation (DES) simulation.\n_\nThis includes a ground heat exchanger and all thermal connectors needed\nto connect these objects to Dragonfly Buildings.\n-"
