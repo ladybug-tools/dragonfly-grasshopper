@@ -17,6 +17,8 @@ Weather Generator" component.
         _run_period_: A Ladybug Analysis Period object to describe the time period over
             which to run the simulation. If None, the simulation will be run for
             the whole year.
+        _timestep_: An integer for the number of timesteps per hour at which the
+            calculation will be run. (Default: 12).
         _veg_par_: A VegetationParameter object to specify the behavior of vegetation
             in the urban area. If None, generic vegetation parameters will be
             generated.
@@ -35,7 +37,7 @@ Weather Generator" component.
 
 ghenv.Component.Name = 'DF UWG Simulation Parameter'
 ghenv.Component.NickName = 'UWGSimPar'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.6.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -51,6 +53,8 @@ except ImportError as e:
 sim_par = UWGSimulationParameter()
 if _run_period_:
     sim_par.run_period = UWGRunPeriod.from_analysis_period(_run_period_)
+if _timestep_:
+    sim_par.timestep = _timestep_
 if _veg_par_:
     sim_par.vegetation_parameter = _veg_par_
 if _epw_site_:
