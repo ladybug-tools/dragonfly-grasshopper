@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1", 
+  "version": "1.6.2", 
   "nickname": "UWGSimPar", 
   "outputs": [
     [
@@ -18,6 +18,13 @@
       "name": "_run_period_", 
       "description": "A Ladybug Analysis Period object to describe the time period over\nwhich to run the simulation. If None, the simulation will be run for\nthe whole year.", 
       "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "x", 
+      "description": "Script variable UWGSimPar", 
+      "type": "int", 
       "default": null
     }, 
     {
@@ -43,7 +50,7 @@
     }
   ], 
   "subcategory": "4 :: AlternativeWeather", 
-  "code": "\ntry:  # import the dragonfly uwg dependencies\n    from dragonfly_uwg.simulation.runperiod import UWGRunPeriod\n    from dragonfly_uwg.simulation.parameter import UWGSimulationParameter\n    from dragonfly_uwg.run import run_uwg\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_uwg:\\n\\t{}'.format(e))\n\n\nsim_par = UWGSimulationParameter()\nif _run_period_:\n    sim_par.run_period = UWGRunPeriod.from_analysis_period(_run_period_)\nif _veg_par_:\n    sim_par.vegetation_parameter = _veg_par_\nif _epw_site_:\n    sim_par.reference_epw_site = _epw_site_\nif _bnd_layer_:\n    sim_par.boundary_layer_parameter = _bnd_layer_\n", 
+  "code": "\ntry:  # import the dragonfly uwg dependencies\n    from dragonfly_uwg.simulation.runperiod import UWGRunPeriod\n    from dragonfly_uwg.simulation.parameter import UWGSimulationParameter\n    from dragonfly_uwg.run import run_uwg\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_uwg:\\n\\t{}'.format(e))\n\n\nsim_par = UWGSimulationParameter()\nif _run_period_:\n    sim_par.run_period = UWGRunPeriod.from_analysis_period(_run_period_)\nif _timestep_:\n    sim_par.timestep = _timestep_\nif _veg_par_:\n    sim_par.vegetation_parameter = _veg_par_\nif _epw_site_:\n    sim_par.reference_epw_site = _epw_site_\nif _bnd_layer_:\n    sim_par.boundary_layer_parameter = _bnd_layer_\n", 
   "category": "Dragonfly", 
   "name": "DF UWG Simulation Parameter", 
   "description": "Create a simulation parameter object that carries a complete set of Urban Weather\nGenreator (UWG) simulation settings and can be plugged into the \"DF Run Urban\nWeather Generator\" component.\n-"
