@@ -77,7 +77,7 @@ https://docs.urbanopt.net/installation/installation.html
 
 ghenv.Component.Name = 'DF Run URBANopt'
 ghenv.Component.NickName = 'RunURBANopt'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -148,4 +148,16 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # execute the simulation with URBANopt CLI
     if _run == 1:
-        osm, idf, sql, zsz, rdd, html, err = run_urbanopt(_geojson, scenario, _cpus_)
+        osm, idf, sql, zsz, rdd, html, err = run_urbanopt(_geojson, scenario)
+        if len(sql) == 0:
+            msg = 'All of the OpenStudio workflows failed to execute.\n' \
+                'Check the error logs in the project directory:\n{}'.format(
+                    os.path.join(os.path.dirname(_geojson), 'run', 'honeybee_scenario'))
+            print(msg)
+            raise Exception(msg)
+        elif len(idf) != len(sql):
+            msg = 'EnergyPlus simulations failed.\n' \
+                'Check the .er files in the project directory:\n{}'.format(
+                    os.path.join(os.path.dirname(_geojson), 'run', 'honeybee_scenario'))
+            print(msg)
+            raise Exception(msg)
