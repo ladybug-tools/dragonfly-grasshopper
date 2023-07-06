@@ -77,7 +77,7 @@ https://docs.urbanopt.net/installation/installation.html
 
 ghenv.Component.Name = 'DF Run URBANopt'
 ghenv.Component.NickName = 'RunURBANopt'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.6.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -85,6 +85,7 @@ ghenv.Component.AdditionalHelpFromDocStrings = '1'
 
 try:
     from honeybee_energy.simulation.parameter import SimulationParameter
+    from honeybee_energy.result.err import Err
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy:\n\t{}'.format(e))
 
@@ -95,7 +96,8 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:
-    from ladybug_rhino.grasshopper import all_required_inputs, recommended_processor_count
+    from ladybug_rhino.grasshopper import all_required_inputs, \
+        recommended_processor_count, give_warning
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -151,13 +153,17 @@ if all_required_inputs(ghenv.Component) and _run:
         osm, idf, sql, zsz, rdd, html, err = run_urbanopt(_geojson, scenario)
         if len(sql) == 0:
             msg = 'All of the OpenStudio workflows failed to execute.\n' \
-                'Check the error logs in the project directory:\n{}'.format(
+                'Check the run.log files in the sub-folders of this directory:\n{}'.format(
                     os.path.join(os.path.dirname(_geojson), 'run', 'honeybee_scenario'))
             print(msg)
             raise Exception(msg)
-        elif len(idf) != len(sql):
-            msg = 'EnergyPlus simulations failed.\n' \
-                'Check the .er files in the project directory:\n{}'.format(
-                    os.path.join(os.path.dirname(_geojson), 'run', 'honeybee_scenario'))
-            print(msg)
-            raise Exception(msg)
+        for err_file in err:
+            fail_file = err_file.replace('eplusout.err', 'failed.job')
+            if os.path.isfile(fail_file):
+                err_obj = Err(err_file)
+                print(err_obj.file_contents)
+                for error in err_obj.fatal_errors:
+                    bldg = os.path.split(os.path.split(err_file)[0])[-1]
+                    msg = 'The EnergyPlus simulation failed for Building ' \
+                        '"{}":\n{}'.format(bldg, error)
+                    give_warning(ghenv.Component, msg)
