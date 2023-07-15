@@ -55,7 +55,7 @@ Create Dragonfly Buildings from solid geometry (closed Rhino polysurfaces).
 
 ghenv.Component.Name = "DF Building from Solid"
 ghenv.Component.NickName = 'BuildingSolid'
-ghenv.Component.Message = '1.6.2'
+ghenv.Component.Message = '1.6.3'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
@@ -82,7 +82,7 @@ try:  # import the core ladybug_rhino dependencies
     from ladybug_rhino.togeometry import to_face3d
     from ladybug_rhino.fromgeometry import from_face3d
     from ladybug_rhino.grasshopper import all_required_inputs, longest_list, \
-        document_counter
+        document_counter, give_warning
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -126,8 +126,11 @@ if all_required_inputs(ghenv.Component) and _run:
 
         # get the floor geometries of the building
         floor_breps = split_solid_to_floors(geo, floor_heights)
-        floor_faces = []
+        floor_faces, final_f2f, intersect_fail = [], [], False
         for flr, hgt in zip(floor_breps, real_floor_heights):
+            if len(flr) == 0:
+                intersect_fail = True
+                break
             story_faces = []
             for rm_face in flr:
                 fc3d = to_face3d(rm_face)
@@ -137,6 +140,12 @@ if all_required_inputs(ghenv.Component) and _run:
                     fc3d = [f.move(m_vec) for f in fc3d]
                 story_faces.extend(fc3d)
             floor_faces.append(story_faces)
+        if intersect_fail:
+            msg = 'Brep geometry with index {} failed to intersect and was removed ' \
+                'from the output.\nTry cleaning and rebuilding it.'.format(i)
+            print(msg)
+            give_warning(ghenv.Component, msg)
+            continue
 
         # create the Building
         building = Building.from_all_story_geometry(
