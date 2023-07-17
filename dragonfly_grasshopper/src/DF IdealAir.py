@@ -44,6 +44,14 @@ Apply a customized IdealAirSystem to Dragonfly Buildings, Stories or Room2Ds.
             be determined during the EnergyPlus sizing calculation. This can also
             be the text 'NoLimit' to indicate no upper limit to the cooling
             capacity. Default: 'autosize'.
+        heat_avail_: An optional on/off schedule to set the availability of
+            heating over the course of the simulation. This can also be the
+            identifier of an on/off schedule to be looked up in the schedule
+            library (Default: None).
+        cool_avail_: An optional on/off schedule to set the availability of
+            cooling over the course of the simulation. This can also be the
+            identifier of an on/off schedule to be looked up in the schedule
+            library (Default: None).
 
     Returns:
         df_objs: The input Dragonfly object with the custom Ideal Air System assigned.
@@ -51,7 +59,7 @@ Apply a customized IdealAirSystem to Dragonfly Buildings, Stories or Room2Ds.
 
 ghenv.Component.Name = "DF IdealAir"
 ghenv.Component.NickName = 'DFIdealAir'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.6.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -64,6 +72,7 @@ except ImportError as e:
 
 try:  # import the honeybee-energy extension
     from honeybee_energy.hvac.idealair import IdealAirSystem
+    from honeybee_energy.lib.schedules import schedule_by_identifier
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy:\n\t{}'.format(e))
 
@@ -115,6 +124,12 @@ if all_required_inputs(ghenv.Component):
     # duplicate the initial objects
     df_objs = [obj.duplicate() for obj in _df_objs]
 
+        # get schedules by identifer if they are strings
+    if isinstance(heat_avail_, str):
+        heat_avail_ = schedule_by_identifier(heat_avail_)
+    if isinstance(cool_avail_, str):
+        cool_avail_ = schedule_by_identifier(cool_avail_)
+
     for df_obj in df_objs:
         for room in extract_room2ds(df_obj):
             if room.properties.energy.is_conditioned:
@@ -144,6 +159,10 @@ if all_required_inputs(ghenv.Component):
                     new_ideal_air.cooling_limit = alt_numbers[_cool_limit_]
                 except KeyError:
                     new_ideal_air.cooling_limit = _cool_limit_
+                if heat_avail_ is not None:
+                    new_ideal_air.heating_availability = heat_avail_
+                if cool_avail_ is not None:
+                    new_ideal_air.cooling_availability = cool_avail_
 
                 # assign the HVAC to the Room
                 room.properties.energy.hvac = new_ideal_air
