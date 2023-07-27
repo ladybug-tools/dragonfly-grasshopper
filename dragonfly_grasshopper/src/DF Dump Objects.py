@@ -39,10 +39,14 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Dump Objects'
 ghenv.Component.NickName = 'DumpObjects'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
+
+import sys
+import os
+import json
 
 try:  # import the core honeybee dependencies
     from honeybee.config import folders
@@ -58,9 +62,6 @@ try:  # import the core ladybug_rhino dependencies
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
-
-import os
-import json
 
 
 if all_required_inputs(ghenv.Component) and _dump:
@@ -87,5 +88,12 @@ if all_required_inputs(ghenv.Component) and _dump:
                 obj_dict[obj.identifier] = obj.to_dict()
 
     # write the dictionary into a file
-    with open(df_file, 'w') as fp:
-        json.dump(obj_dict, fp, indent=indent_)
+    if not os.path.isdir(folder):
+        os.makedirs(folder)
+    if (sys.version_info < (3, 0)):  # we need to manually encode it as UTF-8
+        with open(df_file, 'wb') as fp:
+            obj_str = json.dumps(obj_dict, indent=4, ensure_ascii=False)
+            fp.write(obj_str.encode('utf-8'))
+    else:
+        with open(df_file, 'w', encoding='utf-8') as fp:
+            obj_str = json.dump(obj_dict, fp, indent=4, ensure_ascii=False)

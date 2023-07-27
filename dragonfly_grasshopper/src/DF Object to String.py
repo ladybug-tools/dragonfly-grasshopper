@@ -29,7 +29,7 @@ Schedule, Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Object to String'
 ghenv.Component.NickName = 'ObjToStr'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -43,4 +43,4 @@ import json
 
 
 if all_required_inputs(ghenv.Component):
-    df_str = json.dumps(_df_obj.to_dict(), indent=4)
+    df_str = json.dumps(_df_obj.to_dict(), indent=4, ensure_ascii=False)
