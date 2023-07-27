@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0", 
+  "version": "1.6.1", 
   "nickname": "BuildingFootprint", 
   "outputs": [
     [
@@ -16,7 +16,7 @@
     {
       "access": "list", 
       "name": "_footprint_geo", 
-      "description": "A list of horizontal Rhino surfaces to be converted\ninto Buildings.", 
+      "description": "A list of horizontal Rhino surfaces or closed planar curves\nto be converted into Buildings.", 
       "type": "Brep", 
       "default": null
     }, 

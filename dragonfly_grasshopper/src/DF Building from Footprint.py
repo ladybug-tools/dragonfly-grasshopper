@@ -12,8 +12,8 @@ Create Dragonfly Buildings from footprint geometry (horizontal Rhino surfaces).
 -
 
     Args:
-        _footprint_geo: A list of horizontal Rhino surfaces to be converted
-            into Buildings.
+        _footprint_geo: A list of horizontal Rhino surfaces or closed planar curves
+            to be converted into Buildings.
         _floor_to_floor: A list of float values with a length equal to the number of
             stories in each Building. Each value in the list represents the
             floor_to_floor height of the Story starting from the first floor and
@@ -49,7 +49,7 @@ Create Dragonfly Buildings from footprint geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = 'DF Building from Footprint'
 ghenv.Component.NickName = 'BuildingFootprint'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
