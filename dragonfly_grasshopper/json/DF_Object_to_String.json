@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0", 
+  "version": "1.6.1", 
   "nickname": "ObjToStr", 
   "outputs": [
     [
@@ -22,7 +22,7 @@
     }
   ], 
   "subcategory": "2 :: Serialize", 
-  "code": "\ntry:  # import the core ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\nimport json\n\n\nif all_required_inputs(ghenv.Component):\n    df_str = json.dumps(_df_obj.to_dict(), indent=4)\n", 
+  "code": "\ntry:  # import the core ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\nimport json\n\n\nif all_required_inputs(ghenv.Component):\n    df_str = json.dumps(_df_obj.to_dict(), indent=4, ensure_ascii=False)\n", 
   "category": "Dragonfly", 
   "name": "DF Object to String", 
   "description": "Serialize any dragonfly object to a JSON text string. You can use \"DF String to Object\"\ncomponent to load the objects from the file back.\n-\nThis includes any Model, Building, Story, Room2D, WindowParameter, or ShadingParameter.\n-\nIt also includes any honeybee energy Material, Construction, ConstructionSet,\nSchedule, Load, ProgramType, or Simulation object.\n-"
