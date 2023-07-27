@@ -12,8 +12,8 @@ Create Dragonfly Room2Ds from floor plate geometry (horizontal Rhino surfaces).
 -
 
     Args:
-        _geo: A list of horizontal Rhino surfaces representing floor plates to
-            be converted into Room2Ds.
+        _geo: A list of horizontal Rhino surfaces or closed planar polylines
+            representing floor plates to be converted into Room2Ds.
         _flr_to_ceiling: A number for the height above the floor where the
             ceiling begins. Typical values range from 3 to 5 meters.
         _name_: Text to set the base name for the Room2D, which will also be
@@ -42,7 +42,7 @@ Create Dragonfly Room2Ds from floor plate geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = 'DF Room2D'
 ghenv.Component.NickName = 'Room2D'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'
