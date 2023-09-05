@@ -28,10 +28,12 @@ based on the Room2D floor elevations and a warning will be given.
 
 ghenv.Component.Name = 'DF Rejoin to Building'
 ghenv.Component.NickName = 'Rejoin'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.6.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
+
+from collections import OrderedDict
 
 try:  # import the core dragonfly dependencies
     from dragonfly.building import Building
@@ -57,14 +59,14 @@ if all_required_inputs(ghenv.Component):
 
     # organize the rooms into a nested dictionary by story/building
     orphaned_rooms = []
-    org_dict, bldg_dict = {}, {}
+    org_dict, bldg_dict = OrderedDict(), OrderedDict()
     for rm in room2ds:
         if rm.has_parent and rm.parent.has_parent:
             story = rm.parent
             bldg = story.parent
             if bldg.identifier not in bldg_dict:
                 bldg_dict[bldg.identifier] = bldg
-                org_dict[bldg.identifier] = {}
+                org_dict[bldg.identifier] = OrderedDict()
             try:
                 org_dict[bldg.identifier][story.identifier].append(rm)
             except KeyError:
