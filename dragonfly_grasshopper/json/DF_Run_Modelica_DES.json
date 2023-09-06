@@ -1,0 +1,43 @@
+{
+  "version": "1.6.0", 
+  "nickname": "RunDES", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "modelica", 
+        "description": "A folder where all of the Modelica files of the District Energy\nSystem (DES) are written.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_geojson", 
+      "description": "The path to an URBANopt-compatible geoJSON file. This geoJSON\nfile can be obtained form the \"DF Model to geoJSON\" component.\nThe geoJSON must have a valid District Energy System (DES) Loop\nassigned to it in order to run correctly through the DES simulation.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_scenario", 
+      "description": "The path to an URBANopt .csv file for the scenario. This CSV\nfile can be obtained form the \"DF Run URBANopt\" component.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_run", 
+      "description": "Set to \"True\" to simulate the Distric Energy System.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\nimport os\nimport subprocess\n\ntry:\n    from ladybug.futil import nukedir\n    from ladybug.config import folders as lb_folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:\n    from honeybee.config import folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.run import run_default_report\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.download import download_file_by_name\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\nUO_GMT_VERSION = '0.6.0rc1'\nUO_TN_VERSION = '0.2.1'\nMBL_VERSION = '9.1.1'\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # set clobal values\n    ext = '.exe' if os.name == 'nt' else ''\n    executor_path = os.path.join(\n        lb_folders.ladybug_tools_folder, '{{plugin}}',\n        'ladybug_{{plugin}}_dotnet', 'Ladybug.Executor.exe')\n\n    # check to see if the geojson-modelica-translator is installed\n    uo_gmt = '{}/uo_des{}'.format(folders.python_scripts_path, ext)\n    uo_gmt_pack = '{}/geojson_modelica_translator-{}.dist-info'.format(\n        folders.python_package_path, UO_GMT_VERSION)\n    if not os.path.isfile(uo_gmt) or not os.path.isdir(uo_gmt_pack):\n        #install_cmd = 'pip install geojson-modelica-translator=={}'.format(UO_GMT_VERSION)\n        install_cmd = 'pip install git+https://github.com/urbanopt/geojson-modelica-translator@develop'\n        if os.name == 'nt' and os.path.isfile(executor_path) and \\\n                'Program Files' in executor_path:\n            pip_cmd = [\n                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)\n            ]\n        else:\n            pip_cmd = '\"{py_exe}\" -m {uo_cmd}'.format(\n                py_exe=folders.python_exe_path, uo_cmd=install_cmd)\n        shell = True if os.name == 'nt' else False\n        process = subprocess.Popen(pip_cmd, stderr=subprocess.PIPE, shell=shell)\n        stderr = process.communicate()\n\n    # check to see if the ThermalNetwork package is installed\n    uo_tn = '{}/thermalnetwork{}'.format(folders.python_scripts_path, ext)\n    uo_tn_pack = '{}/ThermalNetwork-{}.dist-info'.format(\n        folders.python_package_path, UO_TN_VERSION)\n    if not os.path.isfile(uo_tn) or not os.path.isdir(uo_tn_pack):\n        install_cmd = 'pip install thermalnetwork=={}'.format(UO_TN_VERSION)\n        if os.name == 'nt' and os.path.isfile(executor_path) and \\\n                'Program Files' in executor_path:\n            pip_cmd = [\n                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)\n            ]\n        else:\n            pip_cmd = '\"{py_exe}\" -m {uo_cmd}'.format(\n                py_exe=folders.python_exe_path, uo_cmd=install_cmd)\n        shell = True if os.name == 'nt' else False\n        process = subprocess.Popen(pip_cmd, stderr=subprocess.PIPE, shell=shell)\n        stderr = process.communicate()\n\n    # check to see if the Modelica Buildings Library is installed\n    install_directory = os.path.join(lb_folders.ladybug_tools_folder, 'resources')\n    final_dir = os.path.join(install_directory, 'mbl')\n    version_file = os.path.join(final_dir, 'version.txt')\n    already_installed = False\n    if os.path.isdir(final_dir) and os.path.isfile(version_file):\n        with open(version_file, 'r') as vf:\n            install_version = vf.read()\n        if install_version == MBL_VERSION:\n            already_installed = True\n        else:\n            nukedir(final_dir, True)\n    if not already_installed:\n        install_cmd = 'dragonfly_energy install mbl --version {}'.format(MBL_VERSION)\n        if os.name == 'nt' and os.path.isfile(executor_path) and \\\n                'Program Files' in executor_path:\n            pip_cmd = [\n                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)\n            ]\n        else:\n            pip_cmd = '\"{py_exe}\" -m {uo_cmd}'.format(\n                py_exe=folders.python_exe_path, uo_cmd=install_cmd)\n        shell = True if os.name == 'nt' else False\n        process = subprocess.Popen(pip_cmd, stderr=subprocess.PIPE, shell=shell)\n        stderr = process.communicate()\n\n    \"\"\"\n    # delete any existing files in the result folder\n    scen_name = os.path.basename(_scenario).replace('.csv', '')\n    run_folder = os.path.join(os.path.dirname(_geojson), 'run', scen_name)\n    result_folder = os.path.join(run_folder, 'modelica')\n    nukedir(result_folder)\n\n    # prepare the Modelica-running command\n    command = '\"{uo_ditto}\" run-opendss -f \"{feature_file}\" ' \\\n        '-s \"{scenario_file}\"'.format(\n            uo_ditto=uo_ditto, feature_file=_geojson, scenario_file=_scenario)\n\n    # execute the command to run everything through Modelica\n    shell = False if os.name == 'nt' else True\n    process = subprocess.Popen(command, stderr=subprocess.PIPE, shell=shell)\n    stderr = process.communicate()\n\n    # gather together all of the result files\n    bldg_folder = os.path.join(result_folder, 'results', 'Features')\n    \"\"\"\n", 
+  "category": "Dragonfly", 
+  "name": "DF Run Modelica DES", 
+  "description": "Run a an URBANopt geoJSON and scenario through Modelica DES simulation.\n_\nThe geoJSON must have a valid DES Loop assigned to it in order to run correctly\nthrough Modelica DES simulation.\n-"
+}
