@@ -67,7 +67,7 @@ except ImportError as e:
 
 UO_GMT_VERSION = '0.6.0rc1'
 UO_TN_VERSION = '0.2.1'
-MBL_VERSION = '10.0.0'
+MBL_VERSION = '9.1.0'
 
 
 if all_required_inputs(ghenv.Component) and _write:
@@ -102,7 +102,7 @@ if all_required_inputs(ghenv.Component) and _write:
         folders.python_package_path, UO_TN_VERSION)
     if not os.path.isfile(uo_tn) or not os.path.isdir(uo_tn_pack):
         #install_cmd = 'pip install thermalnetwork=={}'.format(UO_TN_VERSION)
-        install_cmd = 'pip install git+https://github.com/NREL/ThermalNetwork'
+        install_cmd = 'pip install git+https://github.com/NREL/ThermalNetwork@main'
         if os.name == 'nt' and os.path.isfile(executor_path) and \
                 'Program Files' in executor_path:
             pip_cmd = [
