@@ -77,7 +77,7 @@ to connect these objects to Dragonfly Buildings.
 
 ghenv.Component.Name = 'DF GHE Thermal Loop'
 ghenv.Component.NickName = 'GHELoop'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.6.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -99,7 +99,7 @@ except ImportError as e:
 try:
     from ladybug_rhino.togeometry import to_linesegment2d, to_polyline2d
     from ladybug_rhino.togeometry import to_polygon2d
-    from ladybug_rhino.config import angle_tolerance
+    from ladybug_rhino.config import angle_tolerance, conversion_to_meters
     from ladybug_rhino.grasshopper import all_required_inputs, give_warning
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -119,9 +119,10 @@ if all_required_inputs(ghenv.Component):
     connectors = []
     for i, lin in enumerate(lines):
         connectors.append(ThermalConnector('{}_ThermalConnector_{}'.format(name, i), lin))
-    ghes = []
+    ghes, total_area = [], 0
     for i, geo in enumerate(_ghe_geo):
         gp = to_polygon2d(geo)
+        total_area += gp.area * conversion_to_meters()
         if not gp.is_rectangle(math.radians(angle_tolerance)):
             msg = 'The ground heat exchanger with index {} is not a perfect rectangle ' \
                 'but it will be approximated as such in the DES simulation.'.format(i)
@@ -160,3 +161,15 @@ if all_required_inputs(ghenv.Component):
         des_loop.fluid_parameters.fluid_type = _fluid_type_.replace(' ', '')
     if concentration_:
         des_loop.fluid_parameters.concentration = concentration_
+
+    # give a warning about RAM if the size of the borehole field is too large
+    borehole_count = int(total_area / (des_loop.borehole_parameters.min_spacing ** 2))
+    MAX_BOREHOLES = 8000
+    if borehole_count > MAX_BOREHOLES:
+        msg = 'The inputs suggest that there may be as many as {} boreholes in the ' \
+            'GHE field\nand this can cause the GHE sizing routine to use ' \
+            'more than 10GB of memory.\nA smaller _ghe_geo or a larger '\
+            '_bore_spacing_ is recommended such that fewer\nthan {} boreholes are ' \
+            'generated.'.format(borehole_count, MAX_BOREHOLES)
+        print(msg)
+        give_warning(ghenv.Component, msg)
