@@ -35,7 +35,7 @@ through Modelica DES simulation.
 
 ghenv.Component.Name = 'DF Run Modelica DES'
 ghenv.Component.NickName = 'RunDES'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.6.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
