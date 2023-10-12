@@ -28,7 +28,7 @@ based on the Room2D floor elevations and a warning will be given.
 
 ghenv.Component.Name = 'DF Rejoin to Building'
 ghenv.Component.NickName = 'Rejoin'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.6.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -83,8 +83,17 @@ if all_required_inputs(ghenv.Component):
                 rm_2ds = org_dict[bldg.identifier][story.identifier]
                 story._room_2ds = ()
                 story.add_room_2ds(rm_2ds)
-            except KeyError:  # story missing from the input and we'll use the old ones
-                pass
+            except KeyError:  # story missing from the input; raise an error
+                msg = 'Building "{}" could not be reconstructed from the input Room2Ds.\n' \
+                    'This is likely because the input Room2Ds were created using the "DF Deconstruct ' \
+                    'All Object" component\ninstead of the "DF Deconstruct Object" ' \
+                    'component, which preserves the connection of the Room2Ds to the ' \
+                    'original Building.\nSo you should either relace this component on your ' \
+                    'canvas or, if this is not possible, then you must create the ' \
+                    'Building\nby joining the Rooms into a new "DF Story" and then ' \
+                    'making a new "DF Building from Stories".'.format(new_bldg.display_name)
+                print(msg)
+                raise ValueError(msg)
         buildings.append(new_bldg)
 
     # if there were orphaned Room2Ds, add them to their own building
