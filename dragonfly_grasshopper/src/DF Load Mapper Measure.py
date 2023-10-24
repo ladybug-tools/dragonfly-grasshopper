@@ -30,7 +30,7 @@ The resulting measure object can be plugged into the "measures_" input of the
 
 ghenv.Component.Name = 'DF Load Mapper Measure'
 ghenv.Component.NickName = 'LoadMapper'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

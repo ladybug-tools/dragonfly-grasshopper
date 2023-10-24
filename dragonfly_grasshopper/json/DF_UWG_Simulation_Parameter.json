@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2", 
+  "version": "1.7.0", 
   "nickname": "UWGSimPar", 
   "outputs": [
     [
@@ -22,8 +22,8 @@
     }, 
     {
       "access": "item", 
-      "name": "x", 
-      "description": "Script variable UWGSimPar", 
+      "name": "_timestep_", 
+      "description": "An integer for the number of timesteps per hour at which the\ncalculation will be run. (Default: 12).", 
       "type": "int", 
       "default": null
     }, 

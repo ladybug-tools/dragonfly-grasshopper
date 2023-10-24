@@ -24,7 +24,7 @@ dry bulb temperature, and dew point temperature.
 
 ghenv.Component.Name = 'DF Horizontal Infrared'
 ghenv.Component.NickName = 'HorizInfr'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'

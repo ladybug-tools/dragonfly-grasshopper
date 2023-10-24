@@ -40,7 +40,7 @@ to connect these objects to Dragonfly Buildings.
 
 ghenv.Component.Name = 'DF Electrical Network'
 ghenv.Component.NickName = 'Network'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'

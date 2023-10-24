@@ -25,7 +25,7 @@ Create an OpenDSS Substation from its footprint geometry (horizontal Rhino surfa
 
 ghenv.Component.Name = 'DF Substation'
 ghenv.Component.NickName = 'Substation'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'

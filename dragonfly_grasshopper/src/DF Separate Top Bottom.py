@@ -42,7 +42,7 @@ heat flow through exposed roofs of middle floors.
 
 ghenv.Component.Name = 'DF Separate Top Bottom'
 ghenv.Component.NickName = 'TopBottom'
-ghenv.Component.Message = '1.6.2'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

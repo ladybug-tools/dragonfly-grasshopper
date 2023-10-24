@@ -28,7 +28,7 @@ Create an OpenDSS Transformer from its footprint geometry (horizontal Rhino surf
 
 ghenv.Component.Name = 'DF Transformer'
 ghenv.Component.NickName = 'Transformer'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'

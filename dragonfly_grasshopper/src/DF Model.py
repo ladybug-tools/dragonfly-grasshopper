@@ -28,7 +28,7 @@ for simulation.
 
 ghenv.Component.Name = 'DF Model'
 ghenv.Component.NickName = 'Model'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'

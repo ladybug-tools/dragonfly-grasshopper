@@ -37,7 +37,7 @@ have an Adiabatic or Ground boundary condition.
 
 ghenv.Component.Name = 'DF BC by Orientation'
 ghenv.Component.NickName = 'BCByOrient'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

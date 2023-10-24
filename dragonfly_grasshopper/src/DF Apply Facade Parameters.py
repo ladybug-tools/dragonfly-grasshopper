@@ -34,7 +34,7 @@ Story, Room2D).
 
 ghenv.Component.Name = "DF Apply Facade Parameters"
 ghenv.Component.NickName = 'ApplyFacadePar'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"

@@ -29,7 +29,7 @@ properties, which include the wires and their geometrical arrangement.
 
 ghenv.Component.Name = 'DF Electrical Connector'
 ghenv.Component.NickName = 'ElecConnect'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'

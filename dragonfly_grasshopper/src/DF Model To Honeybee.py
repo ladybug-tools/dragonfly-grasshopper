@@ -67,7 +67,7 @@ Convert a Dragonfly Model into a series of Honeybee Models.
 
 ghenv.Component.Name = 'DF Model To Honeybee'
 ghenv.Component.NickName = 'ToHoneybee'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

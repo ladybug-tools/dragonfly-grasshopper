@@ -63,7 +63,7 @@ https://gis.ncdc.noaa.gov/maps/ncei/cdo/hourly
 
 ghenv.Component.Name = 'DF Import NOAA File'
 ghenv.Component.NickName = 'ImportNOAA'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'

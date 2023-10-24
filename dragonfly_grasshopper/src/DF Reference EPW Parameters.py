@@ -33,7 +33,7 @@ where rural EPW data was recorded for an Urban Weather Genrator (UWG) simulation
 
 ghenv.Component.Name = "DF Reference EPW Parameters"
 ghenv.Component.NickName = 'RefEPWPar'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

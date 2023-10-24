@@ -31,7 +31,7 @@ This includes a substation and road geometries running between the buildings.
 
 ghenv.Component.Name = 'DF Road Network'
 ghenv.Component.NickName = 'Roads'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'

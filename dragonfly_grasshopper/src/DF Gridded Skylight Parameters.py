@@ -28,7 +28,7 @@ according to a ratio with the base Roof surface.
 
 ghenv.Component.Name = "DF Gridded Skylight Parameters"
 ghenv.Component.NickName = 'GridSkyPar'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "6"

@@ -46,7 +46,7 @@ and separation.
 
 ghenv.Component.Name = "DF Repeating Window Width Height Parameters"
 ghenv.Component.NickName = 'RepeatingWHPar'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"

@@ -29,7 +29,7 @@ editing it so that it can be re-assigned with "DF Apply Roof" component.
 
 ghenv.Component.Name = "DF Deconstruct Roof"
 ghenv.Component.NickName = 'DecnstrRoof'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

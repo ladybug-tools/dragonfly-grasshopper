@@ -29,7 +29,7 @@ Schedule, Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Object to String'
 ghenv.Component.NickName = 'ObjToStr'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'

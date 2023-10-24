@@ -28,7 +28,7 @@ based on the Room2D floor elevations and a warning will be given.
 
 ghenv.Component.Name = 'DF Rejoin to Building'
 ghenv.Component.NickName = 'Rejoin'
-ghenv.Component.Message = '1.6.2'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
