@@ -37,7 +37,7 @@ Create a Dragonfly Building from individual Dragonfly Story objects.
 
 ghenv.Component.Name = 'DF Building from Stories'
 ghenv.Component.NickName = 'BuildingStories'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

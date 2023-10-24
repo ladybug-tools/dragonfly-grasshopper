@@ -30,7 +30,7 @@ Parse any CSV file output from an OpenDSS simulation.
 
 ghenv.Component.Name = 'DF Read OpenDSS Result'
 ghenv.Component.NickName = 'OpenDSSResult'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '5'

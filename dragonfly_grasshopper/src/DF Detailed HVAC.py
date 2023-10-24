@@ -30,7 +30,7 @@ Apply a detailed Ironbug HVAC to Dragonfly Buildings, Stories or Room2Ds.
 
 ghenv.Component.Name = "DF Detailed HVAC"
 ghenv.Component.NickName = 'DFDetailedHVAC'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

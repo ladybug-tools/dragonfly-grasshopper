@@ -39,7 +39,7 @@ Weather Generator (UWG).
 
 ghenv.Component.Name = 'DF Assign Model UWG Properties'
 ghenv.Component.NickName = 'ModelUWG'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

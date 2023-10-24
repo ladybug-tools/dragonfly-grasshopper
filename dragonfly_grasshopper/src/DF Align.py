@@ -32,7 +32,7 @@ may completely remove the small Room2D if it becomes degenerate.
 
 ghenv.Component.Name = 'DF Align'
 ghenv.Component.NickName = 'Align'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

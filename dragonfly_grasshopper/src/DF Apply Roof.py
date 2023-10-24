@@ -39,7 +39,7 @@ roof specifications for different Stories of a Dragonfly Building or Model.
 
 ghenv.Component.Name = 'DF Apply Roof'
 ghenv.Component.NickName = 'ApplyRoof'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '7'

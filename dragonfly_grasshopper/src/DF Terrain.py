@@ -37,7 +37,7 @@ the urban area.
 
 ghenv.Component.Name = 'DF Terrain'
 ghenv.Component.NickName = 'Terrain'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

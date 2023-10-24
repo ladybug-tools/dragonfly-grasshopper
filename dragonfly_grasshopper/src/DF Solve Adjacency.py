@@ -46,7 +46,7 @@ Solve adjacencies between the Room2Ds of Dragonfly objects.
 
 ghenv.Component.Name = "DF Solve Adjacency"
 ghenv.Component.NickName = 'SolveAdj2D'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"

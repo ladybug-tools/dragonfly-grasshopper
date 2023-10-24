@@ -26,7 +26,7 @@ attributes and values.
 
 ghenv.Component.Name = 'DF Deconstruct OpenDSS'
 ghenv.Component.NickName = 'DecnstrDSS'
-ghenv.Component.Message = '1.6.0'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

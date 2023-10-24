@@ -23,7 +23,7 @@ represented by multipliers
 
 ghenv.Component.Name = 'DF Visualize All'
 ghenv.Component.NickName = 'VizAll'
-ghenv.Component.Message = '1.6.1'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'

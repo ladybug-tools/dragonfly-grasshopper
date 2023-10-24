@@ -34,7 +34,7 @@ dragonfly OpenDSS standards library (aka. the URBANopt extended cataolog).
 
 ghenv.Component.Name = "DF Search OpenDSS"
 ghenv.Component.NickName = 'SearchOpenDSS'
-ghenv.Component.Message = '1.6.2'
+ghenv.Component.Message = '1.7.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '5'
