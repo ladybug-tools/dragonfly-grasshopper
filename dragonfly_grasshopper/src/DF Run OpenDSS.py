@@ -79,6 +79,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 UO_DITTO_VERSION = '0.5.1'
+TRAITLETS_VERSION = '5.9.0'
 
 
 if all_required_inputs(ghenv.Component) and _run:
@@ -108,6 +109,19 @@ if all_required_inputs(ghenv.Component) and _run:
         process = subprocess.Popen(
             pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
         stderr = process.communicate()
+        # install the old version of traitlets because Ditto didn't specify versions
+        if os.name == 'nt' and os.path.isfile(executor_path) and \
+                'Program Files' in executor_path:
+            pip_cmd = [
+                executor_path, folders.python_exe_path,
+                '-m pip install traitlets=={}'.format(TRAITLETS_VERSION)
+            ]
+        else:
+            pip_cmd = '"{py_exe}" -m pip install traitlets=={tr_ver}'.format(
+                py_exe=folders.python_exe_path, tr_ver=TRAITLETS_VERSION)
+            process = subprocess.Popen(
+            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
+            stderr = process.communicate()
 
     # generate the default scenario report
     def_report = os.path.join(os.path.dirname(_geojson), 'run',
