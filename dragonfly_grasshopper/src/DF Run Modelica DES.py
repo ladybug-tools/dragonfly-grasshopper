@@ -65,8 +65,8 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-UO_GMT_VERSION = '0.6.0rc1'
-UO_TN_VERSION = '0.2.1'
+UO_GMT_VERSION = '0.6.0rc2'
+UO_TN_VERSION = '0.2.3rc1'
 MBL_VERSION = '9.1.0'
 
 
