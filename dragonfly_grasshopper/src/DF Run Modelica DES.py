@@ -35,7 +35,7 @@ through Modelica DES simulation.
 
 ghenv.Component.Name = 'DF Run Modelica DES'
 ghenv.Component.NickName = 'RunDES'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -71,7 +71,11 @@ MBL_VERSION = '9.1.0'
 
 
 if all_required_inputs(ghenv.Component) and _write:
-    # set clobal values
+    # set up the custom python environment
+    custom_env = os.environ.copy()
+    custom_env['PYTHONHOME'] = ''
+
+    # set global values
     ext = '.exe' if os.name == 'nt' else ''
     executor_path = os.path.join(
         lb_folders.ladybug_tools_folder, 'grasshopper',
@@ -93,7 +97,8 @@ if all_required_inputs(ghenv.Component) and _write:
             pip_cmd = '"{py_exe}" -m {uo_cmd}'.format(
                 py_exe=folders.python_exe_path, uo_cmd=install_cmd)
         shell = True if os.name == 'nt' else False
-        process = subprocess.Popen(pip_cmd, stderr=subprocess.PIPE, shell=shell)
+        process = subprocess.Popen(
+            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
         stderr = process.communicate()
 
     # check to see if the ThermalNetwork package is installed
@@ -112,7 +117,8 @@ if all_required_inputs(ghenv.Component) and _write:
             pip_cmd = '"{py_exe}" -m {uo_cmd}'.format(
                 py_exe=folders.python_exe_path, uo_cmd=install_cmd)
         shell = True if os.name == 'nt' else False
-        process = subprocess.Popen(pip_cmd, stderr=subprocess.PIPE, shell=shell)
+        process = subprocess.Popen(
+            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
         stderr = process.communicate()
 
     # check to see if the Modelica Buildings Library is installed
@@ -138,7 +144,8 @@ if all_required_inputs(ghenv.Component) and _write:
             pip_cmd = '"{py_exe}" -m {uo_cmd}'.format(
                 py_exe=folders.python_exe_path, uo_cmd=install_cmd)
         shell = True if os.name == 'nt' else False
-        process = subprocess.Popen(pip_cmd, stderr=subprocess.PIPE, shell=shell)
+        process = subprocess.Popen(
+            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
         stderr = process.communicate()
 
     # run the command that adds the building loads to the system parameters

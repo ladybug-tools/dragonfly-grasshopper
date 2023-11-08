@@ -47,7 +47,7 @@ run correctly through OpenDSS.
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -82,6 +82,10 @@ UO_DITTO_VERSION = '0.5.1'
 
 
 if all_required_inputs(ghenv.Component) and _run:
+    # set up the custom python environment
+    custom_env = os.environ.copy()
+    custom_env['PYTHONHOME'] = ''
+
     # check to see if the urbanopt-ditto-reader is installed
     ext = '.exe' if os.name == 'nt' else ''
     uo_ditto = '{}/ditto_reader_cli{}'.format(folders.python_scripts_path, ext)
@@ -101,7 +105,8 @@ if all_required_inputs(ghenv.Component) and _run:
             pip_cmd = '"{py_exe}" -m pip install urbanopt-ditto-reader=={uo_ver}'.format(
                 py_exe=folders.python_exe_path, uo_ver=UO_DITTO_VERSION)
         shell = True if os.name == 'nt' else False
-        process = subprocess.Popen(pip_cmd, stderr=subprocess.PIPE, shell=shell)
+        process = subprocess.Popen(
+            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
         stderr = process.communicate()
 
     # generate the default scenario report
@@ -157,7 +162,8 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # execute the command to run everything through OpenDSS
     shell = False if os.name == 'nt' else True
-    process = subprocess.Popen(command, stderr=subprocess.PIPE, shell=shell)
+    process = subprocess.Popen(
+        command, stderr=subprocess.PIPE, shell=shell, env=custom_env)
     stderr = process.communicate()
 
     # gather together all of the result files
