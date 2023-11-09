@@ -46,7 +46,7 @@ and separation.
 
 ghenv.Component.Name = "DF Repeating Window Width Height Parameters"
 ghenv.Component.NickName = 'RepeatingWHPar'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"
@@ -58,20 +58,20 @@ except ImportError as e:
 
 try:
     from ladybug_rhino.config import conversion_to_meters
-    from ladybug_rhino.grasshopper import all_required_inputs
+    from ladybug_rhino.grasshopper import turn_off_old_tag
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+turn_off_old_tag(ghenv.Component)
 
 
-if all_required_inputs(ghenv.Component):
-    # set defaults for any blank inputs
-    conversion = conversion_to_meters()
-    _win_height_ = _win_height_ if _win_height_ is not None else 2.0 / conversion
-    _win_width_ = _win_width_ if _win_width_ is not None else 1.5 / conversion
-    _sill_height_ = _sill_height_ if _sill_height_ is not None else 0.8 / conversion
-    _horiz_separ_ = _horiz_separ_ if _horiz_separ_ is not None else 3.0 / conversion
+# set defaults for any blank inputs
+conversion = conversion_to_meters()
+_win_height_ = _win_height_ if _win_height_ is not None else 2.0 / conversion
+_win_width_ = _win_width_ if _win_width_ is not None else 1.5 / conversion
+_sill_height_ = _sill_height_ if _sill_height_ is not None else 0.8 / conversion
+_horiz_separ_ = _horiz_separ_ if _horiz_separ_ is not None else 3.0 / conversion
 
-    # create the window parameters
-    if _win_height_ != 0 and _win_width_ != 0:
-        win_par = RepeatingWindowWidthHeight(
-            _win_height_, _win_width_, _sill_height_, _horiz_separ_)
+# create the window parameters
+if _win_height_ != 0 and _win_width_ != 0:
+    win_par = RepeatingWindowWidthHeight(
+        _win_height_, _win_width_, _sill_height_, _horiz_separ_)

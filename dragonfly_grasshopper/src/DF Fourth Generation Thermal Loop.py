@@ -31,7 +31,7 @@ This includes a central hot and chilled water plant for the district.
 
 ghenv.Component.Name = 'DF Fourth Generation Thermal Loop'
 ghenv.Component.NickName = 'Gen4Loop'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -47,18 +47,18 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:
-    from ladybug_rhino.grasshopper import all_required_inputs, give_warning
+    from ladybug_rhino.grasshopper import turn_off_old_tag
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+turn_off_old_tag(ghenv.Component)
 
 
-if all_required_inputs(ghenv.Component):
-    # set defaults
-    name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'
-    cwt = 6 if _chilled_temp_ is None else _chilled_temp_
-    hwt = 54 if _hot_temp_ is None else _hot_temp_
+# set defaults
+name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'
+cwt = 6 if _chilled_temp_ is None else _chilled_temp_
+hwt = 54 if _hot_temp_ is None else _hot_temp_
 
-    # create the loop
-    des_loop = FourthGenThermalLoop(name, cwt, hwt)
-    if _name_ is not None:
-        des_loop.display_name = _name_
+# create the loop
+des_loop = FourthGenThermalLoop(name, cwt, hwt)
+if _name_ is not None:
+    des_loop.display_name = _name_

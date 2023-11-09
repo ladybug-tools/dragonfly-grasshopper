@@ -37,7 +37,7 @@ Weather Generator" component.
 
 ghenv.Component.Name = 'DF UWG Simulation Parameter'
 ghenv.Component.NickName = 'UWGSimPar'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -48,6 +48,12 @@ try:  # import the dragonfly uwg dependencies
     from dragonfly_uwg.run import run_uwg
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_uwg:\n\t{}'.format(e))
+
+try:
+    from ladybug_rhino.grasshopper import turn_off_old_tag
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+turn_off_old_tag(ghenv.Component)
 
 
 sim_par = UWGSimulationParameter()

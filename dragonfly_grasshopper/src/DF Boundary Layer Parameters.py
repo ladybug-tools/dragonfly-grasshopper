@@ -41,7 +41,7 @@ layer in an Urban Weather Genrator (UWG) simulation.
 
 ghenv.Component.Name = "DF Boundary Layer Parameters"
 ghenv.Component.NickName = 'BoundaryLayer'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -50,6 +50,12 @@ try:  # import the dragonfly_uwg dependencies
     from dragonfly_uwg.simulation.boundary import BoundaryLayerParameter
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_uwg:\n\t{}'.format(e))
+
+try:
+    from ladybug_rhino.grasshopper import turn_off_old_tag
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+turn_off_old_tag(ghenv.Component)
 
 
 # process default values

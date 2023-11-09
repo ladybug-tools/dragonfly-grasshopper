@@ -34,7 +34,7 @@ dragonfly OpenDSS standards library (aka. the URBANopt extended cataolog).
 
 ghenv.Component.Name = "DF Search OpenDSS"
 ghenv.Component.NickName = 'SearchOpenDSS'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '5'
@@ -50,6 +50,12 @@ try:  # import the honeybee-energy dependencies
     from dragonfly_energy.opendss.lib.wires import WIRES
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee_energy:\n\t{}'.format(e))
+
+try:
+    from ladybug_rhino.grasshopper import turn_off_old_tag
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+turn_off_old_tag(ghenv.Component)
 
 
 if len(keywords_) == 0:
