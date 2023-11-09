@@ -45,7 +45,7 @@ urban area.
 
 ghenv.Component.Name = "DF Vegetation Parameters"
 ghenv.Component.NickName = 'VegetationPar'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -59,6 +59,12 @@ try:  # import the honeybee dependencies
     from honeybee.altnumber import autocalculate
 except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+
+try:
+    from ladybug_rhino.grasshopper import turn_off_old_tag
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+turn_off_old_tag(ghenv.Component)
 
 
 # process default values
