@@ -1,50 +1,50 @@
 {
-  "description": "Create Dragonfly window parameters with instructions for repeating rectangular\nwindows of a fixed width and height.\n_\nThis effectively fills a wall with windows at the specified width, height\nand separation.\n-", 
+  "version": "1.7.2", 
+  "nickname": "RepeatingWHPar", 
   "outputs": [
     [
       {
-        "type": null, 
+        "access": "None", 
         "name": "win_par", 
         "description": "Window Parameters that can be applied to a Dragonfly object\nusing the \"DF Apply Facade Parameters\" component.", 
-        "access": "None", 
+        "type": null, 
         "default": null
       }
     ]
   ], 
-  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import RepeatingWindowWidthHeight\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\n# set defaults for any blank inputs\nconversion = conversion_to_meters()\n_win_height_ = _win_height_ if _win_height_ is not None else 2.0 / conversion\n_win_width_ = _win_width_ if _win_width_ is not None else 1.5 / conversion\n_sill_height_ = _sill_height_ if _sill_height_ is not None else 0.8 / conversion\n_horiz_separ_ = _horiz_separ_ if _horiz_separ_ is not None else 3.0 / conversion\n\n# create the window parameters\nif _win_height_ != 0 and _win_width_ != 0:\n    win_par = RepeatingWindowWidthHeight(\n        _win_height_, _win_width_, _sill_height_, _horiz_separ_)", 
-  "name": "DF Repeating Window Width Height Parameters", 
-  "version": "1.7.1", 
-  "category": "Dragonfly", 
-  "subcategory": "0 :: Create", 
-  "nickname": "RepeatingWHPar", 
   "inputs": [
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_win_height_", 
-      "description": "A number for the target height of the windows.\nNote that, if the window_height is larger than the height of the wall,\nthe generated windows will have a height equal to the wall height in\norder to avoid having windows extend outside the wall face. Default:\n2 meters.", 
-      "access": "item", 
+      "description": "A number for the target height of the windows. Note that, if the\nwindow_height is larger than the height of the wall, the generated\nwindows will have a height equal to the wall height in order\nto avoid having windows extend outside the wall face. (Default:\n2 meters).", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_win_width_", 
-      "description": "A number for the target width of the windows.\nNote that, if the window_width is larger than the width of the wall,\nthe generated windows will have a width equal to the wall width in\norder to avoid having windows extend outside the wall face. Default:\n1.5 meters", 
-      "access": "item", 
+      "description": "A number for the target width of the windows. Note that, if the\nwindow_width is larger than the width of the wall, the generated\nwindows will have a width equal to the wall width in order to avoid\nhaving windows extend outside the wall face. (Default: 1.5 meters).", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_sill_height_", 
-      "description": "A number for the target height above the bottom edge of\nthe face to start the apertures. Note that, if the ratio is too large\nfor the height, the ratio will take precedence and the sill_height\nwill be smaller than this value. If an array of values are input here,\ndifferent heights will be assigned based on cardinal direction, starting\nwith north and moving clockwise. Default: 0.8 meters.", 
-      "access": "item", 
+      "description": "A number for the target height above the bottom edge of the face\nto start the apertures. Note that, if the window height is too large\nto acoomodate the sill height input here, the window height will\ntake precedence and the sill height will be smaller than this\nvalue. (Default: 0.8 meters).", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
-      "name": "_horiz_separ_", 
-      "description": "A number for the horizontal separation between\nindividual aperture centerlines.  If this number is larger than\nthe parent face's length, only one aperture will be produced.\nIf an array of values are input here, different separation distances\nwill be assigned based on cardinal direction, starting with north\nand moving clockwise. Default: 3 meters.", 
       "access": "item", 
+      "name": "_horiz_separ_", 
+      "description": "A number for the horizontal separation between individual aperture\ncenterlines.  If this number is larger than the parent face's length,\nonly one aperture will be produced. (Default: 3 meters).", 
+      "type": "double", 
       "default": null
     }
-  ]
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import RepeatingWindowWidthHeight\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\n# set defaults for any blank inputs\nconversion = conversion_to_meters()\n_win_height_ = _win_height_ if _win_height_ is not None else 2.0 / conversion\n_win_width_ = _win_width_ if _win_width_ is not None else 1.5 / conversion\n_sill_height_ = _sill_height_ if _sill_height_ is not None else 0.8 / conversion\n_horiz_separ_ = _horiz_separ_ if _horiz_separ_ is not None else 3.0 / conversion\n\n# create the window parameters\nif _win_height_ != 0 and _win_width_ != 0:\n    win_par = RepeatingWindowWidthHeight(\n        _win_height_, _win_width_, _sill_height_, _horiz_separ_)", 
+  "category": "Dragonfly", 
+  "name": "DF Repeating Window Width Height Parameters", 
+  "description": "Create Dragonfly window parameters with instructions for repeating rectangular\nwindows of a fixed width and height.\n_\nThis effectively fills a wall with windows at the specified width, height\nand separation.\n-"
 }
