@@ -16,28 +16,23 @@ and separation.
 -
 
     Args:
-        _win_height_: A number for the target height of the windows.
-            Note that, if the window_height is larger than the height of the wall,
-            the generated windows will have a height equal to the wall height in
-            order to avoid having windows extend outside the wall face. Default:
-            2 meters.
-        _win_width_: A number for the target width of the windows.
-            Note that, if the window_width is larger than the width of the wall,
-            the generated windows will have a width equal to the wall width in
-            order to avoid having windows extend outside the wall face. Default:
-            1.5 meters
-        _sill_height_: A number for the target height above the bottom edge of
-            the face to start the apertures. Note that, if the ratio is too large
-            for the height, the ratio will take precedence and the sill_height
-            will be smaller than this value. If an array of values are input here,
-            different heights will be assigned based on cardinal direction, starting
-            with north and moving clockwise. Default: 0.8 meters.
-        _horiz_separ_: A number for the horizontal separation between
-            individual aperture centerlines.  If this number is larger than
-            the parent face's length, only one aperture will be produced.
-            If an array of values are input here, different separation distances
-            will be assigned based on cardinal direction, starting with north
-            and moving clockwise. Default: 3 meters.
+        _win_height_: A number for the target height of the windows. Note that, if the
+            window_height is larger than the height of the wall, the generated
+            windows will have a height equal to the wall height in order
+            to avoid having windows extend outside the wall face. (Default:
+            2 meters).
+        _win_width_: A number for the target width of the windows. Note that, if the
+            window_width is larger than the width of the wall, the generated
+            windows will have a width equal to the wall width in order to avoid
+            having windows extend outside the wall face. (Default: 1.5 meters).
+        _sill_height_: A number for the target height above the bottom edge of the face
+            to start the apertures. Note that, if the window height is too large
+            to acoomodate the sill height input here, the window height will
+            take precedence and the sill height will be smaller than this
+            value. (Default: 0.8 meters).
+        _horiz_separ_: A number for the horizontal separation between individual aperture
+            centerlines.  If this number is larger than the parent face's length,
+            only one aperture will be produced. (Default: 3 meters).
 
     Returns:
         win_par: Window Parameters that can be applied to a Dragonfly object
@@ -46,7 +41,7 @@ and separation.
 
 ghenv.Component.Name = "DF Repeating Window Width Height Parameters"
 ghenv.Component.NickName = 'RepeatingWHPar'
-ghenv.Component.Message = '1.7.1'
+ghenv.Component.Message = '1.7.2'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"
