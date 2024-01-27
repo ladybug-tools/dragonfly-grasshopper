@@ -24,6 +24,9 @@ through Modelica DES simulation.
             file can be obtained form the "DF Run URBANopt" component.
         _write: Set to "True" to run the component, install any missing dependencies,
             and write the Modelica files for the Distric Energy System.
+        run_: Set to "True" to translate the Modelica files to a Functional Mockup Unit (FMU)
+            and then simulate the FMU. This will ensure that all result files appear
+            in their respective outputs from this component.
 
     Returns:
         report: Reports, errors, warnings, etc.
@@ -31,11 +34,13 @@ through Modelica DES simulation.
             Energy System, including the detailed Building load profiles.
         modelica: A folder where all of the Modelica files of the District Energy
             System (DES) are written.
+        results: A folder containing the results of the Modelica simulation if run_ is
+            True and the simulation is successful.
 """
 
 ghenv.Component.Name = 'DF Run Modelica DES'
 ghenv.Component.NickName = 'RunDES'
-ghenv.Component.Message = '1.7.1'
+ghenv.Component.Message = '1.7.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -55,19 +60,21 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the dragonfly_energy dependencies
-    from dragonfly_energy.run import run_des_sys_param, run_des_modelica
+    from dragonfly_energy.config import folders as df_folders
+    from dragonfly_energy.run import run_des_sys_param, run_des_modelica, \
+        run_modelica_docker
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:
     from ladybug_rhino.download import download_file_by_name
-    from ladybug_rhino.grasshopper import all_required_inputs
+    from ladybug_rhino.grasshopper import all_required_inputs, give_warning
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-UO_GMT_VERSION = '0.6.0rc2'
-UO_TN_VERSION = '0.2.3rc1'
-MBL_VERSION = '9.1.0'
+UO_GMT_VERSION = '0.6.0'
+UO_TN_VERSION = '0.2.3'
+MBL_VERSION = '10.0.0'
 
 
 if all_required_inputs(ghenv.Component) and _write:
@@ -86,8 +93,7 @@ if all_required_inputs(ghenv.Component) and _write:
     uo_gmt_pack = '{}/geojson_modelica_translator-{}.dist-info'.format(
         folders.python_package_path, UO_GMT_VERSION)
     if not os.path.isfile(uo_gmt) or not os.path.isdir(uo_gmt_pack):
-        #install_cmd = 'pip install geojson-modelica-translator=={}'.format(UO_GMT_VERSION)
-        install_cmd = 'pip install git+https://github.com/urbanopt/geojson-modelica-translator@develop'
+        install_cmd = 'pip install geojson-modelica-translator=={}'.format(UO_GMT_VERSION)
         if os.name == 'nt' and os.path.isfile(executor_path) and \
                 'Program Files' in executor_path:
             pip_cmd = [
@@ -106,8 +112,7 @@ if all_required_inputs(ghenv.Component) and _write:
     uo_tn_pack = '{}/ThermalNetwork-{}.dist-info'.format(
         folders.python_package_path, UO_TN_VERSION)
     if not os.path.isfile(uo_tn) or not os.path.isdir(uo_tn_pack):
-        #install_cmd = 'pip install thermalnetwork=={}'.format(UO_TN_VERSION)
-        install_cmd = 'pip install git+https://github.com/NREL/ThermalNetwork@main'
+        install_cmd = 'pip install thermalnetwork=={}'.format(UO_TN_VERSION)
         if os.name == 'nt' and os.path.isfile(executor_path) and \
                 'Program Files' in executor_path:
             pip_cmd = [
@@ -153,3 +158,15 @@ if all_required_inputs(ghenv.Component) and _write:
 
     # run the command that generates the modelica files
     modelica = run_des_modelica(sys_param, _geojson, _scenario)
+
+    # execute the modelica files in URBANopt
+    if run_:
+        if df_folders.docker_version_str is not None:
+            results = run_modelica_docker(modelica)
+        else:
+            docker_url  = 'https://www.docker.com/products/docker-desktop/'
+            msg = 'No Docker installation was found on this machine.\n' \
+                'This is needed to execute Modelica simulations.\n' \
+                'Download Docker Desktop from: {}'.format(docker_url)
+            print(msg)
+            give_warning(ghenv.Component, msg)
