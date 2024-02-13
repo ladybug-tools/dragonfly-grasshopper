@@ -1,0 +1,43 @@
+{
+  "version": "1.7.0", 
+  "nickname": "BuildingHBRooms", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "building", 
+        "description": "Dragonfly Building.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "base_bldg_", 
+      "description": "An optional Dragonfly Building.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_hb_rooms", 
+      "description": "Honeybee Room objects for additional Rooms that are a part of the\nBuilding but are not represented within the Stories or Room2Ds.\nMatching the Honeybee Room story property (assigned with the\n\"HB Set Multiplier\" component) to the Dragonfly Story name\nwill effectively place the Honeybee Room on that Story for the\npurposes of floor_area, exterior_wall_area, etc. However, note\nthat the Honeybee Room.multiplier property takes precedence over\nwhatever multiplier is assigned to the Dragonfly Story that the\nRoom.story may reference.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_name_", 
+      "description": "Text to set the name for the Building, which will also be incorporated\ninto unique Building identifier. If the name is not provided a random\none will be assigned.", 
+      "type": "string", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_and_id_string, clean_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, document_counter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # generate a default identifier\n    if _name_ is None:  # get a default Building name\n        display_name = 'Building_{}'.format(document_counter('bldg_count'))\n        name = clean_and_id_string(display_name)\n    else:\n        display_name = _name_\n        name = clean_string(display_name)\n\n    # create the Building\n    room_3ds = [r.duplicate() for r in _hb_rooms]\n    if base_bldg_ is not None:\n        building = base_bldg_.duplicate()\n        building = name\n        building.add_room_3ds(room_3ds)\n    else:  # make the building entirely from the \n        building = Building(name, room_3ds=room_3ds)\n    building.display_name = display_name\n", 
+  "category": "Dragonfly", 
+  "name": "DF Building from Detailed Rooms", 
+  "description": "Create a Dragonfly Building from detailed Honeybee Rooms.\n_\nThis is useful when there are parts of the Building geometry that cannot easily\nbe represented with the extruded floor plate and sloped roof assumptions that\nunderlie Dragonfly Room2Ds and RoofSpecification. Cases where this input is most\nuseful include sloped walls and certain types of domed roofs that become tedious\nto implement with RoofSpecification.\n-"
+}

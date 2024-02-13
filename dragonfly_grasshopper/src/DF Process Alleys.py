@@ -34,10 +34,10 @@ that may exist between buildings of a denser urban district.
 
 ghenv.Component.Name = 'DF Process Alleys'
 ghenv.Component.NickName = 'Alleys'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
-ghenv.Component.AdditionalHelpFromDocStrings = '0'
+ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
 try:  # import the core dragonfly dependencies
     from dragonfly.model import Model
