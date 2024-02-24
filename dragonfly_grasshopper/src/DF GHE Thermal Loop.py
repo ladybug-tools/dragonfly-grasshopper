@@ -77,7 +77,7 @@ to connect these objects to Dragonfly Buildings.
 
 ghenv.Component.Name = 'DF GHE Thermal Loop'
 ghenv.Component.NickName = 'GHELoop'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -97,7 +97,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:
-    from ladybug_rhino.togeometry import to_linesegment2d, to_polyline2d
+    from ladybug_rhino.togeometry import to_polyline2d
     from ladybug_rhino.togeometry import to_polygon2d
     from ladybug_rhino.config import angle_tolerance, conversion_to_meters
     from ladybug_rhino.grasshopper import all_required_inputs, give_warning
@@ -112,10 +112,7 @@ if all_required_inputs(ghenv.Component):
     # create the GHE fields and the Thermal Connectors
     lines = []
     for geo in _connector_geo:
-        try:
-            lines.append(to_polyline2d(geo))
-        except AttributeError:
-            lines.append(to_linesegment2d(geo))
+        lines.append(to_polyline2d(geo))
     connectors = []
     for i, lin in enumerate(lines):
         connectors.append(ThermalConnector('{}_ThermalConnector_{}'.format(name, i), lin))

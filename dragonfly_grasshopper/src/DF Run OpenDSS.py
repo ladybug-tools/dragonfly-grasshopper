@@ -47,7 +47,7 @@ run correctly through OpenDSS.
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.7.1'
+ghenv.Component.Message = '1.7.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -79,6 +79,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 UO_DITTO_VERSION = '0.5.1'
+DITTO_VERSION = '0.2.3'
 TRAITLETS_VERSION = '5.9.0'
 
 
@@ -122,6 +123,25 @@ if all_required_inputs(ghenv.Component) and _run:
             process = subprocess.Popen(
             pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
             stderr = process.communicate()
+    # make sure that a compatible version of ditto is installed
+    ditto_pack = '{}/ditto.py-{}.dist-info'.format(folders.python_package_path, DITTO_VERSION)
+    if not os.path.isdir(uo_ditto_pack):
+        executor_path = os.path.join(
+            lb_folders.ladybug_tools_folder, 'grasshopper',
+            'ladybug_grasshopper_dotnet', 'Ladybug.Executor.exe')
+        if os.name == 'nt' and os.path.isfile(executor_path) and \
+                'Program Files' in executor_path:
+            pip_cmd = [
+                executor_path, folders.python_exe_path,
+                '-m pip install ditto.py=={}'.format(DITTO_VERSION)
+            ]
+        else:
+            pip_cmd = '"{py_exe}" -m pip install ditto.py=={d_ver}'.format(
+                py_exe=folders.python_exe_path, d_ver=DITTO_VERSION)
+        shell = True if os.name == 'nt' else False
+        process = subprocess.Popen(
+            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
+        stderr = process.communicate()
 
     # generate the default scenario report
     def_report = os.path.join(os.path.dirname(_geojson), 'run',

@@ -31,7 +31,7 @@ This includes a substation and road geometries running between the buildings.
 
 ghenv.Component.Name = 'DF Road Network'
 ghenv.Component.NickName = 'Roads'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'
@@ -48,7 +48,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:
-    from ladybug_rhino.togeometry import to_linesegment2d, to_polyline2d
+    from ladybug_rhino.togeometry import to_polyline2d
     from ladybug_rhino.grasshopper import all_required_inputs, \
         document_counter
 except ImportError as e:
@@ -62,10 +62,7 @@ if all_required_inputs(ghenv.Component):
     # create the roads
     lines = []
     for geo in _road_geo:
-        try:
-            lines.append(to_polyline2d(geo))
-        except AttributeError:
-            lines.append(to_linesegment2d(geo))
+        lines.append(to_polyline2d(geo))
     roads = []
     for i, geo in enumerate(lines):
         # get the name for the Road
