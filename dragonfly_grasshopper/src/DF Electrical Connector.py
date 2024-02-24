@@ -29,7 +29,7 @@ properties, which include the wires and their geometrical arrangement.
 
 ghenv.Component.Name = 'DF Electrical Connector'
 ghenv.Component.NickName = 'ElecConnect'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.7.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'
@@ -46,7 +46,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:  # import ladybug-rhino
-    from ladybug_rhino.togeometry import to_linesegment2d, to_polyline2d
+    from ladybug_rhino.togeometry import to_polyline2d
     from ladybug_rhino.grasshopper import all_required_inputs, longest_list, \
         document_counter
 except ImportError as e:
@@ -61,10 +61,7 @@ if all_required_inputs(ghenv.Component):
     # convert rhino geometry to ladybug geometry
     lines = []
     for geo in _geo:
-        try:
-            lines.append(to_polyline2d(geo))
-        except AttributeError:
-            lines.append(to_linesegment2d(geo))
+        lines.append(to_polyline2d(geo))
 
     connector = []  # list of connectors that will be returned
     for i, geo in enumerate(lines):
