@@ -47,7 +47,7 @@ run correctly through OpenDSS.
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.7.2'
+ghenv.Component.Message = '1.7.3'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -87,16 +87,17 @@ if all_required_inputs(ghenv.Component) and _run:
     # set up the custom python environment
     custom_env = os.environ.copy()
     custom_env['PYTHONHOME'] = ''
+    ext = '.exe' if os.name == 'nt' else ''
+    shell = True if os.name == 'nt' else False
+    executor_path = os.path.join(
+        lb_folders.ladybug_tools_folder, 'grasshopper',
+        'ladybug_grasshopper_dotnet', 'Ladybug.Executor.exe')
 
     # check to see if the urbanopt-ditto-reader is installed
-    ext = '.exe' if os.name == 'nt' else ''
     uo_ditto = '{}/ditto_reader_cli{}'.format(folders.python_scripts_path, ext)
     uo_ditto_pack = '{}/urbanopt_ditto_reader-{}.dist-info'.format(
         folders.python_package_path, UO_DITTO_VERSION)
     if not os.path.isfile(uo_ditto) or not os.path.isdir(uo_ditto_pack):
-        executor_path = os.path.join(
-            lb_folders.ladybug_tools_folder, 'grasshopper',
-            'ladybug_grasshopper_dotnet', 'Ladybug.Executor.exe')
         if os.name == 'nt' and os.path.isfile(executor_path) and \
                 'Program Files' in executor_path:
             pip_cmd = [
@@ -106,29 +107,13 @@ if all_required_inputs(ghenv.Component) and _run:
         else:
             pip_cmd = '"{py_exe}" -m pip install urbanopt-ditto-reader=={uo_ver}'.format(
                 py_exe=folders.python_exe_path, uo_ver=UO_DITTO_VERSION)
-        shell = True if os.name == 'nt' else False
         process = subprocess.Popen(
             pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
         stderr = process.communicate()
-        # install the old version of traitlets because Ditto didn't specify versions
-        if os.name == 'nt' and os.path.isfile(executor_path) and \
-                'Program Files' in executor_path:
-            pip_cmd = [
-                executor_path, folders.python_exe_path,
-                '-m pip install traitlets=={}'.format(TRAITLETS_VERSION)
-            ]
-        else:
-            pip_cmd = '"{py_exe}" -m pip install traitlets=={tr_ver}'.format(
-                py_exe=folders.python_exe_path, tr_ver=TRAITLETS_VERSION)
-            process = subprocess.Popen(
-            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
-            stderr = process.communicate()
+
     # make sure that a compatible version of ditto is installed
     ditto_pack = '{}/ditto.py-{}.dist-info'.format(folders.python_package_path, DITTO_VERSION)
     if not os.path.isdir(uo_ditto_pack):
-        executor_path = os.path.join(
-            lb_folders.ladybug_tools_folder, 'grasshopper',
-            'ladybug_grasshopper_dotnet', 'Ladybug.Executor.exe')
         if os.name == 'nt' and os.path.isfile(executor_path) and \
                 'Program Files' in executor_path:
             pip_cmd = [
@@ -138,9 +123,25 @@ if all_required_inputs(ghenv.Component) and _run:
         else:
             pip_cmd = '"{py_exe}" -m pip install ditto.py=={d_ver}'.format(
                 py_exe=folders.python_exe_path, d_ver=DITTO_VERSION)
-        shell = True if os.name == 'nt' else False
         process = subprocess.Popen(
             pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
+        stderr = process.communicate()
+
+    # install the old version of traitlets because Ditto didn't specify versions
+    traitlets_pack = '{}/traitlets-{}.dist-info'.format(
+        folders.python_package_path, TRAITLETS_VERSION)
+    if not os.path.isdir(traitlets_pack):
+        if os.name == 'nt' and os.path.isfile(executor_path) and \
+                'Program Files' in executor_path:
+            pip_cmd = [
+                executor_path, folders.python_exe_path,
+                '-m pip install traitlets=={}'.format(TRAITLETS_VERSION)
+            ]
+        else:
+            pip_cmd = '"{py_exe}" -m pip install traitlets=={tr_ver}'.format(
+                py_exe=folders.python_exe_path, tr_ver=TRAITLETS_VERSION)
+        process = subprocess.Popen(
+        pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
         stderr = process.communicate()
 
     # generate the default scenario report
@@ -171,26 +172,28 @@ if all_required_inputs(ghenv.Component) and _run:
             command, os.path.join(os.path.dirname(_geojson), 'electrical_database.json'))
 
     # add the other options into the command
+    # try to sense the timestep from the simulation parameter file
+    timestep = 6  # assume the default timestep in case no file is found
+    sim_par_json = os.path.join(os.path.dirname(_geojson), 'simulation_parameter.json')
+    if os.path.isfile(sim_par_json):
+        with open(sim_par_json, 'r') as spj:
+            sim_par = json.load(spj)
+        if 'timestep' in sim_par:
+            timestep = sim_par['timestep']
+    command = '{} --timestep {}'.format(command, int(60 / timestep))
     if _run_period_ is not None:
         # first, format the run period dates for the command
         st_dt = '2006/{}'.format(_run_period_.st_time.strftime('%m/%d'))
         end_dt = '2006/{}'.format(_run_period_.end_time.add_hour(24).strftime('%m/%d'))
         command = '{} -a "{}" -n "{}"'.format(command, st_dt, end_dt)
-        # try to sense the timestep from the simulation parameter file
-        timestep = 6  # assume the default timestep in case no file is found
-        sim_par_json = os.path.join(os.path.dirname(_geojson), 'simulation_parameter.json')
-        if os.path.isfile(sim_par_json):
-            with open(sim_par_json, 'r') as spj:
-                sim_par = json.load(spj)
-            if 'timestep' in sim_par:
-                timestep = sim_par['timestep']
+        
         # using the simulation timestep, specify the correct start and end time
         if timestep == 1:
             command = '{} -b 01:00:00 -d 00:00:00'.format(command)
         else:
             st_min = str(int(60 / timestep))
             st_min = '0{}'.format(st_min) if len(st_min) == 1 else st_min
-            command = '{} -b 00:():00 -d 00:00:00'.format(command, st_min)
+            command = '{} -b 00:{}:00 -d 00:00:00'.format(command, st_min)
     if autosize_:
         command = '{} --upgrade'.format(command)
 
@@ -212,6 +215,6 @@ if all_required_inputs(ghenv.Component) and _run:
         msg = 'Failed to run the OpenDSS simulation.\nMake sure that your ' \
             'GeoJSON has an Electrical Network object in it\nor, if the GeoJSON has '\
             'a Road Network object in it, the "Run RNM" component\ncan be used to ' \
-            'generate an Electrical Network that can be simulated in OpenDSS.'
-        print(msg)
+            'generate an Electrical Network that can be simulated in OpenDSS.\n{}'.format(
+                stderr[1])
         raise ValueError(msg)
