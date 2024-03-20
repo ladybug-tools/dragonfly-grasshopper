@@ -1,43 +1,43 @@
 {
-  "description": "Create an Fourth Generation Thermal Loop, which represents all infrastructure\nfor a District Energy Simulation (DES) simulation.\n_\nThis includes a central hot and chilled water plant for the district.\n-", 
+  "version": "1.8.0", 
+  "nickname": "Gen4Loop", 
   "outputs": [
     [
       {
-        "type": null, 
+        "access": "None", 
         "name": "des_loop", 
         "description": "A Dragonfly Thermal Loop object possessing all infrastructure for a\nDistrict Energy Simulation (DES) simulation. This should be connected\nto the loop_ input of the \"DF Model to GeoJSON\" component.", 
-        "access": "None", 
+        "type": null, 
         "default": null
       }
     ]
   ], 
-  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.loop import FourthGenThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\n# set defaults\nname = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\ncwt = 6 if _chilled_temp_ is None else _chilled_temp_\nhwt = 54 if _hot_temp_ is None else _hot_temp_\n\n# create the loop\ndes_loop = FourthGenThermalLoop(name, cwt, hwt)\nif _name_ is not None:\n    des_loop.display_name = _name_\n", 
-  "name": "DF Fourth Generation Thermal Loop", 
-  "version": "1.7.1", 
-  "category": "Dragonfly", 
-  "subcategory": "3 :: Energy", 
-  "nickname": "Gen4Loop", 
   "inputs": [
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_chilled_temp_", 
       "description": "A number for the temperature of chilled water in the DES\nin degrees Celsius. (Default: 6).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_hot_temp_", 
       "description": "A number for the temperature of hot water in the DES in degrees\nCelsius. (Default: 54).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "string", 
+      "access": "item", 
       "name": "_name_", 
       "description": "Text to be used for the name and identifier of the Thermal Loop.\nIf no name is provided, it will be \"unnamed\".", 
-      "access": "item", 
+      "type": "string", 
       "default": null
     }
-  ]
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.loop import FourthGenThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\n# set defaults\nname = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\ncwt = 6 if _chilled_temp_ is None else _chilled_temp_\nhwt = 54 if _hot_temp_ is None else _hot_temp_\n\n# create the loop\ndes_loop = FourthGenThermalLoop(name, cwt, hwt)\nif _name_ is not None:\n    des_loop.display_name = _name_\n", 
+  "category": "Dragonfly", 
+  "name": "DF Fourth Generation Thermal Loop", 
+  "description": "Create an Fourth Generation Thermal Loop, which represents all infrastructure\nfor a District Energy Simulation (DES) simulation.\n_\nThis includes a central hot and chilled water plant for the district.\n-"
 }
