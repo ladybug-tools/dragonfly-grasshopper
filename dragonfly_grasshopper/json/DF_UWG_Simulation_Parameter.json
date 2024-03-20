@@ -1,57 +1,57 @@
 {
-  "description": "Create a simulation parameter object that carries a complete set of Urban Weather\nGenreator (UWG) simulation settings and can be plugged into the \"DF Run Urban\nWeather Generator\" component.\n-", 
+  "version": "1.8.0", 
+  "nickname": "UWGSimPar", 
   "outputs": [
     [
       {
-        "type": null, 
+        "access": "None", 
         "name": "sim_par", 
         "description": "A UWG SimulationParameter object that can be connected to the\n\"DF Run Urban Weather Generator\" component in order to specify\nUWG simulation settings", 
-        "access": "None", 
+        "type": null, 
         "default": null
       }
     ]
   ], 
-  "code": "\ntry:  # import the dragonfly uwg dependencies\n    from dragonfly_uwg.simulation.runperiod import UWGRunPeriod\n    from dragonfly_uwg.simulation.parameter import UWGSimulationParameter\n    from dragonfly_uwg.run import run_uwg\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_uwg:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nsim_par = UWGSimulationParameter()\nif _run_period_:\n    sim_par.run_period = UWGRunPeriod.from_analysis_period(_run_period_)\nif _timestep_:\n    sim_par.timestep = _timestep_\nif _veg_par_:\n    sim_par.vegetation_parameter = _veg_par_\nif _epw_site_:\n    sim_par.reference_epw_site = _epw_site_\nif _bnd_layer_:\n    sim_par.boundary_layer_parameter = _bnd_layer_\n", 
-  "name": "DF UWG Simulation Parameter", 
-  "version": "1.7.1", 
-  "category": "Dragonfly", 
-  "subcategory": "4 :: AlternativeWeather", 
-  "nickname": "UWGSimPar", 
   "inputs": [
     {
-      "type": "System.Object", 
+      "access": "item", 
       "name": "_run_period_", 
       "description": "A Ladybug Analysis Period object to describe the time period over\nwhich to run the simulation. If None, the simulation will be run for\nthe whole year.", 
-      "access": "item", 
+      "type": "System.Object", 
       "default": null
     }, 
     {
-      "type": "int", 
+      "access": "item", 
       "name": "_timestep_", 
       "description": "An integer for the number of timesteps per hour at which the\ncalculation will be run. (Default: 12).", 
-      "access": "item", 
+      "type": "int", 
       "default": null
     }, 
     {
-      "type": "System.Object", 
+      "access": "item", 
       "name": "_veg_par_", 
       "description": "A VegetationParameter object to specify the behavior of vegetation\nin the urban area. If None, generic vegetation parameters will be\ngenerated.", 
-      "access": "item", 
+      "type": "System.Object", 
       "default": null
     }, 
     {
-      "type": "System.Object", 
+      "access": "item", 
       "name": "_epw_site_", 
       "description": "A ReferenceEPWSite object to specify the properties of the\nreference site where the input rural EPW was recorded. If None,\ngeneric airport properties will be generated.", 
-      "access": "item", 
+      "type": "System.Object", 
       "default": null
     }, 
     {
-      "type": "System.Object", 
+      "access": "item", 
       "name": "_bnd_layer_", 
       "description": "A BoundaryLayerParameter to specify the properties of the urban\nboundary layer. If None, generic boundary layer parameters will\nbe generated.", 
-      "access": "item", 
+      "type": "System.Object", 
       "default": null
     }
-  ]
+  ], 
+  "subcategory": "4 :: AlternativeWeather", 
+  "code": "\ntry:  # import the dragonfly uwg dependencies\n    from dragonfly_uwg.simulation.runperiod import UWGRunPeriod\n    from dragonfly_uwg.simulation.parameter import UWGSimulationParameter\n    from dragonfly_uwg.run import run_uwg\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_uwg:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nsim_par = UWGSimulationParameter()\nif _run_period_:\n    sim_par.run_period = UWGRunPeriod.from_analysis_period(_run_period_)\nif _timestep_:\n    sim_par.timestep = _timestep_\nif _veg_par_:\n    sim_par.vegetation_parameter = _veg_par_\nif _epw_site_:\n    sim_par.reference_epw_site = _epw_site_\nif _bnd_layer_:\n    sim_par.boundary_layer_parameter = _bnd_layer_\n", 
+  "category": "Dragonfly", 
+  "name": "DF UWG Simulation Parameter", 
+  "description": "Create a simulation parameter object that carries a complete set of Urban Weather\nGenreator (UWG) simulation settings and can be plugged into the \"DF Run Urban\nWeather Generator\" component.\n-"
 }

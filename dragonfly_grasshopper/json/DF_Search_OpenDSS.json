@@ -1,50 +1,50 @@
 {
-  "description": "Search for available TransformerProperties, PowerLines, and Wires within the\ndragonfly OpenDSS standards library (aka. the URBANopt extended cataolog).\n-", 
+  "version": "1.8.0", 
+  "nickname": "SearchOpenDSS", 
   "outputs": [
     [
       {
-        "type": null, 
+        "access": "None", 
         "name": "transformers", 
         "description": "A list of all transformer properties within the dragonfly OpenDSS\nstandards library (filtered by keywords_ if they are input).", 
-        "access": "None", 
+        "type": null, 
         "default": null
       }, 
       {
-        "type": null, 
+        "access": "None", 
         "name": "power_lines", 
         "description": "A list of all power lines within the dragonfly OpenDSS standards\nlibrary (filtered by keywords_ if they are input).", 
-        "access": "None", 
+        "type": null, 
         "default": null
       }, 
       {
-        "type": null, 
+        "access": "None", 
         "name": "wires", 
         "description": "A list of all wires within the dragonfly OpenDSS standards\nlibrary (filtered by keywords_ if they are input).", 
-        "access": "None", 
+        "type": null, 
         "default": null
       }
     ]
   ], 
-  "code": "\ntry:  # import the honeybee-core dependencies\n    from honeybee.search import filter_array_by_keywords\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the honeybee-energy dependencies\n    from dragonfly_energy.opendss.lib.transformers import TRANSFORMER_PROPERTIES\n    from dragonfly_energy.opendss.lib.powerlines import POWER_LINES\n    from dragonfly_energy.opendss.lib.wires import WIRES\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nif len(keywords_) == 0:\n    transformers = sorted(TRANSFORMER_PROPERTIES)\n    power_lines = sorted(POWER_LINES)\n    wires = sorted(WIRES)\nelse:\n    split_words = True if join_words_ is None else not join_words_\n    transformers = sorted(filter_array_by_keywords(TRANSFORMER_PROPERTIES, keywords_, split_words))\n    power_lines = sorted(filter_array_by_keywords(POWER_LINES, keywords_, split_words))\n    wires = sorted(filter_array_by_keywords(WIRES, keywords_, split_words))\n", 
-  "name": "DF Search OpenDSS", 
-  "version": "1.7.1", 
-  "category": "Dragonfly", 
-  "subcategory": "3 :: Energy", 
-  "nickname": "SearchOpenDSS", 
   "inputs": [
     {
-      "type": "string", 
+      "access": "list", 
       "name": "keywords_", 
       "description": "Optional keywords to be used to narrow down the output list of\nobjects. If nothing is input here, all available objects\nwill be output.", 
-      "access": "list", 
+      "type": "string", 
       "default": null
     }, 
     {
-      "type": "bool", 
+      "access": "item", 
       "name": "join_words_", 
       "description": "If False or None, this component will automatically split\nany strings of multiple keywords (spearated by spaces) into separate\nkeywords for searching. This results in a greater liklihood of\nfinding an item in the search but it may not be appropropriate for\nall cases. You may want to set it to True when you are searching for\na specific phrase that includes spaces. (Default: False).", 
-      "access": "item", 
+      "type": "bool", 
       "default": null
     }
-  ]
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\ntry:  # import the honeybee-core dependencies\n    from honeybee.search import filter_array_by_keywords\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the honeybee-energy dependencies\n    from dragonfly_energy.opendss.lib.transformers import TRANSFORMER_PROPERTIES\n    from dragonfly_energy.opendss.lib.powerlines import POWER_LINES\n    from dragonfly_energy.opendss.lib.wires import WIRES\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nif len(keywords_) == 0:\n    transformers = sorted(TRANSFORMER_PROPERTIES)\n    power_lines = sorted(POWER_LINES)\n    wires = sorted(WIRES)\nelse:\n    split_words = True if join_words_ is None else not join_words_\n    transformers = sorted(filter_array_by_keywords(TRANSFORMER_PROPERTIES, keywords_, split_words))\n    power_lines = sorted(filter_array_by_keywords(POWER_LINES, keywords_, split_words))\n    wires = sorted(filter_array_by_keywords(WIRES, keywords_, split_words))\n", 
+  "category": "Dragonfly", 
+  "name": "DF Search OpenDSS", 
+  "description": "Search for available TransformerProperties, PowerLines, and Wires within the\ndragonfly OpenDSS standards library (aka. the URBANopt extended cataolog).\n-"
 }

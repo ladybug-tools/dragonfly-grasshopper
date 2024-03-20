@@ -1,7 +1,7 @@
 # Honeybee: A Plugin for Environmental Analysis (GPL)
 # This file is part of Honeybee.
 #
-# Copyright (c) 2023, Ladybug Tools.
+# Copyright (c) 2024, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Honeybee; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -36,7 +36,7 @@ different Transformers and ElectricalConnectors.
 
 ghenv.Component.Name = 'DF Color Network Attributes'
 ghenv.Component.NickName = 'ColorNetAttr'
-ghenv.Component.Message = '1.7.0'
+ghenv.Component.Message = '1.8.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'

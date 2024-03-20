@@ -1,85 +1,85 @@
 {
-  "description": "Customize the financial settings of a REopt analysis.\n-", 
+  "version": "1.8.0", 
+  "nickname": "FinancialPar", 
   "outputs": [
     [
       {
-        "type": null, 
+        "access": "None", 
         "name": "financial_par", 
         "description": "A REoptParameter object that can be plugged into the 'DF\nRun REopt' component.", 
-        "access": "None", 
+        "type": null, 
         "default": null
       }
     ]
   ], 
-  "code": "\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.reopt import REoptParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nfinancial_par = REoptParameter()\n\nif _years_ is not None:\n    financial_par.financial_parameter.analysis_years = _years_\nif _escalation_ is not None:\n    financial_par.financial_parameter.escalation_rate = _escalation_\nif _tax_ is not None:\n    financial_par.financial_parameter.tax_rate = _tax_\nif _discount_ is not None:\n    financial_par.financial_parameter.discount_rate = _discount_\nif _wind_cost_ is not None:\n    financial_par.wind_parameter.dollars_per_kw = _wind_cost_\nif _pv_cost_ is not None:\n    financial_par.pv_parameter.dollars_per_kw = _pv_cost_\nif _pv_grnd_cost_ is not None:\n    financial_par.pv_parameter.dollars_per_kw_ground = _pv_grnd_cost_\nif _storage_cost_ is not None:\n    financial_par.storage_parameter.dollars_per_kw = _storage_cost_\nif _gener_cost_ is not None:\n    financial_par.generator_parameter.dollars_per_kw = _gener_cost_\n", 
-  "name": "DF REopt Financial Parameters", 
-  "version": "1.7.1", 
-  "category": "Dragonfly", 
-  "subcategory": "3 :: Energy", 
-  "nickname": "FinancialPar", 
   "inputs": [
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_years_", 
       "description": "An integer for the number of years over which cost will\nbe optimized. (Default: 25).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_escalation_", 
       "description": "A number between 0 and 1 for the escalation rate over\nthe analysis. (Default: 0.023).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_tax_", 
       "description": "A number between 0 and 1 for the rate at which the owner/host\nof the system is taxed. (Default: 0.26).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_discount_", 
       "description": "A number between 0 and 1 for the discount rate for the\nowner/host of the system. (Default: 0.083).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_wind_cost_", 
       "description": "A number for the installation cost of wind power in US dollars\nper kW. (Default: 3013).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_pv_cost_", 
       "description": "A number for the installation cost of photovoltaic power in US\ndollars per kW. (Default: 1600).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_pv_grnd_cost_", 
       "description": "A number for the installation cost of photovoltaic power in US\ndollars per kW. (Default: 2200).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_storage_cost_", 
       "description": "A number for the installation cost of power storage in US\ndollars per kW. (Default: 840).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }, 
     {
-      "type": "double", 
+      "access": "item", 
       "name": "_gener_cost_", 
       "description": "A number for the installation cost of generators in US dollars\nper kW. (Default: 500).", 
-      "access": "item", 
+      "type": "double", 
       "default": null
     }
-  ]
+  ], 
+  "subcategory": "3 :: Energy", 
+  "code": "\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.reopt import REoptParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nfinancial_par = REoptParameter()\n\nif _years_ is not None:\n    financial_par.financial_parameter.analysis_years = _years_\nif _escalation_ is not None:\n    financial_par.financial_parameter.escalation_rate = _escalation_\nif _tax_ is not None:\n    financial_par.financial_parameter.tax_rate = _tax_\nif _discount_ is not None:\n    financial_par.financial_parameter.discount_rate = _discount_\nif _wind_cost_ is not None:\n    financial_par.wind_parameter.dollars_per_kw = _wind_cost_\nif _pv_cost_ is not None:\n    financial_par.pv_parameter.dollars_per_kw = _pv_cost_\nif _pv_grnd_cost_ is not None:\n    financial_par.pv_parameter.dollars_per_kw_ground = _pv_grnd_cost_\nif _storage_cost_ is not None:\n    financial_par.storage_parameter.dollars_per_kw = _storage_cost_\nif _gener_cost_ is not None:\n    financial_par.generator_parameter.dollars_per_kw = _gener_cost_\n", 
+  "category": "Dragonfly", 
+  "name": "DF REopt Financial Parameters", 
+  "description": "Customize the financial settings of a REopt analysis.\n-"
 }

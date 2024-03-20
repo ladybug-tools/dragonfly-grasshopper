@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2023, Ladybug Tools.
+# Copyright (c) 2024, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -41,7 +41,7 @@ layer in an Urban Weather Genrator (UWG) simulation.
 
 ghenv.Component.Name = "DF Boundary Layer Parameters"
 ghenv.Component.NickName = 'BoundaryLayer'
-ghenv.Component.Message = '1.7.1'
+ghenv.Component.Message = '1.8.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
