@@ -23,7 +23,7 @@ represented by multipliers
 
 ghenv.Component.Name = 'DF Visualize All'
 ghenv.Component.NickName = 'VizAll'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -58,6 +58,14 @@ def room_2d_geometry(room_2ds):
     return room_geo
 
 
+def room_3d_geometry(room_3ds):
+    """Get Rhino geometry from a list of 3D Rooms."""
+    room_geo = []
+    for room in room_3ds:
+        room_geo.append(from_polyface3d(room.geometry))
+    return room_geo
+
+
 def context_shade_geometry(context_shades):
     """Get Rhino geometry from a list of ContextShades."""
     return [from_face3d(fc) for shd_geo in context_shades for fc in shd_geo.geometry]
@@ -74,9 +82,11 @@ if all_required_inputs(ghenv.Component):
             for bldg in df_obj.buildings:
                 rooms.extend(bldg.all_room_2ds())
             geo.extend(room_2d_geometry(rooms))
+            geo.extend(room_3d_geometry(df_obj.room_3ds))
             geo.extend(context_shade_geometry(df_obj.context_shades))
         elif isinstance(df_obj, Building):
             geo.extend(room_2d_geometry(df_obj.all_room_2ds()))
+            geo.extend(room_3d_geometry(df_obj.room_3ds))
         elif isinstance(df_obj, Story):
             geo.extend(room_2d_geometry(df_obj.room_2ds))
         elif isinstance(df_obj, Room2D):

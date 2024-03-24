@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "FromHoneybee", 
   "outputs": [
     [
@@ -22,6 +22,13 @@
     }, 
     {
       "access": "item", 
+      "name": "all_3d_to_2d_", 
+      "description": "Boolean to note whether 3D Rooms should be converted\ninto the Room2D format even when this means some loss or\nsimplification of geometry (True). If False (the default), only\nthe Honeybee Rooms that meet the criteria for translation to\nRoom2D without loss of geometry will be converted and the other\n3D Rooms that don't meet this criteria will be stored under the\nDragonfly Building.room_3ds property in their original Honeybee\nformat. (Default: False).", 
+      "type": "bool", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
       "name": "incl_shades_", 
       "description": "Boolean to note whether orphaned shades should be included\nas dragonfly ContextShades. (Default: False).", 
       "type": "bool", 
@@ -36,7 +43,7 @@
     }
   ], 
   "subcategory": "2 :: Serialize", 
-  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the core ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _load:\n    if incl_shades_:\n        df_model = Model.from_honeybee(_hb_models[0])\n        for h_model in _hb_models[1:]:\n            df_model.add_model(Model.from_honeybee(h_model))\n    else:\n        bldgs = [Building.from_honeybee(h_model) for h_model in _hb_models]\n        base = _hb_models[0]\n        df_model = Model(\n            base.identifier, bldgs, units=base.units, tolerance=base.tolerance,\n            angle_tolerance=base.angle_tolerance)\n", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the core ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _load:\n    method = 'AllRoom2D' if all_3d_to_2d_ else 'ExtrudedOnly'\n    if incl_shades_:\n        df_model = Model.from_honeybee(_hb_models[0], conversion_method=method)\n        for h_model in _hb_models[1:]:\n            df_model.add_model(Model.from_honeybee(h_model, conversion_method=method))\n    else:\n        bldgs = [Building.from_honeybee(h_model, conversion_method=method)\n                 for h_model in _hb_models]\n        base = _hb_models[0]\n        df_model = Model(\n            base.identifier, bldgs, units=base.units, tolerance=base.tolerance,\n            angle_tolerance=base.angle_tolerance)\n", 
   "category": "Dragonfly", 
   "name": "DF Model From Honeybee", 
   "description": "Create a Dragonfly Model from a Honeybee Model.\n-"
