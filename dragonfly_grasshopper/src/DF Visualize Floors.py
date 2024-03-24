@@ -23,7 +23,7 @@ including all stories represented by multipliers
 
 ghenv.Component.Name = 'DF Visualize Floors'
 ghenv.Component.NickName = 'VizFloors'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -37,6 +37,11 @@ try:  # import the core dragonfly dependencies
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
+try:  # import the core honeybee dependencies
+    from honeybee.facetype import Floor
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+
 try:  # import the ladybug_rhino dependencies
     from ladybug_rhino.fromgeometry import from_face3d
     from ladybug_rhino.grasshopper import all_required_inputs
@@ -47,6 +52,16 @@ except ImportError as e:
 def room_2d_geometry(room_2ds):
     """Get Rhino geometry from a list of Room2Ds."""
     return [from_face3d(room.floor_geometry) for room in room_2ds]
+
+
+def room_3d_geometry(room_3ds):
+    """Get Rhino geometry from a list of 3D Rooms."""
+    room_geo = []
+    for room in room_3ds:
+        for face in room.faces:
+            if isinstance(face.type, Floor):
+                room_geo.append(from_face3d(face.geometry))
+    return room_geo
 
 
 def context_shade_geometry(context_shades):
@@ -66,9 +81,11 @@ if all_required_inputs(ghenv.Component):
             for bldg in df_obj.buildings:
                 rooms.extend(bldg.all_room_2ds())
             geo.extend(room_2d_geometry(rooms))
+            geo.extend(room_3d_geometry(df_obj.room_3ds))
             geo.extend(context_shade_geometry(df_obj.context_shades))
         elif isinstance(df_obj, Building):
             geo.extend(room_2d_geometry(df_obj.all_room_2ds()))
+            geo.extend(room_3d_geometry(df_obj.room_3ds))
         elif isinstance(df_obj, Story):
             geo.extend(room_2d_geometry(df_obj.room_2ds))
         elif isinstance(df_obj, Room2D):
