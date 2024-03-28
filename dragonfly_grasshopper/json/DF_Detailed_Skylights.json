@@ -1,0 +1,36 @@
+{
+  "version": "1.8.0", 
+  "nickname": "DetailedSkylights", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "df_objs", 
+        "description": "The input dragonfly objects with the input _windows added to it.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "list", 
+      "name": "_df_objs", 
+      "description": "A Dragonfly Model, Building, Story or Room2D, to which the _windows\nshould be added.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "list", 
+      "name": "_skylights", 
+      "description": "A list of Breps that will be added to the input _df_objs as\ndetailed skylights.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the ladybug_geometry dependencies\n    from ladybug_geometry.geometry2d import Point2D, Polygon2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.skylightparameter import DetailedSkylights\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\n    from ladybug_{{cad}}.config import tolerance, angle_tolerance\n    from ladybug_{{cad}}.togeometry import to_face3d\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects and convert skylights to Face3D\n    df_objs = [obj.duplicate() for obj in _df_objs]\n    sky_faces = [f for geo in _skylights for f in to_face3d(geo)]\n    sky_polys = [Polygon2D((Point2D(pt.x, pt.y) for pt in f.boundary)) for f in sky_faces]\n\n    # collect all of the Room2Ds in the connected dragonfly objects\n    room_2ds = []\n    for df_obj in df_objs:\n        if isinstance(df_obj, Model):\n            room_2ds.extend(df_obj.room_2ds)\n        elif isinstance(df_obj, Building):\n            room_2ds.extend(df_obj.unique_room_2ds)\n        elif isinstance(df_obj, Story):\n            room_2ds.extend(df_obj.room_2ds)\n        elif isinstance(df_obj, Room2D):\n            room_2ds.append(df_obj)\n\n    # assign the relevant geometries to the Room2Ds\n    for room in room_2ds:\n        if room.is_top_exposed:\n            room_bound = room.floor_geometry.boundary_polygon2d\n            hole_polys = room.floor_geometry.hole_polygon2d\n            geo_to_add = []\n            for geo in sky_polys:\n                if room_bound.is_polygon_inside(geo):\n                    if not hole_polys:\n                        geo_to_add.append(geo)\n                    elif all(hp.is_polygon_outside(geo)):\n                            geo_to_add.append(geo)\n            if len(geo_to_add) != 0:\n                det_sky = DetailedSkylights(geo_to_add)\n                room.skylight_parameters = det_sky\n", 
+  "category": "Dragonfly", 
+  "name": "DF Detailed Skylights", 
+  "description": "Add detailed skylight geometries to Dragonfly Room2Ds.\n-"
+}
