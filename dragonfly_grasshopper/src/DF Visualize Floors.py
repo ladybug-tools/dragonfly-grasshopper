@@ -15,7 +15,7 @@ including all stories represented by multipliers
     Args:
         _df_objs: A Dragonfly Model, Building, Story, Room2D, or ContextShade to
             be previewed as a list of floor plates in the Rhino scene.
-    
+
     Returns:
         geo: The Rhino version of the Dragonfly geometry object, which will be
             visible in the Rhino scene.
@@ -23,10 +23,15 @@ including all stories represented by multipliers
 
 ghenv.Component.Name = 'DF Visualize Floors'
 ghenv.Component.NickName = 'VizFloors'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
+
+try:  # import the ladybug_geometry dependencies
+    from ladybug_geometry.geometry3d import Face3D
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_geometry:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
     from dragonfly.model import Model
@@ -43,7 +48,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.fromgeometry import from_face3d
+    from ladybug_rhino.fromgeometry import from_face3d, from_mesh3d
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -66,8 +71,12 @@ def room_3d_geometry(room_3ds):
 
 def context_shade_geometry(context_shades):
     """Get Rhino geometry from a list of ContextShades."""
-    return [from_face3d(fc) for shd_geo in context_shades
-            for fc in shd_geo.geometry]
+    shds = []
+    for shd_geo in context_shades:
+        for fc in shd_geo.geometry:
+            go = from_face3d(fc) if isinstance(fc, Face3D) else from_mesh3d(fc)
+            shds.append(go)
+    return shds
 
 
 if all_required_inputs(ghenv.Component):
