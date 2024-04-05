@@ -39,7 +39,7 @@ Create Dragonfly ContextShade.
 
 ghenv.Component.Name = 'DF ContextShade'
 ghenv.Component.NickName = 'Context'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '7'
@@ -55,7 +55,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.togeometry import to_face3d
+    from ladybug_rhino.togeometry import to_face3d, to_mesh3d
     from ladybug_rhino.grasshopper import all_required_inputs, longest_list, \
         document_counter
 except ImportError as e:
@@ -72,6 +72,14 @@ except ImportError as e:
         raise ValueError('ep_trans_sch_ has been specified but honeybee-energy '
                          'has failed to import.\n{}'.format(e))
 
+# define special meshing parameters that are better for shades
+try:  # use try/except so that the code is still usable without RhinoCommon
+    import Rhino.Geometry.Mesh as rhm
+    import Rhino.Geometry.MeshingParameters as mp
+    meshing_parameters = mp.FastRenderMesh
+except ImportError:
+    rhm, meshing_parameters = None, None
+
 
 if all_required_inputs(ghenv.Component):
     context = []  # list of context shades that will be returned
@@ -85,7 +93,9 @@ if all_required_inputs(ghenv.Component):
         name = clean_and_id_string(display_name)
 
         # create the ContextShade object
-        df_shd = ContextShade(name, to_face3d(geo))
+        lb_geo = [to_mesh3d(geo)] if isinstance(geo, rhm) else \
+            to_face3d(geo, meshing_parameters)
+        df_shd = ContextShade(name, lb_geo)
         df_shd.display_name = display_name
 
         # try to assign the energyplus construction
