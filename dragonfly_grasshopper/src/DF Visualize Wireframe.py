@@ -15,7 +15,7 @@ scene, including all stories represented by multipliers
     Args:
         _df_objs: A Dragonfly Model, Building, Story, Room2D, or ContextShade to
             be previewed as a wire frame in the Rhino scene.
-    
+
     Returns:
         geo: The Rhino version of the Dragonfly geometry object, which will be
             visible in the Rhino scene.
@@ -23,10 +23,15 @@ scene, including all stories represented by multipliers
 
 ghenv.Component.Name = 'DF Visualize Wireframe'
 ghenv.Component.NickName = 'VizWireF'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
+
+try:  # import the ladybug_geometry dependencies
+    from ladybug_geometry.geometry3d import Face3D
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_geometry:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
     from dragonfly.model import Model
@@ -43,7 +48,8 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.fromgeometry import from_face3d_to_wireframe
+    from ladybug_rhino.fromgeometry import from_face3d_to_wireframe, \
+        from_mesh3d_to_wireframe
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -66,11 +72,14 @@ def room_3d_geometry(room_3ds):
 
 
 def context_shade_geometry(context_shades):
-    """Get Rhino geometry curves from a list of ContextShades."""
-    
-    faces =  [face for shd_geo in context_shades
-            for face in shd_geo.geometry]
-    return [curve for face in faces for curve in from_face3d_to_wireframe(face)]
+    """Get Rhino geometry from a list of ContextShades."""
+    shds = []
+    for shd_geo in context_shades:
+        for fc in shd_geo.geometry:
+            go = from_face3d_to_wireframe(fc) if isinstance(fc, Face3D) else \
+                from_mesh3d_to_wireframe(fc)
+            shds.extend(go)
+    return shds
 
 
 if all_required_inputs(ghenv.Component):
