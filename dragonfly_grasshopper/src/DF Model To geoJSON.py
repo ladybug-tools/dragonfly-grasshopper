@@ -82,7 +82,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -97,15 +97,8 @@ except ImportError as e:
 
 try:  # import the ladybug dependencies
     from ladybug.location import Location
-    from ladybug.futil import nukedir
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
-
-try:  # import the ladybug dependencies
-    from honeybee.config import folders
-    from honeybee.typing import clean_and_id_string
-except ImportError as e:
-    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
     from dragonfly.model import Model
