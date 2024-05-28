@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "WriteEPW", 
   "outputs": [
     [
@@ -42,7 +42,7 @@
       "default": null
     }
   ], 
-  "subcategory": "4 :: AlternativeWeather", 
+  "subcategory": "6 :: AlternativeWeather", 
   "code": "\nimport os\n\ntry:\n    from ladybug.config import folders\n    from ladybug.epw import EPW\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    assert isinstance(_epw_obj, EPW), '_epw_obj must be an EPW object from the ' \\\n        'Create EPW component. Got {}.'.format(type(_epw_obj))\n    \n    # write out the epw object\n    _folder_ = folders.default_epw_folder if _folder_ is None else _folder_\n    _file_name_ = _epw_obj.location.city if _file_name_ is None else _file_name_\n    if not _file_name_.endswith('.epw'):\n        _file_name_ = _file_name_ + '.epw'\n    epw_file = os.path.join(_folder_, _file_name_)\n    _epw_obj.save(epw_file)", 
   "category": "Dragonfly", 
   "name": "DF Write EPW", 

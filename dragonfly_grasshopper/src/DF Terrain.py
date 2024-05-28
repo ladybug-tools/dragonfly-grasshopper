@@ -37,9 +37,9 @@ the urban area.
 
 ghenv.Component.Name = 'DF Terrain'
 ghenv.Component.NickName = 'Terrain'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '4 :: AlternativeWeather'
+ghenv.Component.SubCategory = '6 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
 try:  # import the dragonfly_uwg dependencies

@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "WriteDDY", 
   "outputs": [
     [
@@ -49,7 +49,7 @@
       "default": null
     }
   ], 
-  "subcategory": "4 :: AlternativeWeather", 
+  "subcategory": "6 :: AlternativeWeather", 
   "code": "\nimport os\n\ntry:\n    from ladybug.config import folders\n    from ladybug.ddy import DDY\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # default folder and file name\n    _folder_ = folders.default_epw_folder if _folder_ is None else _folder_\n    if _name_ is None:\n        _name_ = 'unnamed.ddy'\n    if not _name_.lower().endswith('.ddy'):\n        _name_ = _name_ + '.ddy'\n    ddy_file = os.path.join(_folder_, _name_)\n\n    # write the DDY file\n    ddy_obj = DDY(_location, _design_days)\n    ddy_obj.save(ddy_file)", 
   "category": "Dragonfly", 
   "name": "DF Write DDY", 

@@ -38,10 +38,10 @@ Customize the financial settings of a REopt analysis.
 
 ghenv.Component.Name = 'DF REopt Financial Parameters'
 ghenv.Component.NickName = 'FinancialPar'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
-ghenv.Component.AdditionalHelpFromDocStrings = '0'
+ghenv.Component.AdditionalHelpFromDocStrings = '4'
 
 try:  # import the dragonfly_energy dependencies
     from dragonfly_energy.reopt import REoptParameter

@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "SearchOpenDSS", 
   "outputs": [
     [
@@ -42,7 +42,7 @@
       "default": null
     }
   ], 
-  "subcategory": "3 :: Energy", 
+  "subcategory": "4 :: Electric Grid", 
   "code": "\ntry:  # import the honeybee-core dependencies\n    from honeybee.search import filter_array_by_keywords\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the honeybee-energy dependencies\n    from dragonfly_energy.opendss.lib.transformers import TRANSFORMER_PROPERTIES\n    from dragonfly_energy.opendss.lib.powerlines import POWER_LINES\n    from dragonfly_energy.opendss.lib.wires import WIRES\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nif len(keywords_) == 0:\n    transformers = sorted(TRANSFORMER_PROPERTIES)\n    power_lines = sorted(POWER_LINES)\n    wires = sorted(WIRES)\nelse:\n    split_words = True if join_words_ is None else not join_words_\n    transformers = sorted(filter_array_by_keywords(TRANSFORMER_PROPERTIES, keywords_, split_words))\n    power_lines = sorted(filter_array_by_keywords(POWER_LINES, keywords_, split_words))\n    wires = sorted(filter_array_by_keywords(WIRES, keywords_, split_words))\n", 
   "category": "Dragonfly", 
   "name": "DF Search OpenDSS", 

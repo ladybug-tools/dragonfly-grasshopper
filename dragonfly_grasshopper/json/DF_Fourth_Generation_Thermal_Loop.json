@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "Gen4Loop", 
   "outputs": [
     [
@@ -35,7 +35,7 @@
       "default": null
     }
   ], 
-  "subcategory": "3 :: Energy", 
+  "subcategory": "5 :: District Thermal", 
   "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.loop import FourthGenThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\n# set defaults\nname = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\ncwt = 6 if _chilled_temp_ is None else _chilled_temp_\nhwt = 54 if _hot_temp_ is None else _hot_temp_\n\n# create the loop\ndes_loop = FourthGenThermalLoop(name, cwt, hwt)\nif _name_ is not None:\n    des_loop.display_name = _name_\n", 
   "category": "Dragonfly", 
   "name": "DF Fourth Generation Thermal Loop", 

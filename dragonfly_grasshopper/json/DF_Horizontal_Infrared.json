@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "HorizInfr", 
   "outputs": [
     [
@@ -35,7 +35,7 @@
       "default": null
     }
   ], 
-  "subcategory": "4 :: AlternativeWeather", 
+  "subcategory": "6 :: AlternativeWeather", 
   "code": "\ntry:\n    from ladybug.skymodel import calc_horizontal_infrared\n    from ladybug.datacollection import HourlyContinuousCollection\n    from ladybug.datatype.energyflux import HorizontalInfraredRadiationIntensity\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    horiz_infrared = HourlyContinuousCollection.compute_function_aligned(\n        calc_horizontal_infrared, [_sky_cover, _dry_bulb, _dew_point],\n        HorizontalInfraredRadiationIntensity(), 'W/m2')\n", 
   "category": "Dragonfly", 
   "name": "DF Horizontal Infrared", 

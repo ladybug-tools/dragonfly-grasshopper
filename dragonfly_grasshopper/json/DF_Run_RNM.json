@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "RunRNM", 
   "outputs": [
     [
@@ -63,7 +63,7 @@
       "default": null
     }
   ], 
-  "subcategory": "3 :: Energy", 
+  "subcategory": "4 :: Electric Grid", 
   "code": "\nimport os\n\ntry:\n    from ladybug.config import folders as lb_folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:\n    from honeybee.config import folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.run import run_default_report, run_rnm\n    from dragonfly_energy.opendss.network import ElectricalNetwork\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\n    from ladybug_{{cad}}.config import units_system\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # set default values\n    ug_ratio = 0.9 if _ug_ratio_ is None else _ug_ratio_\n    lv_only = True if include_hv_ is None else not include_hv_\n    nodes_per_bldg = 1 if nodes_per_bldg_ is None else nodes_per_bldg_\n\n    # generate the default scenario report\n    def_report = os.path.join(os.path.dirname(_geojson), 'run',\n                              'honeybee_scenario', 'default_scenario_report.csv')\n    if not os.path.isfile(def_report):\n        run_default_report(_geojson, _scenario)\n\n    # execute the simulation with URBANopt CLI\n    results = run_rnm(_geojson, _scenario, ug_ratio, lv_only, nodes_per_bldg)\n\n    # add the kVA to the output GeoJSON file\n    if results is not None:\n        dss_results = os.path.join(results, 'OpenDSS')\n        geo_file = os.path.join(results, 'GeoJSON', 'Distribution_system.json')\n        network = ElectricalNetwork.from_rnm_geojson(geo_file, units=units_system())\n", 
   "category": "Dragonfly", 
   "name": "DF Run RNM", 

@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "RefEPWPar", 
   "outputs": [
     [
@@ -42,7 +42,7 @@
       "default": null
     }
   ], 
-  "subcategory": "4 :: AlternativeWeather", 
+  "subcategory": "6 :: AlternativeWeather", 
   "code": "\ntry:  # import the dragonfly_uwg dependencies\n    from dragonfly_uwg.simulation.refsite import ReferenceEPWSite\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_uwg:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\n# process default values\n_obstacle_hght_ = _obstacle_hght_ if _obstacle_hght_ is not None else 0.1\n_veg_cover_ = _veg_cover_ if _veg_cover_ is not None else 0.9\n_temp_hght_ = _temp_hght_ if _temp_hght_ is not None else 10\n_wind_hght_ = _wind_hght_ if _wind_hght_ is not None else 10\n\n# create the traffic parameters\nepw_site = ReferenceEPWSite(\n    _obstacle_hght_, _veg_cover_, _temp_hght_, _wind_hght_)\n", 
   "category": "Dragonfly", 
   "name": "DF Reference EPW Parameters", 

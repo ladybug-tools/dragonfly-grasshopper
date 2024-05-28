@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "Transformer", 
   "outputs": [
     [
@@ -35,7 +35,7 @@
       "default": null
     }
   ], 
-  "subcategory": "3 :: Energy", 
+  "subcategory": "4 :: Electric Grid", 
   "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_and_id_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.opendss.lib.transformers import transformer_prop_by_identifier\n    from dragonfly_energy.opendss.transformer import Transformer\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:  # import ladybug-{{cad}}\n    from ladybug_{{cad}}.togeometry import to_polygon2d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, longest_list, \\\n        document_counter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    transformer = []  # list of transformers that will be returned\n    polygons = [to_polygon2d(geo) for geo in _geo]  # convert to lb geo\n    for i, geo in enumerate(polygons):\n        # get the name for the Transformer\n        if len(_name_) == 0:  # make a default Transformer name\n            display_name = 'Transformer_{}'.format(document_counter('transformer_count'))\n        else:\n            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1) \\\n                if len(_name_) != len(polygons) else longest_list(_name_, i)\n        name = clean_and_id_string(display_name)\n\n        # get the properties for the transformer\n        props = longest_list(_properties, i)\n        if isinstance(props, str):\n            props = transformer_prop_by_identifier(props)\n\n        # create the Transformer\n        trans = Transformer(name, geo, props)\n        trans.display_name = display_name\n        transformer.append(trans)\n", 
   "category": "Dragonfly", 
   "name": "DF Transformer", 

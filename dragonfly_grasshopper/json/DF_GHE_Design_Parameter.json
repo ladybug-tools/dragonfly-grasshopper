@@ -1,0 +1,50 @@
+{
+  "version": "1.8.0", 
+  "nickname": "GHEDesign", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "design", 
+        "description": "A GHEDesignParameter object that can be plugged into the \"DF GHE Designer\"\ncomponent in order to customize the criteria used to design a GHE.\nIt can also be plugged into the \"DF GHE Thermal Loop\" component to\nperform a similar role in a District Energy Simulation (DES) of a\nloop with a ground heat exchanger.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_flow_rate_", 
+      "description": "A number for the volumetric design flow rate through each borehole\nof the ground heat exchanger in L/s. (Default: 0.2 L/s).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_max_eft_", 
+      "description": "A number for the maximum heat pump entering fluid temperature\nin Celsius. (Default: 35C).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_min_eft_", 
+      "description": "A number for the minimum heat pump entering fluid temperature\nin Celsius. (Default: 5C).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_month_count_", 
+      "description": "An integer for the number of months over which the simulation\nwill be run in order to ensure stable ground temperature\nconditions. (Default: 240).", 
+      "type": "int", 
+      "default": null
+    }
+  ], 
+  "subcategory": "5 :: District Thermal", 
+  "code": "\ntry:\n    from dragonfly_energy.des.ghe import {{PLGN}}EDesignParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\n\nflow_rate = _flow_rate_ if _flow_rate_ is not None else 0.2\nmax_eft = _max_eft_ if _max_eft_ is not None else 35\nmin_eft = _min_eft_ if _min_eft_ is not None else 5\nmonth_count = _month_count_ if _month_count_ is not None else 240\n\n\ndesign = {{PLGN}}EDesignParameter(\n    flow_rate=flow_rate, max_eft=max_eft, min_eft=min_eft, month_count=month_count)\n", 
+  "category": "Dragonfly", 
+  "name": "DF GHE Design Parameter", 
+  "description": "Create a GHEDesignParameter object that can be used to customize the criteria used\nto design a Ground Heat Exchanger (GHE).\n_\nThe output of this component can be used with either the \"DF GHE Designer\"\ncomponent or the \"DF GHE Thermal Loop\" component.\n-"
+}
