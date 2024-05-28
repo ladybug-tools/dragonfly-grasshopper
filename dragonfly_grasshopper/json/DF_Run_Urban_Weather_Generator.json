@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "RunUWG", 
   "outputs": [
     [
@@ -63,7 +63,7 @@
       "default": null
     }
   ], 
-  "subcategory": "4 :: AlternativeWeather", 
+  "subcategory": "6 :: AlternativeWeather", 
   "code": "\nimport os\nimport json\n\ntry:  # import the core ladybug dependencies\n    from ladybug.config import folders as lb_folders\n    from ladybug.futil import preparedir\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly uwg dependencies\n    from dragonfly_uwg.simulation.parameter import UWGSimulationParameter\n    from dragonfly_uwg.run import run_uwg\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_uwg:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _write:\n    # create the UWGSimulationParameter or use the input\n    if _sim_par_ is not None:\n        assert isinstance(_sim_par_, UWGSimulationParameter), \\\n        'Expected UWG Simulation Parameters. Got {}.'.format(type(_sim_par_))\n    else:\n        _sim_par_ = UWGSimulationParameter()\n\n    if run_ is not None and run_ > 0:  # write and simulate the UWG JSON\n        silent = True if run_ > 1 else False\n        uwg_json, urban_epw = run_uwg(_model, _epw_file, _sim_par_, _folder_, silent)\n    else:  # only write the UWG JSON but don't run it\n        # get the directory into which the urban epw will be written\n        if _folder_ is None:\n            _folder_ = os.path.join(lb_folders.default_epw_folder, _model.identifier)\n        preparedir(_folder_, remove_content=False)\n        # write the model to a UWG dictionary\n        uwg_dict = _model.to.uwg(_model, _epw_file, _sim_par_)\n        uwg_json = os.path.join(_folder_, '{}_uwg.json'.format(_model.identifier))\n        with open(uwg_json, 'w') as fp:\n            json.dump(uwg_dict, fp, indent=4)\n", 
   "category": "Dragonfly", 
   "name": "DF Run Urban Weather Generator", 

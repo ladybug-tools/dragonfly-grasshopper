@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "ConstrDesignDay", 
   "outputs": [
     [
@@ -105,7 +105,7 @@
       "default": null
     }
   ], 
-  "subcategory": "4 :: AlternativeWeather", 
+  "subcategory": "6 :: AlternativeWeather", 
   "code": "\n\ntry:\n    from ladybug.designday import DesignDay\n    from ladybug.dt import Date, DateTime\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set defaults for relevant items\n    if _dry_bulb_range_ is None:\n        _dry_bulb_range_ = 0\n    if _barometric_p_ is None:\n        _barometric_p_ = 101325\n    \n    # process the input date\n    try:\n        date = Date.from_date_string(_date)\n    except ValueError:\n        date = DateTime.from_date_time_string(_date).date\n    \n    design_day = DesignDay.from_design_day_properties(\n        _name, _day_type, _location, date, _dry_bulb_max, _dry_bulb_range_,\n        _humidity_type, _humidity_value, _barometric_p_, _wind_speed, _wind_dir,\n        _sky_type, _sky_properties)", 
   "category": "Dragonfly", 
   "name": "DF Construct Design Day", 

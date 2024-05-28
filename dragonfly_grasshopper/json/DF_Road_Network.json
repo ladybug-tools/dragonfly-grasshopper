@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "Roads", 
   "outputs": [
     [
@@ -35,7 +35,7 @@
       "default": null
     }
   ], 
-  "subcategory": "3 :: Energy", 
+  "subcategory": "4 :: Electric Grid", 
   "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string, clean_and_id_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.opendss.road import Road\n    from dragonfly_energy.opendss.network import RoadNetwork\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_polyline2d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, \\\n        document_counter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\n\n    # create the roads\n    lines = []\n    for geo in _road_geo:\n        lines.append(to_polyline2d(geo))\n    roads = []\n    for i, geo in enumerate(lines):\n        # get the name for the Road\n        if _name_ is None:  # make a default Road name\n            display_name = 'Road_{}'.format(document_counter('road_count'))\n        else:\n            display_name = '{}_{}'.format(_name_, i + 1)\n        r_name = clean_and_id_string(display_name)\n        road = Road(r_name, geo)\n        road.display_name = display_name\n        roads.append(road)\n\n    # create the network\n    network = RoadNetwork(name, _substation, roads)\n    if _name_ is not None:\n        network.display_name = _name_\n", 
   "category": "Dragonfly", 
   "name": "DF Road Network", 

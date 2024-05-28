@@ -47,9 +47,9 @@ run correctly through OpenDSS.
 
 ghenv.Component.Name = 'DF Run OpenDSS'
 ghenv.Component.NickName = 'RunOpenDSS'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '3 :: Energy'
+ghenv.Component.SubCategory = '4 :: Electric Grid'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
 
 import os

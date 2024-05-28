@@ -1,0 +1,64 @@
+{
+  "version": "1.8.0", 
+  "nickname": "GHEBorehole", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "borehole", 
+        "description": "A BoreholeParameter object that can be plugged into the\n\"DF GHE Designer\" component in order to customize the properties\nof borehole min/max depth and borehole min/max spacing. It can\nalso be plugged into the \"DF GHE Thermal Loop\" component to\nperform a similar role in a District Energy Simulation (DES)\nof a loop with a ground heat exchanger.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_min_spacing_", 
+      "description": "A number in Rhino model units (eg. Meters, Feet, etc.) for the minimum\nspacing between boreholes. When the system demand cannot be met\nusing boreholes with the maximum spacing, the borehole spacing\nwill be reduced until either the loads or met or they reach\nthis minimum spacing. So this typically represents the spacing\nat which each borehole will interfere with neighboring ones so much\nthat it is not worthwhile to decrease the spacing further. (Default: 3 meters).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_max_spacing_", 
+      "description": "A number in Rhino model units (eg. Meters, Feet, etc.) for the maximum\nspacing between boreholes in meters. This will set the starting\nvalue for the spacing (Default: 25 meters).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_min_depth_", 
+      "description": "A number in Rhino model units (eg. Meters, Feet, etc.) for the\nminimum depth of the heat-exchanging part of the boreholes in meters.\nThis will set the starting value for the depth (Default: 60 meters).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_max_depth_", 
+      "description": "A number in Rhino model units (eg. Meters, Feet, etc.) for the\nmaximum depth of the heat-exchanging part of the boreholes in meters.\nWhen the system demand cannot be met using boreholes with the\nminimum depth, the boreholes will be extended until either the\nloads or met or they reach the maximum depth specified here. So this\ntypically represents the depth of bedrock or the point at which drilling\ndeeper ceases to be practical. (Default: 135 meters).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_buried_depth_", 
+      "description": "A number in Rhino model units (eg. Meters, Feet, etc.) for the\ndepth below the ground surface at which the top of the heat exchanging\npart of the borehole sits in meters. (Default: 2 meters).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_diameter_", 
+      "description": "A number for the diameter of the borehole in meters. (Default: 0.15 meters).", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "5 :: District Thermal", 
+  "code": "\ntry:\n    from dragonfly_energy.des.ghe import BoreholeParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nmin_depth = _min_depth_ * conversion_to_meters() if _min_depth_ is not None else 60\nmax_depth = _max_depth_ * conversion_to_meters() if _max_depth_ is not None else 135\nmin_spacing = _min_spacing_ * conversion_to_meters() if _min_spacing_ is not None else 3\nmax_spacing = _max_spacing_ * conversion_to_meters() if _max_spacing_ is not None else 25\nburied_depth = _buried_depth_ * conversion_to_meters() if _buried_depth_ is not None else 2\ndiameter = _diameter_ * conversion_to_meters() if _diameter_ is not None else 0.15\n\n\nborehole = BoreholeParameter(min_depth, max_depth, min_spacing, max_spacing,\n                             buried_depth, diameter)\n", 
+  "category": "Dragonfly", 
+  "name": "DF GHE Borehole Parameter", 
+  "description": "Create a BoreholeParameter object that can be used to customize the geometric\nconstraints governing the boreholes of a GHE sizing simulation.\n_\nThe output of this component can be used with either the \"DF GHE Designer\"\ncomponent or the \"DF GHE Thermal Loop\" component.\n-"
+}

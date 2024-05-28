@@ -27,9 +27,9 @@ Write an EPW object into a .epw file.
 
 ghenv.Component.Name = 'DF Write EPW'
 ghenv.Component.NickName = 'WriteEPW'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = "Dragonfly"
-ghenv.Component.SubCategory = '4 :: AlternativeWeather'
+ghenv.Component.SubCategory = '6 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
 import os

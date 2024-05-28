@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "ElecConnect", 
   "outputs": [
     [
@@ -35,7 +35,7 @@
       "default": null
     }
   ], 
-  "subcategory": "3 :: Energy", 
+  "subcategory": "4 :: Electric Grid", 
   "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_and_id_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.opendss.lib.powerlines import power_line_by_identifier\n    from dragonfly_energy.opendss.connector import ElectricalConnector\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:  # import ladybug-{{cad}}\n    from ladybug_{{cad}}.togeometry import to_polyline2d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, longest_list, \\\n        document_counter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # get the power line object used by the connector\n    if isinstance(_power_line, str):\n        _power_line = power_line_by_identifier(_power_line)\n\n    # convert {{cad}} geometry to ladybug geometry\n    lines = []\n    for geo in _geo:\n        lines.append(to_polyline2d(geo))\n\n    connector = []  # list of connectors that will be returned\n    for i, geo in enumerate(lines):\n        # get the name for the ElectricalConnector\n        if len(_name_) == 0:  # make a default ElectricalConnector name\n            display_name = 'ElectricalConnector_{}'.format(\n                document_counter('e_connector_count'))\n        else:\n            display_name = '{}_{}'.format(longest_list(_name_, i), i + 1) \\\n                if len(_name_) != len(lines) else longest_list(_name_, i)\n        name = clean_and_id_string(display_name)\n\n        # create the ElectricalConnector\n        conn = ElectricalConnector(name, geo, _power_line)\n        conn.display_name = display_name\n        connector.append(conn)\n", 
   "category": "Dragonfly", 
   "name": "DF Electrical Connector", 

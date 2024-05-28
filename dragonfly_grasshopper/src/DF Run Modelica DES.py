@@ -40,10 +40,10 @@ through Modelica DES simulation.
 
 ghenv.Component.Name = 'DF Run Modelica DES'
 ghenv.Component.NickName = 'RunDES'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '3 :: Energy'
-ghenv.Component.AdditionalHelpFromDocStrings = '0'
+ghenv.Component.SubCategory = '5 :: District Thermal'
+ghenv.Component.AdditionalHelpFromDocStrings = '1'
 
 import os
 import subprocess

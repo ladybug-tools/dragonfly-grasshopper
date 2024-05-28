@@ -38,9 +38,9 @@ Construct a design day from a set of parameters.
 
 ghenv.Component.Name = 'DF Construct Design Day'
 ghenv.Component.NickName = 'ConstrDesignDay'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '4 :: AlternativeWeather'
+ghenv.Component.SubCategory = '6 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
 

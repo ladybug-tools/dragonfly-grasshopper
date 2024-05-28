@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "ModelUWG", 
   "outputs": [
     [
@@ -49,7 +49,7 @@
       "default": null
     }
   ], 
-  "subcategory": "4 :: AlternativeWeather", 
+  "subcategory": "6 :: AlternativeWeather", 
   "code": "\ntry:  # import the dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # check and duplicate the input\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model. Got {}.'.format(type(_model))\n    model = _model.duplicate()\n\n    # assign any of the input properties\n    if _terrain_ is not None:\n        model.properties.uwg.terrain = _terrain_\n    if _traffic_ is not None:\n        model.properties.uwg.traffic = _traffic_\n    if tree_cover_ is not None:\n        model.properties.uwg.tree_coverage_fraction = tree_cover_\n    if grass_cover_ is not None:\n        model.properties.uwg.grass_coverage_fraction = grass_cover_\n\n    # print some useful information about the model\n    print('{} m - average height'.format(\n        round(model.average_height_above_ground, 1)))\n    print('{} - footprint density'.format(\n        round(model.properties.uwg.footprint_density, 2)))\n    print('{} - facade to site'.format(\n        round(model.properties.uwg.facade_to_site, 2)))\n    print('{} - tree cover'.format(\n        round(model.properties.uwg.tree_coverage_fraction, 2)))\n    print('{} - grass cover'.format(\n        round(model.properties.uwg.grass_coverage_fraction, 2)))\n", 
   "category": "Dragonfly", 
   "name": "DF Assign Model UWG Properties", 

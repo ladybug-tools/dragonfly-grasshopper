@@ -34,10 +34,10 @@ dragonfly OpenDSS standards library (aka. the URBANopt extended cataolog).
 
 ghenv.Component.Name = "DF Search OpenDSS"
 ghenv.Component.NickName = 'SearchOpenDSS'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '3 :: Energy'
-ghenv.Component.AdditionalHelpFromDocStrings = '5'
+ghenv.Component.SubCategory = '4 :: Electric Grid'
+ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
 try:  # import the honeybee-core dependencies
     from honeybee.search import filter_array_by_keywords

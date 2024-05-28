@@ -29,10 +29,10 @@ properties, which include the wires and their geometrical arrangement.
 
 ghenv.Component.Name = 'DF Electrical Connector'
 ghenv.Component.NickName = 'ElecConnect'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '3 :: Energy'
-ghenv.Component.AdditionalHelpFromDocStrings = '4'
+ghenv.Component.SubCategory = '4 :: Electric Grid'
+ghenv.Component.AdditionalHelpFromDocStrings = '3'
 
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_and_id_string

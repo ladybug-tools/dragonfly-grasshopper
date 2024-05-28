@@ -40,10 +40,10 @@ to connect these objects to Dragonfly Buildings.
 
 ghenv.Component.Name = 'DF Electrical Network'
 ghenv.Component.NickName = 'Network'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '3 :: Energy'
-ghenv.Component.AdditionalHelpFromDocStrings = '4'
+ghenv.Component.SubCategory = '4 :: Electric Grid'
+ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_ep_string

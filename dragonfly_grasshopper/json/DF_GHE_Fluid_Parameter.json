@@ -1,0 +1,43 @@
+{
+  "version": "1.8.0", 
+  "nickname": "GHEFluid", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "fluid", 
+        "description": "A FluidParameter object that can be plugged into the \"DF GHE Designer\"\ncomponent in order to customize fluid properties of a GHE sizing\nsimulation. It can also be plugged into the \"DF GHE Thermal Loop\"\ncomponent to perform a similar role in a District Energy Simulation\n(DES) of a loop with a ground heat exchanger.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_type_", 
+      "description": "Text to indicate the type of fluid circulating through a ground heat\nexchanger loop. Many ground heat exchangers use only water but\nother options may be used to prevent freezing in conditions\nwhere the ground is particularly cold. Choose from the options\nbelow. (Default: Water).\n_\n* Water\n* EthylAlcohol\n* EthyleneGlycol\n* MethylAlcohol\n* PropyleneGlycol", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_concentration_", 
+      "description": "A number between 0 and 60 for the concentration of the\nfluid_type in water in percent. Note that this variable has no effect\nwhen the fluid_type is Water. (Default: 35%).", 
+      "type": "double", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_temperature_", 
+      "description": "A number for the average design fluid temperature at peak\nconditions in Celsius. (Default: 20C).", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "5 :: District Thermal", 
+  "code": "\ntry:\n    from dragonfly_energy.des.ghe import FluidParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\n\nfluid_type = _type_ if _type_ is not None else 'Water'\nconcentration = _concentration_ if _concentration_ is not None else 35\ntemperature = _temperature_ if _temperature_ is not None else 20\n\n\nfluid = FluidParameter(fluid_type, concentration, temperature)\n", 
+  "category": "Dragonfly", 
+  "name": "DF GHE Fluid Parameter", 
+  "description": "Create a FluidParameter object that can be used to customize the fluid properties\nwithin a Ground Heat Exchanger (GHE) sizing simulation.\n_\nThe output of this component can be used with either the \"DF GHE Designer\"\ncomponent or the \"DF GHE Thermal Loop\" component.\n-"
+}
