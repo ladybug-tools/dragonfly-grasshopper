@@ -11,9 +11,19 @@
 Run a GHE Designer simulation to size a ground heat exchanger (GHE) and produce a
 G-function that can be used in EnergyPlus/IronBug simulations.
 _
-The GHE sizing requires a data collection of building loads, a site polygon where
-boreholes can be placed, and geometric constraints about the spacing and depth
-of the boreholes.
+The GHE sizing requires a data collection of hourly ground loads, a planar site
+geometry indicating where boreholes can be placed, and geometric constraints
+about the spacing and depth of the boreholes.
+_
+This component uses the GHEDesigner Python package to perform the GHE sizing
+calculation. GHEDesigner is similar in principle to tools like GLHEPRO but is
+currently limited to vertical borehole exchangers (it cannot model horizontal
+exchangers). Also, it requires the input of ground heat extraction/rejection loads.
+So it currently requires you to account for the COP of heat pumps as a manual
+pre-step before using building heating/cooling loads as an input.
+_
+More information on GHEDesigner can be found in the documentation here:
+https://ghedesigner.readthedocs.io/en/latest/background.html
 -
 
     Args:
@@ -76,7 +86,7 @@ of the boreholes.
 
 ghenv.Component.Name = 'DF GHE Designer'
 ghenv.Component.NickName = 'GHEDesigner'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
