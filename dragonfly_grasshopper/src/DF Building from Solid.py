@@ -55,13 +55,13 @@ Create Dragonfly Buildings from solid geometry (closed Rhino polysurfaces).
 
 ghenv.Component.Name = "DF Building from Solid"
 ghenv.Component.NickName = 'BuildingSolid'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "2"
 
 try:  # import the ladybug_geometry dependencies
-    from ladybug_geometry.geometry3d import Vector3D
+    from ladybug_geometry.geometry3d import Vector3D, Face3D
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_geometry:\n\t{}'.format(e))
 
@@ -140,6 +140,10 @@ if all_required_inputs(ghenv.Component) and _run:
                     fc3d = [f.move(m_vec) for f in fc3d]
                 story_faces.extend(fc3d)
             floor_faces.append(story_faces)
+        # rebuild Face3D since Rhino sometimes gives us a bad Face3D plane
+        if perim_offset_ != 0:
+            floor_faces = [[Face3D.from_array(f.to_array()) for f in flr]
+                           for flr in floor_faces]
         if intersect_fail:
             msg = 'Brep geometry with index {} failed to intersect and was removed ' \
                 'from the output.\nTry cleaning and rebuilding it.'.format(i)
