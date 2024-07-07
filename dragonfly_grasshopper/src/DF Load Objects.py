@@ -30,10 +30,12 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Load Objects'
 ghenv.Component.NickName = 'LoadObjects'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
+
+import io
 
 try:  # import the core dragonfly dependencies
     import dragonfly.dictutil as df_dict_util
@@ -143,8 +145,13 @@ def version_check(data):
 
 
 if all_required_inputs(ghenv.Component) and _load:
-    with open(_df_file) as json_file:
-        data = json.load(json_file)
+    with io.open(_df_file, encoding='utf-8') as inf:
+        first_char = inf.read(1)
+        second_char = inf.read(1)
+    with io.open(_df_file, encoding='utf-8') as inf:
+        if second_char == '{':
+            inf.read(1)
+        data = json.load(inf)
 
     version_check(data)  # try to check the version
     try:
