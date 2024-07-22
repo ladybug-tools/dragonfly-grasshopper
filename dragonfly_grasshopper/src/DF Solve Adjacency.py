@@ -46,7 +46,7 @@ Solve adjacencies between the Room2Ds of Dragonfly objects.
 
 ghenv.Component.Name = "DF Solve Adjacency"
 ghenv.Component.NickName = 'SolveAdj2D'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "4"
@@ -79,9 +79,10 @@ def room2d_solve_adj(adj_room2ds):
         for wp in adj_info:
             wp[0][0].set_adjacency(wp[1][0], wp[0][1], wp[1][1])
     else:  # remove colinear vertices, intersect and solve
+        clean_rooms = []
         for room in adj_room2ds:
-            room.remove_colinear_vertices(tolerance)
-        adj_room2ds = Room2D.intersect_adjacency(adj_room2ds, tolerance)
+            clean_rooms.append(room.remove_colinear_vertices(tolerance))
+        adj_room2ds = Room2D.intersect_adjacency(clean_rooms, tolerance)
         adj_info = Room2D.solve_adjacency(adj_room2ds, tolerance)
 
     # set adiabatic boundary conditions if requested
