@@ -18,9 +18,12 @@ Load, ProgramType, or Simulation object.
 -
 
     Args:
-        _df_file: A file path to a dragonfly JSON from which objects will be loaded
-            back into Grasshopper. The objects in the file must be non-abridged
-            in order to be loaded back correctly.
+        _df_file: A file path to a dragonfly JSON (or DFJSON representing a full dragonfly
+            Model) from which objects will be loaded into Grasshopper. This can
+            also be the path to a Pollination Model Format (.POMF) file from which
+            a dragonfly Model will be loaded. Note that, if the objects in the JSON
+            are not a full model, they must be non-abridged in order to be
+            loaded correctly.
         _load: Set to "True to load the objects from the _df_file.
     
     Returns:
@@ -30,12 +33,16 @@ Load, ProgramType, or Simulation object.
 
 ghenv.Component.Name = 'DF Load Objects'
 ghenv.Component.NickName = 'LoadObjects'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
 
+import os
 import io
+import zipfile
+import tempfile
+import uuid
 
 try:  # import the core dragonfly dependencies
     import dragonfly.dictutil as df_dict_util
@@ -60,6 +67,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee_radiance:\n\t{}'.format(e))
 
 try:  # import the core ladybug_rhino dependencies
+    from ladybug.futil import unzip_file
     from ladybug_rhino.grasshopper import all_required_inputs, give_warning
     from ladybug_rhino.config import units_system, tolerance
 except ImportError as e:
@@ -145,6 +153,16 @@ def version_check(data):
 
 
 if all_required_inputs(ghenv.Component) and _load:
+    # first, check whether the file is a Pollination Model Format (.POMF) file
+    if zipfile.is_zipfile(_df_file):
+        folder_name = str(uuid.uuid4())[:6]
+        temp_dir = tempfile.gettempdir()
+        folder_path = os.path.join(temp_dir, folder_name)
+        os.mkdir(folder_path)
+        unzip_file(_df_file, folder_path)
+        _df_file = os.path.join(folder_path, 'model.json')
+
+    # then
     with io.open(_df_file, encoding='utf-8') as inf:
         first_char = inf.read(1)
         second_char = inf.read(1)
