@@ -42,7 +42,7 @@ heat flow through exposed roofs of middle floors.
 
 ghenv.Component.Name = 'DF Separate Top Bottom'
 ghenv.Component.NickName = 'TopBottom'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -80,7 +80,7 @@ if all_required_inputs(ghenv.Component):
     # get the building objects from the input ones
     buildings = [bldg.duplicate() for bldg in _buildings]
     for bldg in buildings:
-        if sep_mid_:
+        if sep_mid_ and len(bldg) != 1:
             if isinstance(bldg, Model):
                 for b in bldg.buildings:
                     b.separate_mid_floors(p_tol)
