@@ -7,7 +7,8 @@
 :dragon: :green_book: Dragonfly plugin for Grasshopper (aka. dragonfly[+]).
 
 This repository contains all Grasshopper components for the dragonfly plugin.
-The package includes both the userobjects (`.ghuser`) and the Python source (`.py`).
+The package includes both the user objects (`.ghuser`), the Python source (`.py`),
+and a JSON version of the grasshopper component data.
 Note that this library only possesses the Grasshopper components and, in order to
 run the plugin, the core libraries must be installed in a way that they can be
 discovered by Rhino (see dependencies).
