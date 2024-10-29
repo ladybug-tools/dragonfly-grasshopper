@@ -42,7 +42,7 @@ Create a Dragonfly Story from individual Dragonfly Room2D objects.
 
 ghenv.Component.Name = 'DF Story'
 ghenv.Component.NickName = 'Story'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -90,6 +90,7 @@ if all_required_inputs(ghenv.Component):
     # create the Story
     story = Story(name, room2ds, _flr_to_flr_, _flr_height_, multiplier_)
     story.display_name = display_name
+    story.check_room2d_floor_heights_valid()
 
     # assign the construction set
     if _constr_set_ is not None:
