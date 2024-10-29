@@ -1,0 +1,36 @@
+{
+  "version": "1.8.0", 
+  "nickname": "JoinSmall", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "df_obj", 
+        "description": "The input Dragonfly objects with Room2Ds that have had small\nRoom2Ds joined together.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_df_obj", 
+      "description": "A Dregonfly Story, Building or Model to have its small Room2Ds\njoined together across the model", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_area_thresh_", 
+      "description": "A number for the Room2D floor area below which it is considered\na small room to be joined into adjacent rooms. (Default: 10.0 square meters).", 
+      "type": "double", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import tolerance, conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set the default area threshold\n    a_thresh = _area_thresh_ if _area_thresh_ is not None \\\n        else 10.0 / conversion_to_meters()\n\n    # duplicate the input object and gather all of the stories\n    df_obj = _df_obj.duplicate()\n    if isinstance(df_obj, Story):\n        stories = [df_obj]\n    elif isinstance(df_obj, Building):\n        stories = df_obj.unique_stories\n    elif isinstance(df_obj, Model):\n        stories = df_obj.stories\n    else:\n        msg = 'Expected Dragonfly Story, Building, or Model. Got {}'.format(type(df_obj))\n        print(msg)\n        raise ValueError(msg)\n\n    # merge small rooms together in the story\n    for story in stories:\n        story.join_small_rooms(a_thresh, tolerance=tolerance)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Join Small Rooms", 
+  "description": "Join small Room2Ds together within Dragonfly Stories.\n_\nThis is particularly useful after operations like automatic core/perimeter\noffsetting, which can create several small Room2Ds from small segments in the\noutline boundary around the Story.\n-"
+}
