@@ -39,7 +39,7 @@ roof specifications for different Stories of a Dragonfly Building or Model.
 
 ghenv.Component.Name = 'DF Apply Roof'
 ghenv.Component.NickName = 'ApplyRoof'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '7'
@@ -69,12 +69,6 @@ if all_required_inputs(ghenv.Component):
     for geo_obj in _roof_geo:
         face3ds.extend(to_face3d(geo_obj))
     roof = RoofSpecification(face3ds)
-    over_count = roof.overlap_count(tolerance)
-    if over_count > 0:
-        msg = 'The input _roof_geo was found to have {} overlaps in plan.\n' \
-            'This is not considered valid and can cause issues.'.format(over_count)
-        print(msg)
-        give_warning(ghenv.Component, msg)
 
     # duplicate the input object and assign the roof to it
     df_obj = _df_obj.duplicate()
