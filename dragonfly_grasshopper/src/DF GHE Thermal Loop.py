@@ -58,7 +58,7 @@ to connect these objects to Dragonfly Buildings.
 
 ghenv.Component.Name = 'DF GHE Thermal Loop'
 ghenv.Component.NickName = 'GHELoop'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -79,7 +79,7 @@ except ImportError as e:
 
 try:
     from ladybug_rhino.togeometry import to_polyline2d
-    from ladybug_rhino.togeometry import to_polygon2d
+    from ladybug_rhino.togeometry import to_face3d
     from ladybug_rhino.config import angle_tolerance, conversion_to_meters
     from ladybug_rhino.grasshopper import all_required_inputs, give_warning
 except ImportError as e:
@@ -99,14 +99,11 @@ if all_required_inputs(ghenv.Component):
         connectors.append(ThermalConnector('{}_ThermalConnector_{}'.format(name, i), lin))
     ghes, total_area = [], 0
     for i, geo in enumerate(_ghe_geo):
-        gp = to_polygon2d(geo)
-        total_area += gp.area * conversion_to_meters()
-        if not gp.is_rectangle(math.radians(angle_tolerance)):
-            msg = 'The ground heat exchanger with index {} is not a perfect rectangle ' \
-                'but it will be approximated as such in the DES simulation.'.format(i)
-            print(msg)
-            give_warning(ghenv.Component, msg)
-        ghes.append(GroundHeatExchanger('{}_GHE_{}'.format(name, i), gp))
+        faces = to_face3d(geo)
+        for gp in faces:
+            print(gp)
+            total_area += gp.area * conversion_to_meters()
+            ghes.append(GroundHeatExchanger('{}_GHE_{}'.format(name, i), gp))
 
     # create the loop
     des_loop = GHEThermalLoop(name, ghes, connectors, _clockwise_,
