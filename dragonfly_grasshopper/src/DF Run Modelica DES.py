@@ -40,7 +40,7 @@ through Modelica DES simulation.
 
 ghenv.Component.Name = 'DF Run Modelica DES'
 ghenv.Component.NickName = 'RunDES'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -72,8 +72,8 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-UO_GMT_VERSION = '0.6.0'
-UO_TN_VERSION = '0.2.4'
+UO_GMT_VERSION = '0.8.0'
+UO_TN_VERSION = '0.3.0'
 MBL_VERSION = '10.0.0'
 
 
