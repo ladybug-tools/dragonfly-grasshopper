@@ -8,39 +8,43 @@
 # @license AGPL-3.0-or-later <https://spdx.org/licenses/AGPL-3.0-or-later>
 
 """
-Run a an URBANopt geoJSON and scenario through Modelica Distric Energy System
-(DES) simulation.
+Use an URBANopt geoJSON with a Distric Energy System (DES) loop assigned to it
+along with the corresponding scenario (containing building loads) to generate
+a Modelica model of the district system.
 _
-The geoJSON must have a valid DES Loop assigned to it in order to run correctly
-through Modelica DES simulation.
+The model is generated using the modules of the Modelica Buildings Library (MBL).
+More information on the MBL can be found here:
+https://simulationresearch.lbl.gov/modelica/
+_
+The Modelica model produced by this component can be opened and edited in any
+of the standard Modelica interfaces (eg. Dymola) or it can be simulated with
+OpenModelica inside a Docker image using the "DF Run Modelica" component.
 -
 
     Args:
         _geojson: The path to an URBANopt-compatible geoJSON file. This geoJSON
             file can be obtained form the "DF Model to geoJSON" component.
-            The geoJSON must have a valid District Energy System (DES) Loop
-            assigned to it in order to run correctly through the DES simulation.
+            Note that the geoJSON must have a valid District Energy System
+            (DES) Loop assigned to it in order to run correctly with this
+            component.
         _scenario: The path to an URBANopt .csv file for the scenario. This CSV
             file can be obtained form the "DF Run URBANopt" component.
         _write: Set to "True" to run the component, install any missing dependencies,
             and write the Modelica files for the Distric Energy System.
-        run_: Set to "True" to translate the Modelica files to a Functional Mockup Unit (FMU)
-            and then simulate the FMU. This will ensure that all result files appear
-            in their respective outputs from this component.
 
     Returns:
         report: Reports, errors, warnings, etc.
         sys_param: A JSON file containing all of the specifications of the District
-            Energy System, including the detailed Building load profiles.
+            Energy System, including the detailed Building load profiles,
+            equipment specifications, borehole field characteristics
+            (if applicable), etc.
         modelica: A folder where all of the Modelica files of the District Energy
             System (DES) are written.
-        results: A folder containing the results of the Modelica simulation if run_ is
-            True and the simulation is successful.
 """
 
-ghenv.Component.Name = 'DF Run Modelica DES'
-ghenv.Component.NickName = 'RunDES'
-ghenv.Component.Message = '1.8.3'
+ghenv.Component.Name = 'DF Write Modelica DES'
+ghenv.Component.NickName = 'WriteDES'
+ghenv.Component.Message = '1.8.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -61,8 +65,7 @@ except ImportError as e:
 
 try:  # import the dragonfly_energy dependencies
     from dragonfly_energy.config import folders as df_folders
-    from dragonfly_energy.run import run_des_sys_param, run_des_modelica, \
-        run_modelica_docker
+    from dragonfly_energy.run import run_des_sys_param, run_des_modelica
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
@@ -73,7 +76,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 UO_GMT_VERSION = '0.8.0'
-UO_TN_VERSION = '0.1.dev194+gddad013'
+UO_TN_VERSION = '0.1.dev202+g94ddd1b'
 MBL_VERSION = '10.0.0'
 
 
@@ -159,15 +162,3 @@ if all_required_inputs(ghenv.Component) and _write:
 
     # run the command that generates the modelica files
     modelica = run_des_modelica(sys_param, _geojson, _scenario)
-
-    # execute the modelica files in URBANopt
-    if run_:
-        if df_folders.docker_version_str is not None:
-            results = run_modelica_docker(modelica)
-        else:
-            docker_url  = 'https://www.docker.com/products/docker-desktop/'
-            msg = 'No Docker installation was found on this machine.\n' \
-                'This is needed to execute Modelica simulations.\n' \
-                'Download Docker Desktop from: {}'.format(docker_url)
-            print(msg)
-            give_warning(ghenv.Component, msg)

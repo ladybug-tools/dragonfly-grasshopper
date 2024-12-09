@@ -64,11 +64,12 @@ https://ghedesigner.readthedocs.io/en/latest/background.html
         g_function: A data tree of G-function coefficients that describe the response
             of the ground to the input loads. Each pair of factors represents
             a point on the G-function. Flattening this data tree enables you
-            to plug it directly into the "Ironbug Ground Heat Sxchanger Vertical"
+            to plug it directly into the "Ironbug Ground Heat Exchanger Vertical"
             component to simulate the ground heat exchanger in EnergyPlus.
-        properties: A list of peroperties that can be plugged into the parameters of the
-            "Ironbug Ground Heat Sxchanger Vertical" component. The properties are
-            in the following order:
+        properties: A list of properties for the GHE that can be used to describe it
+            in EnergyPlus simulations. The properties that can be plugged directly
+            into the parameters of the "Ironbug Ground Heat Exchanger Vertical"
+            component. The properties are in the following order:
             _
             * Borehole Length
             * Borehole Radius
@@ -82,14 +83,19 @@ https://ghedesigner.readthedocs.io/en/latest/background.html
             * Pipe Conductivity
             * Pipe Thickness
             * U Tube Distance
+        month_temps: A list of ground temperatures in Celsius with one value for each month
+            of the period over which the GHEDesigner simulation was run (typically
+            20 years). This can be connected to a nativ Grasshopper "Quick Graph"
+            component and used to check the drift in the ground temperature
+            over long periods of time.
 """
 
 ghenv.Component.Name = 'DF GHE Designer'
 ghenv.Component.NickName = 'GHEDesigner'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
-ghenv.Component.AdditionalHelpFromDocStrings = '1'
+ghenv.Component.AdditionalHelpFromDocStrings = '0'
 
 import os
 import subprocess
@@ -97,8 +103,8 @@ import json
 
 try:
     from ladybug_geometry.geometry2d import Point2D
-    from ladybug_geometry.geometry3d import Point3D
-    from ladybug_geometry.bounding import bounding_rectangle
+    from ladybug_geometry.geometry3d import Vector3D, Point3D, LineSegment3D
+    from ladybug_geometry.bounding import bounding_box
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
@@ -114,6 +120,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:
+    from dragonfly_energy.des.ghe import GroundHeatExchanger
     from dragonfly_energy.des.loop import GHEThermalLoop
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
@@ -121,42 +128,13 @@ except ImportError as e:
 try:
     from ladybug_rhino.config import conversion_to_meters, tolerance
     from ladybug_rhino.togeometry import to_face3d
-    from ladybug_rhino.fromgeometry import from_point2d
+    from ladybug_rhino.fromgeometry import from_point2d, from_linesegment3d
     from ladybug_rhino.grasshopper import all_required_inputs, give_warning, \
         list_to_data_tree
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 GHE_DESIGNER_VERSION = '1.5'
-
-PROPERTY_NAMES = (
-    'Borehole Length (m)',
-    'Borehole Radius (m)',
-    'Design Flow Rate (m3/s)',
-    'Ground Temperature (C)',
-    'Ground Conductivity (W/m-K)',
-    'Ground Heat Capacity (J/m3-K)',
-    'Grout Conductivity (W/m-K)',
-    'Number of Boreholes',
-    'Pipe Outer Diameter (m)',
-    'Pipe Conductivity (W/m-K)',
-    'Pipe Thickness (m)',
-    'U Tube Distance (m)'
-)
-PROPERTY_PATHS = (
-    ('result', 'ghe_system', 'active_borehole_length', 'value'),
-    ('result', 'ghe_system', 'borehole_diameter', 'value'),
-    ('input', 'design', 'flow_rate'),
-    ('result', 'ghe_system', 'soil_undisturbed_ground_temp', 'value'),
-    ('result', 'ghe_system', 'soil_thermal_conductivity', 'value'),
-    ('result', 'ghe_system', 'soil_volumetric_heat_capacity', 'value'),
-    ('result', 'ghe_system', 'grout_thermal_conductivity', 'value'),
-    ('result', 'ghe_system', 'total_drilling', 'value'),
-    ('result', 'ghe_system', 'pipe_geometry', 'pipe_outer_diameter', 'value'),
-    ('result', 'ghe_system', 'pipe_thermal_conductivity', 'value'),
-    ('result', 'ghe_system', 'pipe_geometry', 'pipe_inner_diameter', 'value'),
-    ('result', 'ghe_system', 'shank_spacing', 'value')
-)
 
 
 if all_required_inputs(ghenv.Component) and _write:
@@ -198,8 +176,8 @@ if all_required_inputs(ghenv.Component) and _write:
         site_faces[i] = face.scale(conv_factor)
     # GHEDesigner treats negative values as invalid
     # ensure coordinate values are positive
-    min_pt, max_pt = bounding_rectangle(site_faces)
-    move_vec_2d = Point2D(0, 0) - min_pt
+    min_pt, max_pt = bounding_box(site_faces)
+    move_vec_2d = Point2D(0, 0) - Point2D(min_pt.x, min_pt.y)
     move_vec_3d = Point3D(move_vec_2d.x, move_vec_2d.y, 0)
     for i, face in enumerate(site_faces):
         site_faces[i] = face.move(move_vec_3d)
@@ -237,32 +215,27 @@ if all_required_inputs(ghenv.Component) and _write:
             print(result[0])
             print(result[1])
         else:  # parse the result files
+            # load the borehole positions
             with open(bore_file, 'r') as bf:
                 borehole_data = bf.readlines()
             move_vec_rev = move_vec_2d.reverse()
-            boreholes = []
+            borehole_pts = []
             for pt in borehole_data[1:]:
-                boreholes.append(Point2D(*(float(c) for c in pt.split(','))))
-            boreholes = [from_point2d(pt.move(move_vec_rev)) for pt in boreholes]
+                bore_pt = Point2D(*(float(c) for c in pt.split(',')))
+                borehole_pts.append(bore_pt.move(move_vec_rev))
+            boreholes = [from_point2d(pt) for pt in borehole_pts]
 
-            with open(g_func_file, 'r') as gf:
-                g_function = gf.readlines()
-            g_function = [[float(v) for v in line.split(',')[:2]] for line in g_function[1:]]
-            g_function = list_to_data_tree(g_function)
+            # load the summary data
+            properties = GroundHeatExchanger.load_energyplus_properties(summary_file)
+            zp = zip(GroundHeatExchanger.PROPERTY_NAMES, properties)
+            print('\n'.join('{}: {}'.format(name, val) for name, val in zp))
 
-            with open(summary_file, 'r') as sf:
-                summary_data = json.load(sf)
-            properties = []
-            for p_name, p_path in zip(PROPERTY_NAMES, PROPERTY_PATHS):
-                val = summary_data[p_path[1]] if p_path[0] == 'result' else ghe_dict[p_path[1]]
-                for key in p_path[2:]:
-                    val = val[key]
-                if '(J/m3-K)' in p_name:
-                    val = val * 0.001
-                if 'Borehole Radius' in p_name:
-                    val = val * 0.5
-                if 'Number of Boreholes' in p_name:
-                    val = int(val / properties[0])
-                properties.append(val)
-            properties[-2] = properties[-4] - properties[-2]
-            print('\n'.join('{}: {}'.format(name, val) for name, val in zip(PROPERTY_NAMES, properties)))
+            # create a line segment for each borehole
+            bore_dir = Vector3D(0, 0, -properties[0])
+            ghe_geos = [LineSegment3D(Point3D(pt.x, pt.y, min_pt.z), bore_dir)
+                        for pt in borehole_pts]
+            bore_geo = [from_linesegment3d(pt) for pt in ghe_geos]
+
+            # load the g-function and the monthly temperatures
+            g_function = GroundHeatExchanger.load_g_function(g_func_file)
+            month_temps= GroundHeatExchanger.load_monthly_temperatures(summary_file)
