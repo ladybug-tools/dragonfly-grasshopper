@@ -26,10 +26,10 @@ attributes and values.
 
 ghenv.Component.Name = 'DF Deconstruct OpenDSS'
 ghenv.Component.NickName = 'DecnstrDSS'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '4 :: Electric Grid'
-ghenv.Component.AdditionalHelpFromDocStrings = '4'
+ghenv.Component.AdditionalHelpFromDocStrings = '0'
 
 try:  # import the dragonfly_energy dependencies
     from dragonfly_energy.opendss.lib.wires import wire_by_identifier

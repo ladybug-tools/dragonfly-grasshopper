@@ -41,10 +41,10 @@ results.
 
 ghenv.Component.Name = 'DF Color Network Results'
 ghenv.Component.NickName = 'ColorNetResults'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '1 :: Visualize'
-ghenv.Component.AdditionalHelpFromDocStrings = '0'
+ghenv.Component.SubCategory = '4 :: Electric Grid'
+ghenv.Component.AdditionalHelpFromDocStrings = '4'
 
 try:  # import the ladybug_geometry dependencies
     from ladybug_geometry.geometry2d import Polygon2D, Polyline2D, LineSegment2D
