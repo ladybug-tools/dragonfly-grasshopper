@@ -1,0 +1,78 @@
+{
+  "version": "1.8.0", 
+  "nickname": "ToDES", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "geojson", 
+        "description": "The path to a geoJSON file that contains polygons for all of the\nBuildings within the dragonfly model along with any geometry of\nthe District Energy System (DES).", 
+        "type": null, 
+        "default": null
+      }, 
+      {
+        "access": "None", 
+        "name": "scenario", 
+        "description": "File path to the URBANopt scenario CSV that points to the building\nloads for DES simulation. This can be plugged into the \"DF Write\nModelica DES\" component to create a full Modelica model of the DES.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_model", 
+      "description": "A Dragonfly Model object.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_des_loop", 
+      "description": "A District Energy System (DES) ThermalLoop that is associated\nwith the dragonfly Model.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_epw_file", 
+      "description": "The file path to an EPW that should be associated with the\noutput energy model.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_location_", 
+      "description": "A ladybug Location object possessing longitude and lattiude data\nused to position geoJSON file on the globe.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_point_", 
+      "description": "A Point for where the _location object exists within the space of\nthe Rhino scene. This is used to posistion the geoJSON file on the\nglobe. (Default: Rhino origin (0, 0, 0)).", 
+      "type": "Point3d", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_folder_", 
+      "description": "An optional folder to be used as the root of the URBANopt project\nfolder. If None, the files will be written into a sub-directory\nof the default simulation folder.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_write", 
+      "description": "Set to \"True\" to have the Dragonfly Model translated to a geoJSON\nand other project folder files for District Energy System (DES)\nsimulation.", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "5 :: District Thermal", 
+  "code": "\ntry:  # import the ladybug_geometry dependencies\n    from ladybug_geometry.geometry2d.pointvector import Point2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_point2d\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _write:\n    # check the _model and set default inputs\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n    point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)\n\n    # create the geoJSON and honeybee Model JSONs\n    geojson, scenario, sys_params = _model.to.urbanopt_des(\n        _model, _des_loop, _epw_file, _location_, point,\n        folder=_folder_, tolerance=tolerance)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Model To DES", 
+  "description": "Convert a Dragonfly Model into an URBANopt-compatible geoJSON and DES input files.\n_\nThis component is intended specifically for the case that District Energy\nSystem (DES) simulation is to be performed without using URBANopt to generate\nbuilding energy loads through EnergyPlus. Accordingly, ALL Dragonfly Buildings\nin the Model must have DES loads assigned directly to them in order for this\ncomponent to run correctly.\n-"
+}

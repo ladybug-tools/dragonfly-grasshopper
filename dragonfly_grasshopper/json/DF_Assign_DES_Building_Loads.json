@@ -1,0 +1,50 @@
+{
+  "version": "1.8.0", 
+  "nickname": "AssignBldgLoad", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "building", 
+        "description": "The input Dragonfly Building with DES loads assigned to it. The Model\ncreated with this Building can be converted directly into a format\nthat works with DES simulation using the \"DF Model to DES\"\ncomponent without the need to run EnergyPlus simulations with\nthe \"DF Run URBANopt\" component.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_building", 
+      "description": "A Dragonfly Building, Story or Room2D which is to have its energy\nproperties re-assigned. This can also be an entire Dragonfly Model.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_cooling_", 
+      "description": "An annual hourly data collection for building cooling loads\nfor simulation with a DES. Note that this data collection must have\na data type of Power.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_heating_", 
+      "description": "An annual hourly data collection for building heating loads\nfor simulation with a DES. Note that this data collection must have\na data type of Power.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_hot_water_", 
+      "description": "An annual hourly data collection for building service hot water loads\nfor simulation with a DES. Note that this data collection must have\na data type of Power.", 
+      "type": "System.Object", 
+      "default": null
+    }
+  ], 
+  "subcategory": "5 :: District Thermal", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import ladybug-{{cad}}\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    assert isinstance(_building, Building), 'Expected Dragonfly Building. ' \\\n        'Got {}.'.format(type(_building))\n    building = _building.duplicate()\n    building.properties.energy.des_cooling_load = _cooling_\n    building.properties.energy.des_heating_load = _heating_\n    building.properties.energy.des_hot_water_load = _hot_water_\n", 
+  "category": "Dragonfly", 
+  "name": "DF Assign DES Building Loads", 
+  "description": "Assign cooling, heating and hot water loads to a Dragonfly Building to be used\nwithin a District Energy System (DES) simulation.\n_\nThis component is intended specifically for the case that District Energy System\n(DES) simulation is to be performed without using URBANopt to generate building\nenergy loads through EnergyPlus.\n-"
+}

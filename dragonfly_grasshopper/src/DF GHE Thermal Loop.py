@@ -8,8 +8,7 @@
 # @license AGPL-3.0-or-later <https://spdx.org/licenses/AGPL-3.0-or-later>
 
 """
-Create an Ground Heat Exchanger Thermal Loop, which represents all infrastructure
-for a District Energy Simulation (DES) simulation.
+Create an Ground Heat Exchanger Loop for a District Energy Simulation (DES) simulation.
 _
 This includes a ground heat exchanger and all thermal connectors needed
 to connect these objects to Dragonfly Buildings.
@@ -58,7 +57,7 @@ to connect these objects to Dragonfly Buildings.
 
 ghenv.Component.Name = 'DF GHE Thermal Loop'
 ghenv.Component.NickName = 'GHELoop'
-ghenv.Component.Message = '1.8.2'
+ghenv.Component.Message = '1.8.3'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

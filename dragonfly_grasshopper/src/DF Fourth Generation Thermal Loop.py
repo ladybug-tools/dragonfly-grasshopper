@@ -8,8 +8,7 @@
 # @license AGPL-3.0-or-later <https://spdx.org/licenses/AGPL-3.0-or-later>
 
 """
-Create an Fourth Generation Thermal Loop, which represents all infrastructure
-for a District Energy Simulation (DES) simulation.
+Create an Fourth Generation Loop for a District Energy Simulation (DES) simulation.
 _
 This includes a central hot and chilled water plant for the district.
 -
@@ -31,7 +30,7 @@ This includes a central hot and chilled water plant for the district.
 
 ghenv.Component.Name = 'DF Fourth Generation Thermal Loop'
 ghenv.Component.NickName = 'Gen4Loop'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
