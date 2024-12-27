@@ -25,6 +25,13 @@ component or the "DF GHE Thermal Loop" component.
         _month_count_: An integer for the number of months over which the simulation
             will be run in order to ensure stable ground temperature
             conditions. (Default: 240).
+        _method_: Text for the method to be used in sizing the GHE. Downstream
+            will size each GHE for all of the buildings that lie downstream of
+            the GHE. AreaProportional will take the load along the entire loop
+            and evenly distribute it per unit area of GHE. (Default: AreaProportional).
+            Choose from the following.
+            * AreaProportional
+            * Downstream
 
     Returns:
         design: A GHEDesignParameter object that can be plugged into the "DF GHE Designer"
@@ -36,7 +43,7 @@ component or the "DF GHE Thermal Loop" component.
 
 ghenv.Component.Name = 'DF GHE Design Parameter'
 ghenv.Component.NickName = 'GHEDesign'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -51,7 +58,9 @@ flow_rate = _flow_rate_ if _flow_rate_ is not None else 0.2
 max_eft = _max_eft_ if _max_eft_ is not None else 35
 min_eft = _min_eft_ if _min_eft_ is not None else 5
 month_count = _month_count_ if _month_count_ is not None else 240
+_method_ = _method_ if _method_ is not None else 'AreaProportional'
 
 
 design = GHEDesignParameter(
-    flow_rate=flow_rate, max_eft=max_eft, min_eft=min_eft, month_count=month_count)
+    flow_rate=flow_rate, max_eft=max_eft, min_eft=min_eft,
+    month_count=month_count, method=_method_)
