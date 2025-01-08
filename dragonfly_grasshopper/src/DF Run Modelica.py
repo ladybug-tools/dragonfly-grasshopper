@@ -30,7 +30,7 @@ https://www.docker.com/products/docker-desktop/
 
 ghenv.Component.Name = 'DF Run Modelica'
 ghenv.Component.NickName = 'RunModelica'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -61,7 +61,7 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-UO_GMT_VERSION = '0.8.0'
+UO_GMT_VERSION = '0.9.1'
 
 
 if all_required_inputs(ghenv.Component) and _run:
