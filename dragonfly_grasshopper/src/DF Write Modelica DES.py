@@ -44,7 +44,7 @@ OpenModelica inside a Docker image using the "DF Run Modelica" component.
 
 ghenv.Component.Name = 'DF Write Modelica DES'
 ghenv.Component.NickName = 'WriteDES'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -75,9 +75,9 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-UO_GMT_VERSION = '0.8.0'
-UO_TN_VERSION = '0.1.dev202+g94ddd1b'
-MBL_VERSION = '10.0.0'
+UO_GMT_VERSION = '0.9.1'
+UO_TN_VERSION = '0.3.2'
+MBL_VERSION = '11.0.0'
 
 
 if all_required_inputs(ghenv.Component) and _write:
@@ -115,8 +115,7 @@ if all_required_inputs(ghenv.Component) and _write:
     uo_tn_pack = '{}/ThermalNetwork-{}.dist-info'.format(
         folders.python_package_path, UO_TN_VERSION)
     if not os.path.isfile(uo_tn) or not os.path.isdir(uo_tn_pack):
-        # install_cmd = 'pip install thermalnetwork=={}'.format(UO_TN_VERSION)
-        install_cmd = 'pip install git+https://github.com/chriswmackey/ThermalNetwork'
+        install_cmd = 'pip install thermalnetwork=={}'.format(UO_TN_VERSION)
         if os.name == 'nt' and os.path.isfile(executor_path) and \
                 'Program Files' in executor_path:
             pip_cmd = [
