@@ -44,7 +44,7 @@ OpenModelica inside a Docker image using the "DF Run Modelica" component.
 
 ghenv.Component.Name = 'DF Write Modelica DES'
 ghenv.Component.NickName = 'WriteDES'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -76,7 +76,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
 UO_GMT_VERSION = '0.9.1'
-UO_TN_VERSION = '0.3.2'
+UO_TN_VERSION = '0.3.1'
 MBL_VERSION = '11.0.0'
 
 
