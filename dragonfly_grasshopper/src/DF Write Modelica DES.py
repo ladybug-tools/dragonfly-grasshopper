@@ -44,7 +44,7 @@ OpenModelica inside a Docker image using the "DF Run Modelica" component.
 
 ghenv.Component.Name = 'DF Write Modelica DES'
 ghenv.Component.NickName = 'WriteDES'
-ghenv.Component.Message = '1.8.3'
+ghenv.Component.Message = '1.8.4'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -156,8 +156,15 @@ if all_required_inputs(ghenv.Component) and _write:
             pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
         stderr = process.communicate()
 
+    # check the various files in the project folder
+    proj_dir = os.path.dirname(_geojson)
+    scn_name = os.path.basename(_scenario).replace('.csv', '')
+    des_dir = os.path.join(proj_dir, 'run', scn_name, 'des_modelica')
+    sys_param = os.path.join(proj_dir, 'system_params.json')
+
     # run the command that adds the building loads to the system parameters
-    sys_param = run_des_sys_param(_geojson, _scenario)
+    if not os.path.isdir(des_dir):
+        sys_param = run_des_sys_param(_geojson, _scenario)
 
     # run the command that generates the modelica files
     modelica = run_des_modelica(sys_param, _geojson, _scenario)
