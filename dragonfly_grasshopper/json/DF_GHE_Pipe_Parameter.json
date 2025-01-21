@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "GHEPipe", 
   "outputs": [
     [
@@ -57,7 +57,7 @@
     }
   ], 
   "subcategory": "5 :: District Thermal", 
-  "code": "\ntry:\n    from dragonfly_energy.des.ghe import PipeParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ninner_diameter = _inner_diameter_ * conversion_to_meters() \\\n    if _inner_diameter_ is not None else 0.0216\nouter_diameter = _outer_diameter_ * conversion_to_meters() \\\n    if _outer_diameter_ is not None else 0.0266\nshank_spacing = _shank_spacing_ * conversion_to_meters() \\\n    if _shank_spacing_ is not None else 0.0323\nconductivity = _conductivity_ if _conductivity_ is not None else 0.4\nheat_capacity = _heat_capacity_ if _heat_capacity_ is not None else 1542000\narrangement = _arrangement_ if _arrangement_ is not None else 'SingleUTube'\n\n\npipe = PipeParameter(\n    inner_diameter=inner_diameter, outer_diameter=outer_diameter, shank_spacing=shank_spacing,\n    conductivity=conductivity, heat_capacity=heat_capacity, arrangement=arrangement)\n", 
+  "code": "\ntry:\n    from dragonfly_energy.des.ghe import PipeParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\ninner_diameter = _inner_diameter_ * conversion_to_meters() \\\n    if _inner_diameter_ is not None else 0.0216\nouter_diameter = _outer_diameter_ * conversion_to_meters() \\\n    if _outer_diameter_ is not None else 0.0266\nshank_spacing = _shank_spacing_ * conversion_to_meters() \\\n    if _shank_spacing_ is not None else 0.0323\nconductivity = _conductivity_ if _conductivity_ is not None else 0.4\nheat_capacity = _heat_capacity_ if _heat_capacity_ is not None else 1542000\narrangement = _arrangement_ if _arrangement_ is not None else 'SingleUTube'\n\n\npipe = PipeParameter(\n    inner_diameter=inner_diameter, outer_diameter=outer_diameter, shank_spacing=shank_spacing,\n    conductivity=conductivity, heat_capacity=heat_capacity, arrangement=arrangement)\n", 
   "category": "Dragonfly", 
   "name": "DF GHE Pipe Parameter", 
   "description": "Create a PipeParameter object that can be used to customize the pipe properties\nwithin a Ground Heat Exchanger (GHE) sizing simulation.\n_\nThe output of this component can be used with either the \"DF GHE Designer\"\ncomponent or the \"DF GHE Thermal Loop\" component.\n-"

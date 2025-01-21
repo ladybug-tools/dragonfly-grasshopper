@@ -1,5 +1,5 @@
 {
-  "version": "1.8.1", 
+  "version": "1.8.2", 
   "nickname": "GHEDesign", 
   "outputs": [
     [
@@ -50,7 +50,7 @@
     }
   ], 
   "subcategory": "5 :: District Thermal", 
-  "code": "\ntry:\n    from dragonfly_energy.des.ghe import {{PLGN}}EDesignParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\n\nflow_rate = _flow_rate_ if _flow_rate_ is not None else 0.2\nmax_eft = _max_eft_ if _max_eft_ is not None else 35\nmin_eft = _min_eft_ if _min_eft_ is not None else 5\nmonth_count = _month_count_ if _month_count_ is not None else 240\n_method_ = _method_ if _method_ is not None else 'AreaProportional'\n\n\ndesign = {{PLGN}}EDesignParameter(\n    flow_rate=flow_rate, max_eft=max_eft, min_eft=min_eft,\n    month_count=month_count, method=_method_)\n", 
+  "code": "\ntry:\n    from dragonfly_energy.des.ghe import {{PLGN}}EDesignParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nflow_rate = _flow_rate_ if _flow_rate_ is not None else 0.2\nmax_eft = _max_eft_ if _max_eft_ is not None else 35\nmin_eft = _min_eft_ if _min_eft_ is not None else 5\nmonth_count = _month_count_ if _month_count_ is not None else 240\n_method_ = _method_ if _method_ is not None else 'AreaProportional'\n\n\ndesign = {{PLGN}}EDesignParameter(\n    flow_rate=flow_rate, max_eft=max_eft, min_eft=min_eft,\n    month_count=month_count, method=_method_)\n", 
   "category": "Dragonfly", 
   "name": "DF GHE Design Parameter", 
   "description": "Create a GHEDesignParameter object that can be used to customize the criteria used\nto design a Ground Heat Exchanger (GHE).\n_\nThe output of this component can be used with either the \"DF GHE Designer\"\ncomponent or the \"DF GHE Thermal Loop\" component.\n-"

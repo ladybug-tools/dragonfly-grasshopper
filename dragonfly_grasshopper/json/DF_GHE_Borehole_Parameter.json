@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "GHEBorehole", 
   "outputs": [
     [
@@ -57,7 +57,7 @@
     }
   ], 
   "subcategory": "5 :: District Thermal", 
-  "code": "\ntry:\n    from dragonfly_energy.des.ghe import BoreholeParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nmin_depth = _min_depth_ * conversion_to_meters() if _min_depth_ is not None else 60\nmax_depth = _max_depth_ * conversion_to_meters() if _max_depth_ is not None else 135\nmin_spacing = _min_spacing_ * conversion_to_meters() if _min_spacing_ is not None else 3\nmax_spacing = _max_spacing_ * conversion_to_meters() if _max_spacing_ is not None else 25\nburied_depth = _buried_depth_ * conversion_to_meters() if _buried_depth_ is not None else 2\ndiameter = _diameter_ * conversion_to_meters() if _diameter_ is not None else 0.15\n\n\nborehole = BoreholeParameter(min_depth, max_depth, min_spacing, max_spacing,\n                             buried_depth, diameter)\n", 
+  "code": "\ntry:\n    from dragonfly_energy.des.ghe import BoreholeParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nmin_depth = _min_depth_ * conversion_to_meters() if _min_depth_ is not None else 60\nmax_depth = _max_depth_ * conversion_to_meters() if _max_depth_ is not None else 135\nmin_spacing = _min_spacing_ * conversion_to_meters() if _min_spacing_ is not None else 3\nmax_spacing = _max_spacing_ * conversion_to_meters() if _max_spacing_ is not None else 25\nburied_depth = _buried_depth_ * conversion_to_meters() if _buried_depth_ is not None else 2\ndiameter = _diameter_ * conversion_to_meters() if _diameter_ is not None else 0.15\n\n\nborehole = BoreholeParameter(min_depth, max_depth, min_spacing, max_spacing,\n                             buried_depth, diameter)\n", 
   "category": "Dragonfly", 
   "name": "DF GHE Borehole Parameter", 
   "description": "Create a BoreholeParameter object that can be used to customize the geometric\nconstraints governing the boreholes of a GHE sizing simulation.\n_\nThe output of this component can be used with either the \"DF GHE Designer\"\ncomponent or the \"DF GHE Thermal Loop\" component.\n-"

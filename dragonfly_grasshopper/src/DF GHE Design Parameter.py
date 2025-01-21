@@ -43,7 +43,7 @@ component or the "DF GHE Thermal Loop" component.
 
 ghenv.Component.Name = 'DF GHE Design Parameter'
 ghenv.Component.NickName = 'GHEDesign'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -52,6 +52,11 @@ try:
     from dragonfly_energy.des.ghe import GHEDesignParameter
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
+try:
+    from ladybug_rhino.grasshopper import turn_off_old_tag
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+turn_off_old_tag(ghenv.Component)
 
 
 flow_rate = _flow_rate_ if _flow_rate_ is not None else 0.2
