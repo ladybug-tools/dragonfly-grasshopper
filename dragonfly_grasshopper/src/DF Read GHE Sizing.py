@@ -57,10 +57,10 @@ properties output from the sizing simulation performed by GHEDesigner.
 """
 
 ghenv.Component.Name = 'DF Read GHE Sizing'
-ghenv.Component.NickName = 'ReadGHE'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.NickName = 'GHESizing'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '5 :: District Thermal'
+ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'
 
 import os
