@@ -32,12 +32,11 @@ Convert a Dragonfly Model into a series of Honeybee Models.
             will be multiplied. If False, full geometry objects will be written
             for each and every story in the building such that all resulting
             multipliers will be 1. (Default: True).
-        add_plenum_: Boolean to indicate whether ceiling/floor plenums should
-            be auto-generated for the Rooms. The height of ceiling plenums
-            will be autocalculated as the difference between the Room2D
-            ceiling height and Story ceiling height. The height of the floor
-            plenum will be autocalculated as the difference between the Room2D
-            floor height and Story floor height. (Default: False).
+        no_plenum_: Boolean to indicate whether ceiling/floor plenum depths
+            assigned to Room2Ds should be ignored during translation. This
+            results in each Room2D translating to a single Honeybee Room at
+            the full floor-to-ceiling height instead of a base Room with (a)
+            plenum Room(s). (Default: False).
         ceil_adjacency_: Boolean to note whether adjacencies should be solved between
             interior stories when Room2Ds perfectly match one another in
             their floor plate. This ensures that Surface boundary conditions
@@ -67,7 +66,7 @@ Convert a Dragonfly Model into a series of Honeybee Models.
 
 ghenv.Component.Name = 'DF Model To Honeybee'
 ghenv.Component.NickName = 'ToHoneybee'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -89,7 +88,7 @@ except ImportError as e:
 if all_required_inputs(ghenv.Component) and _run:
     # set default inputs if not specified
     use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True
-    add_plenum_ = add_plenum_ if add_plenum_ is not None else False
+    no_plenum_ = no_plenum_ if no_plenum_ is not None else False
     _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_
     ceil_adjacency_ = ceil_adjacency_ if ceil_adjacency_ is not None else False
 
@@ -99,5 +98,5 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # create the model objects
     hb_models = _model.to_honeybee(
-        _obj_per_model_, shade_dist_, use_multiplier_, add_plenum_, cap_shades_,
+        _obj_per_model_, shade_dist_, use_multiplier_, no_plenum_, cap_shades_,
         ceil_adjacency_, tolerance=tolerance)
