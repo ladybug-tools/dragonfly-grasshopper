@@ -25,13 +25,12 @@ key in the geoJSON.
             simulation will be run once for each unique room and then results
             will be multiplied. If False, full geometry objects will be written
             for each and every story in the building such that all resulting
-            multipliers will be 1. Default: True.
-        add_plenum_: Boolean to indicate whether ceiling/floor plenums should
-            be auto-generated for the Rooms. The height of ceiling plenums
-            will be autocalculated as the difference between the Room2D
-            ceiling height and Story ceiling height. The height of the floor
-            plenum will be autocalculated as the difference between the Room2D
-            floor height and Story floor height. (Default: False).
+            multipliers will be 1. (Default: True).
+        no_plenum_: Boolean to indicate whether ceiling/floor plenum depths
+            assigned to Room2Ds should be ignored during translation. This
+            results in each Room2D translating to a single Honeybee Room at
+            the full floor-to-ceiling height instead of a base Room with (a)
+            plenum Room(s). (Default: False).
         ceil_adjacency_: Boolean to note whether adjacencies should be solved between
             interior stories when Room2Ds perfectly match one another in
             their floor plate. This ensures that Surface boundary conditions
@@ -55,8 +54,8 @@ key in the geoJSON.
         _folder_: Text for the full path to the folder where the geojson will be
             written along with all of the Honeybee Model JSONs. If None, the
             honeybee default simulation folder is used.
-        _write: Set to "True" to have the Dragonfly Model translated to an
-            URBANopt-compatible geoJSON. This input can also be the integer "2",
+        _write: Set to "True" to have the Dragonfly Model translated to an URBANopt-
+            compatible geoJSON. This input can also be the integer "2",
             which will only create the geojson file but not create any honeybee
             Model json files that are linked to it (note that a geojson produced
             this way is not compatible with URBANopt).
@@ -82,7 +81,7 @@ key in the geoJSON.
 
 ghenv.Component.Name = 'DF Model To geoJSON'
 ghenv.Component.NickName = 'ToGeoJSON'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -128,7 +127,7 @@ if all_required_inputs(ghenv.Component) and _write:
     # set default inputs if not specified
     point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)
     use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True
-    add_plenum_ = add_plenum_ if add_plenum_ is not None else False
+    no_plenum_ = no_plenum_ if no_plenum_ is not None else False
     ceil_adjacency_ = ceil_adjacency_ if ceil_adjacency_ is not None else False
 
     if _write == 2:
@@ -144,7 +143,7 @@ if all_required_inputs(ghenv.Component) and _write:
         # create the geoJSON and honeybee Model JSONs
         geojson, hb_jsons, hb_models = _model.to.urbanopt(
             _model, _location, point, shade_dist_, use_multiplier_,
-            add_plenum_, ceil_adjacency_, des_loop=des_loop_,
+            no_plenum_, ceil_adjacency_, des_loop=des_loop_,
             electrical_network=elec_network, road_network=road_network,
             ground_pv=ground_pv_, folder=_folder_, tolerance=tolerance)
         # write the network to a JSON so that it can be loaded in the future
