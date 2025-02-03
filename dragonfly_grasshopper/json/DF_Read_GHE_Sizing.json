@@ -1,64 +1,71 @@
 {
-  "version": "1.8.2", 
-  "nickname": "GHESizing", 
+  "category": "Dragonfly", 
+  "version": "1.8.3", 
+  "code": "\nimport os\nimport re\n\ntry:  # import the ladybug_geometry dependencies\n    from ladybug_geometry.geometry3d import Vector3D, Point3D, LineSegment3D, Face3D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:\n    import ladybug.datatype\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import units_system\n    from ladybug_{{cad}}.fromgeometry import from_point2d, from_linesegment3d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, list_to_data_tree\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n_unit_pattern = re.compile(r'\\((.*)\\)')\n\n\ndef property_to_ip(name, val):\n    \"\"\"Convert a {{PLGN}}E Property to IP.\"\"\"\n    matches = _unit_pattern.findall(name)\n    if len(matches) == 0:\n        return name, val\n    unit = matches[0]\n    base_type = None\n    for key in ladybug.datatype.UNITS:\n        if unit in ladybug.datatype.UNITS[key]:\n            base_type = ladybug.datatype.TYPESDICT[key]()\n            break\n    if base_type is None:\n        return name, val\n    values, new_unit = base_type.to_ip([val], unit)\n    return name.split('(')[0] + '({})'.format(new_unit), values[0]\n\n\nif all_required_inputs(ghenv.Component):\n    # get the folder where all of the sizing results live\n    proj_folder = os.path.dirname(_sys_param)\n    ghe_dir = os.path.join(proj_folder, 'run', 'honeybee_scenario', 'ghe_dir')\n    assert os.path.isdir(ghe_dir), \\\n        'No {{PLGN}}E sizing results were found at\" {}.'.format(ghe_dir)\n\n    # parse the borehole geometry\n    units = units_system()\n    boreholes, bore_geo, g_function, properties, month_temps = [], [], [], [], []\n    for ghe_id in os.listdir(ghe_dir):\n        # find the matching {{PLGN}}E in the loop\n        for ghe in _des_loop.ground_heat_exchangers:\n            if ghe_id == ghe.identifier:\n                matched_ghe = ghe\n                break\n        else:\n            msg = 'No {{PLGN}}E in the connected _des_loop matches with the {{PLGN}}E ' \\\n                '\"{}\" in the _sys_param.'.format(ghe_id)\n            raise ValueError(msg)\n        \n        # get the files with all of the information\n        bore_file = os.path.join(ghe_dir, ghe_id, 'BoreFieldData.csv')\n        summary_file = os.path.join(ghe_dir, ghe_id, 'SimulationSummary.json')\n        g_func_file = os.path.join(ghe_dir, ghe_id, 'Gfunction.csv')\n\n        # load the borehole positions\n        ghe_bores = matched_ghe.load_boreholes(bore_file, units, ortho_rotation=True)\n        ghe_boreholes = [from_point2d(pt) for pt in ghe_bores]\n        boreholes.append(ghe_boreholes)\n\n        # load the summary data\n        props = matched_ghe.load_energyplus_properties(summary_file)\n        properties.append(props)\n        zp = zip(matched_ghe.PROPERTY_NAMES, props)\n        if ip_:\n            zp = [property_to_ip(name, val) for name, val in zp]\n        print(ghe_id + '\\n' + '\\n'.join('  {}: {}'.format(name, val) for name, val in zp))\n\n        # create a line segment for each borehole\n        z_val = matched_ghe.geometry.min.z if isinstance(matched_ghe.geometry, Face3D) else 0\n        bore_dir = Vector3D(0, 0, -props[0])\n        ghe_geos = [LineSegment3D(Point3D(pt.x, pt.y, z_val), bore_dir) for pt in ghe_bores]\n        ghe_geos = [from_linesegment3d(pt) for pt in ghe_geos]\n        bore_geo.append(ghe_geos)\n\n        # load the g-function and the monthly temperatures\n        g_function.append(matched_ghe.load_g_function(g_func_file))\n        t_ground = matched_ghe.load_monthly_temperatures(summary_file)\n        if ip_:\n            t_ground, _ = ladybug.datatype.temperature.Temperature().to_ip(t_ground, 'C')\n        month_temps.append(t_ground)\n\n    # convert the boreholes to a data tree\n    boreholes = list_to_data_tree(boreholes)\n    bore_geo = list_to_data_tree(bore_geo)\n    g_function = list_to_data_tree(g_function)\n    properties = list_to_data_tree(properties)\n    month_temps = list_to_data_tree(month_temps)\n", 
   "outputs": [
     [
       {
-        "access": "None", 
         "name": "boreholes", 
-        "description": "A list of points for the borehole locations within the _site.", 
+        "default": null, 
+        "access": "None", 
         "type": null, 
-        "default": null
+        "description": "A list of points for the borehole locations within the _site."
       }, 
       {
-        "access": "None", 
         "name": "bore_geo", 
-        "description": "Script variable ColorNetAttr", 
+        "default": null, 
+        "access": "None", 
         "type": null, 
-        "default": null
+        "description": "Script variable ColorNetAttr"
       }, 
       {
-        "access": "None", 
         "name": "g_function", 
-        "description": "A data tree of G-function coefficients that describe the response\nof the ground to the input loads. Each pair of factors represents\na point on the G-function. Flattening this data tree enables you\nto plug it directly into the \"Ironbug Ground Heat Exchanger Vertical\"\ncomponent to simulate the ground heat exchanger in EnergyPlus.", 
+        "default": null, 
+        "access": "None", 
         "type": null, 
-        "default": null
+        "description": "A data tree of G-function coefficients that describe the response\nof the ground to the input loads. Each pair of factors represents\na point on the G-function. Flattening this data tree enables you\nto plug it directly into the \"Ironbug Ground Heat Exchanger Vertical\"\ncomponent to simulate the ground heat exchanger in EnergyPlus."
       }, 
       {
-        "access": "None", 
         "name": "properties", 
-        "description": "A list of properties for the GHE that can be used to describe it\nin EnergyPlus simulations. The properties that can be plugged directly\ninto the parameters of the \"Ironbug Ground Heat Exchanger Vertical\"\ncomponent. The properties are in the following order:\n_\n* Borehole Length\n* Borehole Radius\n* Design Flow Rate\n* Ground Temperature\n* Ground Conductivity\n* Ground Heat Capacity\n* Grout Conductivity\n* Number of Boreholes\n* Pipe Outer Diameter\n* Pipe Conductivity\n* Pipe Thickness\n* U Tube Distance", 
+        "default": null, 
+        "access": "None", 
         "type": null, 
-        "default": null
+        "description": "A list of properties for the GHE that can be used to describe it\nin EnergyPlus simulations. The properties that can be plugged directly\ninto the parameters of the \"Ironbug Ground Heat Exchanger Vertical\"\ncomponent. The properties are in the following order:\n_\n* Borehole Length\n* Borehole Radius\n* Design Flow Rate\n* Ground Temperature\n* Ground Conductivity\n* Ground Heat Capacity\n* Grout Conductivity\n* Number of Boreholes\n* Pipe Outer Diameter\n* Pipe Conductivity\n* Pipe Thickness\n* U Tube Distance"
       }, 
       {
-        "access": "None", 
         "name": "month_temps", 
-        "description": "A list of ground temperatures in Celsius with one value for each month\nof the period over which the GHEDesigner simulation was run (typically\n20 years). This can be connected to a nativ Grasshopper \"Quick Graph\"\ncomponent and used to check the drift in the ground temperature\nover long periods of time.", 
+        "default": null, 
+        "access": "None", 
         "type": null, 
-        "default": null
+        "description": "A list of ground temperatures in Celsius with one value for each month\nof the period over which the GHEDesigner simulation was run (typically\n20 years). This can be connected to a nativ Grasshopper \"Quick Graph\"\ncomponent and used to check the drift in the ground temperature\nover long periods of time."
       }
     ]
   ], 
+  "nickname": "GHESizing", 
   "inputs": [
     {
-      "access": "item", 
       "name": "_sys_param", 
-      "description": "The system parameters JSON file output by the \"DF Write Modelica DES\"\ncomponent. This includes the detailed Building load profiles,\nequipment specifications, and borehole field characteristics.", 
+      "default": null, 
+      "access": "item", 
       "type": "string", 
-      "default": null
+      "description": "The system parameters JSON file output by the \"DF Write Modelica DES\"\ncomponent. This includes the detailed Building load profiles,\nequipment specifications, and borehole field characteristics."
     }, 
     {
-      "access": "item", 
       "name": "_des_loop", 
-      "description": "The GHE Thermal Loop object output by the \"DF GHE Thermal Loop\",\nwhich contains the geometry of the district energy system.", 
+      "default": null, 
+      "access": "item", 
       "type": "System.Object", 
-      "default": null
+      "description": "The GHE Thermal Loop object output by the \"DF GHE Thermal Loop\",\nwhich contains the geometry of the district energy system."
+    }, 
+    {
+      "name": "ip_", 
+      "default": null, 
+      "access": "item", 
+      "type": "bool", 
+      "description": "Boolean to note whether all outputs should be in SI or IP units.\nSetting this to True will result in all values in the report to IP\nand the month_temps will be in F instead of C. (Default: False)."
     }
   ], 
-  "subcategory": "1 :: Visualize", 
-  "code": "\nimport os\n\ntry:  # import the ladybug_geometry dependencies\n    from ladybug_geometry.geometry3d import Vector3D, Point3D, LineSegment3D, Face3D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import units_system\n    from ladybug_{{cad}}.fromgeometry import from_point2d, from_linesegment3d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, list_to_data_tree\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # get the folder where all of the sizing results live\n    proj_folder = os.path.dirname(_sys_param)\n    ghe_dir = os.path.join(proj_folder, 'run', 'honeybee_scenario', 'ghe_dir')\n    assert os.path.isdir(ghe_dir), \\\n        'No {{PLGN}}E sizing results were found at\" {}.'.format(ghe_dir)\n\n    # parse the borehole geometry\n    units = units_system()\n    boreholes, bore_geo, g_function, properties, month_temps = [], [], [], [], []\n    for ghe_id in os.listdir(ghe_dir):\n        # find the matching {{PLGN}}E in the loop\n        for ghe in _des_loop.ground_heat_exchangers:\n            if ghe_id == ghe.identifier:\n                matched_ghe = ghe\n                break\n        else:\n            msg = 'No {{PLGN}}E in the connected _des_loop matches with the {{PLGN}}E ' \\\n                '\"{}\" in the _sys_param.'.format(ghe_id)\n            raise ValueError(msg)\n        \n        # get the files with all of the information\n        bore_file = os.path.join(ghe_dir, ghe_id, 'BoreFieldData.csv')\n        summary_file = os.path.join(ghe_dir, ghe_id, 'SimulationSummary.json')\n        g_func_file = os.path.join(ghe_dir, ghe_id, 'Gfunction.csv')\n\n        # load the borehole positions\n        ghe_bores = matched_ghe.load_boreholes(bore_file, units, ortho_rotation=True)\n        ghe_boreholes = [from_point2d(pt) for pt in ghe_bores]\n        boreholes.append(ghe_boreholes)\n\n        # load the summary data\n        props = matched_ghe.load_energyplus_properties(summary_file)\n        properties.append(props)\n        zp = zip(matched_ghe.PROPERTY_NAMES, props)\n        print(ghe_id + '\\n' + '\\n'.join('  {}: {}'.format(name, val) for name, val in zp))\n\n        # create a line segment for each borehole\n        z_val = matched_ghe.geometry.min.z if isinstance(matched_ghe.geometry, Face3D) else 0\n        bore_dir = Vector3D(0, 0, -props[0])\n        ghe_geos = [LineSegment3D(Point3D(pt.x, pt.y, z_val), bore_dir) for pt in ghe_bores]\n        ghe_geos = [from_linesegment3d(pt) for pt in ghe_geos]\n        bore_geo.append(ghe_geos)\n\n        # load the g-function and the monthly temperatures\n        g_function.append(matched_ghe.load_g_function(g_func_file))\n        month_temps.append(matched_ghe.load_monthly_temperatures(summary_file))\n\n    # convert the boreholes to a data tree\n    boreholes = list_to_data_tree(boreholes)\n    bore_geo = list_to_data_tree(bore_geo)\n    g_function = list_to_data_tree(g_function)\n    properties = list_to_data_tree(properties)\n    month_temps = list_to_data_tree(month_temps)\n", 
-  "category": "Dragonfly", 
   "name": "DF Read GHE Sizing", 
-  "description": "Load properties of the Ground Heat Exchangers (GHEs) from the \"DF Write Modelica DES\"\ncomponent. This includes the positions of boreholes in each GHE, the G-function\nof each GHE that describes the response of the ground to load, an a range of other\nproperties output from the sizing simulation performed by GHEDesigner.\n-"
+  "description": "Load properties of the Ground Heat Exchangers (GHEs) from the \"DF Write Modelica DES\"\ncomponent. This includes the positions of boreholes in each GHE, the G-function\nof each GHE that describes the response of the ground to load, an a range of other\nproperties output from the sizing simulation performed by GHEDesigner.\n-", 
+  "subcategory": "5 :: District Thermal"
 }
