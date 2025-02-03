@@ -20,6 +20,9 @@ properties output from the sizing simulation performed by GHEDesigner.
             equipment specifications, and borehole field characteristics.
         _des_loop: The GHE Thermal Loop object output by the "DF GHE Thermal Loop",
             which contains the geometry of the district energy system.
+        ip_: Boolean to note whether all outputs should be in SI or IP units.
+            Setting this to True will result in all values in the report to IP
+            and the month_temps will be in F instead of C. (Default: False).
 
     Returns:
         report: Reports, errors, warnings, etc.
@@ -58,17 +61,23 @@ properties output from the sizing simulation performed by GHEDesigner.
 
 ghenv.Component.Name = 'DF Read GHE Sizing'
 ghenv.Component.NickName = 'GHESizing'
-ghenv.Component.Message = '1.8.2'
+ghenv.Component.Message = '1.8.3'
 ghenv.Component.Category = 'Dragonfly'
-ghenv.Component.SubCategory = '1 :: Visualize'
+ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'
 
 import os
+import re
 
 try:  # import the ladybug_geometry dependencies
     from ladybug_geometry.geometry3d import Vector3D, Point3D, LineSegment3D, Face3D
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_geometry:\n\t{}'.format(e))
+
+try:
+    import ladybug.datatype
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
     from ladybug_rhino.config import units_system
@@ -76,6 +85,25 @@ try:  # import the ladybug_rhino dependencies
     from ladybug_rhino.grasshopper import all_required_inputs, list_to_data_tree
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+
+_unit_pattern = re.compile(r'\((.*)\)')
+
+
+def property_to_ip(name, val):
+    """Convert a GHE Property to IP."""
+    matches = _unit_pattern.findall(name)
+    if len(matches) == 0:
+        return name, val
+    unit = matches[0]
+    base_type = None
+    for key in ladybug.datatype.UNITS:
+        if unit in ladybug.datatype.UNITS[key]:
+            base_type = ladybug.datatype.TYPESDICT[key]()
+            break
+    if base_type is None:
+        return name, val
+    values, new_unit = base_type.to_ip([val], unit)
+    return name.split('(')[0] + '({})'.format(new_unit), values[0]
 
 
 if all_required_inputs(ghenv.Component):
@@ -113,6 +141,8 @@ if all_required_inputs(ghenv.Component):
         props = matched_ghe.load_energyplus_properties(summary_file)
         properties.append(props)
         zp = zip(matched_ghe.PROPERTY_NAMES, props)
+        if ip_:
+            zp = [property_to_ip(name, val) for name, val in zp]
         print(ghe_id + '\n' + '\n'.join('  {}: {}'.format(name, val) for name, val in zp))
 
         # create a line segment for each borehole
@@ -124,7 +154,10 @@ if all_required_inputs(ghenv.Component):
 
         # load the g-function and the monthly temperatures
         g_function.append(matched_ghe.load_g_function(g_func_file))
-        month_temps.append(matched_ghe.load_monthly_temperatures(summary_file))
+        t_ground = matched_ghe.load_monthly_temperatures(summary_file)
+        if ip_:
+            t_ground, _ = ladybug.datatype.temperature.Temperature().to_ip(t_ground, 'C')
+        month_temps.append(t_ground)
 
     # convert the boreholes to a data tree
     boreholes = list_to_data_tree(boreholes)
