@@ -20,6 +20,9 @@ outline boundary around the Story.
             joined together across the model
         _area_thresh_: A number for the Room2D floor area below which it is considered
             a small room to be joined into adjacent rooms. (Default: 10.0 square meters).
+        join_to_large_: A boolean to note whether the small Room2Ds should
+            be joined into neighboring large Room2Ds as opposed to simply
+            joining the small rooms to one another. (Default: False).
 
     Returns:
         report: Reports, errors, warnings, etc.
@@ -29,7 +32,7 @@ outline boundary around the Story.
 
 ghenv.Component.Name = 'DF Join Small Rooms'
 ghenv.Component.NickName = 'JoinSmall'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -68,4 +71,7 @@ if all_required_inputs(ghenv.Component):
 
     # merge small rooms together in the story
     for story in stories:
-        story.join_small_rooms(a_thresh, tolerance=tolerance)
+        story.join_small_room_2ds(a_thresh, join_into_large=join_to_large_,
+                                  tolerance=tolerance)
+        story.reset_adjacency()
+        story.solve_room_2d_adjacency(tolerance=tolerance)
