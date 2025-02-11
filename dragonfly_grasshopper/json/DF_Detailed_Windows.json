@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0", 
+  "version": "1.8.1", 
   "nickname": "DetailedWindows", 
   "outputs": [
     [
@@ -23,13 +23,20 @@
     {
       "access": "list", 
       "name": "_windows", 
-      "description": "A list of Breps that will be added to the input _df_objs as\ndetailed windows.", 
+      "description": "A list of Breps that will be added to the input _df_objs as detailed\nwindows. This can also be a list of orphaned Honeybee Apertures and/or\nDoors to be added to the Dragonfly objects. In the case of Doors, they\nwill be assigned to the Dragonfly object as such.", 
       "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "project_dist_", 
+      "description": "An optional number to be used to project the Aperture/Door geometry\nonto parent Faces. If specified, then sub-faces within this distance\nof the parent Face will be projected and added. Otherwise,\nApertures/Doors will only be added if they are coplanar with a parent Face.", 
+      "type": "double", 
       "default": null
     }
   ], 
   "subcategory": "0 :: Create", 
-  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import DetailedWindows\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\n    from ladybug_{{cad}}.config import tolerance, angle_tolerance\n    from ladybug_{{cad}}.togeometry import to_face3d\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects and convert windows to Face3D\n    df_objs = [obj.duplicate() for obj in _df_objs]\n    win_geo = [f for geo in _windows for f in to_face3d(geo)]\n\n    # collect all of the Room2Ds in the connected dragonfly objects\n    room_2ds = []\n    for df_obj in df_objs:\n        if isinstance(df_obj, Model):\n            room_2ds.extend(df_obj.room_2ds)\n        elif isinstance(df_obj, Building):\n            room_2ds.extend(df_obj.unique_room_2ds)\n        elif isinstance(df_obj, Story):\n            room_2ds.extend(df_obj.room_2ds)\n        elif isinstance(df_obj, Room2D):\n            room_2ds.append(df_obj)\n\n    # assign the relevant geometries to the Room2Ds\n    for room in room_2ds:\n        new_win_pars = []\n        for seg, win_par in zip(room.floor_segments, room.window_parameters):\n            win_to_add = []\n            for geo in win_geo:\n                if DetailedWindows.is_face3d_in_segment_plane(\n                        geo, seg, room.floor_to_ceiling_height,\n                        tolerance, angle_tolerance):\n                    win_to_add.append(geo)\n            if len(win_to_add) != 0:\n                det_win = DetailedWindows.from_face3ds(win_to_add, seg)\n                new_win_pars.append(det_win)\n            else:\n                new_win_pars.append(win_par)\n        room.window_parameters = new_win_pars\n", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.windowparameter import DetailedWindows\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the core honeybee dependencies\n    from honeybee.aperture import Aperture\n    from honeybee.door import Door\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\n    from ladybug_{{cad}}.config import tolerance, angle_tolerance\n    from ladybug_{{cad}}.togeometry import to_face3d\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects and convert windows to sub-faces\n    df_objs = [obj.duplicate() for obj in _df_objs]\n    win_geo = []\n    for geo in _windows:\n        if isinstance(geo, (Aperture, Door)):\n            win_geo.append(geo)\n        else:\n            for f in to_face3d(geo):\n                win_geo.append(Aperture('Dummy_Ap', f))\n    project_dist = 0 if project_dist_ is None else project_dist_\n\n    # collect all of the Room2Ds in the connected dragonfly objects\n    room_2ds = []\n    for df_obj in df_objs:\n        if isinstance(df_obj, Model):\n            room_2ds.extend(df_obj.room_2ds)\n        elif isinstance(df_obj, Building):\n            room_2ds.extend(df_obj.unique_room_2ds)\n        elif isinstance(df_obj, Story):\n            room_2ds.extend(df_obj.room_2ds)\n        elif isinstance(df_obj, Room2D):\n            room_2ds.append(df_obj)\n\n    # assign the relevant geometries to the Room2Ds\n    for room in room_2ds:\n        room.assign_sub_faces(win_geo, project_dist, tolerance=tolerance,\n                              angle_tolerance=angle_tolerance)\n", 
   "category": "Dragonfly", 
   "name": "DF Detailed Windows", 
   "description": "Add detailed window geometries to Dragonfly Room2Ds.\n-"
