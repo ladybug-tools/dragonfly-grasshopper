@@ -35,7 +35,7 @@ component or the "DF GHE Thermal Loop" component.
                 * DoubleUTubeParallel
 
     Returns:
-        soil: A PipeParameter object that can be plugged into the "DF GHE Designer"
+        pipe: A PipeParameter object that can be plugged into the "DF GHE Designer"
             component in order to customize pipe properties of a GHE sizing
             simulation. It can also be plugged into the "DF GHE Thermal Loop"
             component to perform a similar role in a District Energy Simulation
@@ -44,7 +44,7 @@ component or the "DF GHE Thermal Loop" component.
 
 ghenv.Component.Name = 'DF GHE Pipe Parameter'
 ghenv.Component.NickName = 'GHEPipe'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
