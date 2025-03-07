@@ -39,14 +39,25 @@ to connect these objects to Dragonfly Buildings.
         _fluid_: A GHE Fluid object from the "DF GHE Fluid Parameters" component.
             This can be used to customize the fuild used (eg. water, glycol)
             as well as the concentration of the fluid. (Default: 100% Water).
-        _pipe_: A GHEPipe object from the "DF GHE Pipe Parameters" component.
+        _pipe_: A GHE Pipe object from the "DF GHE Pipe Parameters" component.
             This can be used to customize the pipe diameter, conductivty,
             and roughness.
+        _horiz_pipe_: A HorizontalPipe object to specify the properties of the
+            horizontal pipes contained within ThermalConnectors. This can be
+            used to customize the pipe insulation, pressure loss, etc.
         _design_: A GHEDesign object from the "DF GHE Design" component. This can be
             used to customize the mina and max entering fluid temperatures
             as well as the max boreholes.
         _name_: Text to be used for the name and identifier of the Thermal Loop.
             If no name is provided, it will be "unnamed".
+        _ghe_names_: An optional list of names that align with the input _ghe_geo and
+            note the name to be used for each ground heat exchanger in the
+            DES loop. If no names are provided, they will be derived from
+            the DES Loop name above.
+        _connect_names_: An optional list of names that align with the input _connector_geo
+            and note the name to be used for each thermal connector in the
+            DES loop. If no names are provided, they will be derived from
+            the DES Loop name above.
 
     Returns:
         report: Reports, errors, warnings, etc.
@@ -57,12 +68,10 @@ to connect these objects to Dragonfly Buildings.
 
 ghenv.Component.Name = 'DF GHE Thermal Loop'
 ghenv.Component.NickName = 'GHELoop'
-ghenv.Component.Message = '1.8.3'
+ghenv.Component.Message = '1.8.4'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
-
-import math
 
 try:  # import the core honeybee dependencies
     from honeybee.typing import clean_ep_string
@@ -89,24 +98,40 @@ if all_required_inputs(ghenv.Component):
     # set a default name
     name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'
 
-    # create the GHE fields and the Thermal Connectors
-    lines = []
-    for geo in _connector_geo:
-        lines.append(to_polyline2d(geo))
+    # create the Thermal Connectors
     connectors = []
-    for i, lin in enumerate(lines):
-        connectors.append(ThermalConnector('{}_ThermalConnector_{}'.format(name, i), lin))
+    for i, geo in enumerate(_connector_geo):
+        lin = to_polyline2d(geo)
+        try:
+            conn_name = _connect_names_[i]
+            conn_id = clean_ep_string(conn_name)
+        except IndexError:
+            conn_name, conn_id = None, '{}_ThermalConnector_{}'.format(name, i)
+        conn_obj = ThermalConnector(conn_id, lin)
+        if conn_name is not None:
+            conn_obj.display_name = conn_name
+        connectors.append(conn_obj)
+
+    # create the GHE fields
     ghes, total_area = [], 0
     for i, geo in enumerate(_ghe_geo):
         faces = to_face3d(geo)
-        for gp in faces:
-            print(gp)
-            total_area += gp.area * conversion_to_meters()
-            ghes.append(GroundHeatExchanger('{}_GHE_{}'.format(name, i), gp))
+        gp = faces[0]
+        total_area += gp.area * conversion_to_meters()
+        try:
+            ghe_name = _ghe_names_[i]
+            ghe_id = clean_ep_string(ghe_name)
+        except IndexError:
+            ghe_name, ghe_id = None, '{}_GHE_{}'.format(name, i)
+        ghe_obj = GroundHeatExchanger(ghe_id, gp)
+        if ghe_name is not None:
+            ghe_obj.display_name = ghe_name
+        ghes.append(ghe_obj)
 
     # create the loop
-    des_loop = GHEThermalLoop(name, ghes, connectors, _clockwise_,
-                              _soil_, _fluid_, _pipe_, _borehole_, _design_)
+    des_loop = GHEThermalLoop(
+        name, ghes, connectors, _clockwise_,
+        _soil_, _fluid_, _pipe_, _borehole_, _design_, _horiz_pipe_)
     if _name_ is not None:
         des_loop.display_name = _name_
 

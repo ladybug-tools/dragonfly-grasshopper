@@ -1,64 +1,64 @@
 {
-  "version": "1.8.1", 
-  "nickname": "GHEPipe", 
+  "subcategory": "5 :: District Thermal", 
+  "code": "\ntry:\n    from dragonfly_energy.des.ghe import PipeParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\ninner_diameter = _inner_diameter_ * conversion_to_meters() \\\n    if _inner_diameter_ is not None else 0.0216\nouter_diameter = _outer_diameter_ * conversion_to_meters() \\\n    if _outer_diameter_ is not None else 0.0266\nshank_spacing = _shank_spacing_ * conversion_to_meters() \\\n    if _shank_spacing_ is not None else 0.0323\nconductivity = _conductivity_ if _conductivity_ is not None else 0.4\nheat_capacity = _heat_capacity_ if _heat_capacity_ is not None else 1542000\narrangement = _arrangement_ if _arrangement_ is not None else 'SingleUTube'\n\n\npipe = PipeParameter(\n    inner_diameter=inner_diameter, outer_diameter=outer_diameter, shank_spacing=shank_spacing,\n    conductivity=conductivity, heat_capacity=heat_capacity, arrangement=arrangement)\n", 
   "outputs": [
     [
       {
-        "access": "None", 
         "name": "pipe", 
-        "description": "A SoilParameter object that can be plugged into the \"DF GHE Designer\"\ncomponent in order to customize soil properties of a GHE sizing\nsimulation. It can also be plugged into the \"DF GHE Thermal Loop\"\ncomponent to perform a similar role in a District Energy Simulation\n(DES) of a loop with a ground heat exchanger.", 
+        "access": "None", 
+        "description": "A PipeParameter object that can be plugged into the \"DF GHE Designer\"\ncomponent in order to customize pipe properties of a GHE sizing\nsimulation. It can also be plugged into the \"DF GHE Thermal Loop\"\ncomponent to perform a similar role in a District Energy Simulation\n(DES) of a loop with a ground heat exchanger.", 
         "type": null, 
         "default": null
       }
     ]
   ], 
+  "description": "Create a PipeParameter object that can be used to customize the pipe properties\nwithin a Ground Heat Exchanger (GHE) sizing simulation.\n_\nThe output of this component can be used with either the \"DF GHE Designer\"\ncomponent or the \"DF GHE Thermal Loop\" component.\n-", 
+  "version": "1.8.2", 
   "inputs": [
     {
-      "access": "item", 
       "name": "_inner_diameter_", 
+      "access": "item", 
       "description": "A number in Rhino model units (eg. Meters, Feet, etc.) for the\ndiameter of the inner pipe surface in meters. (Default: 0.0216 meters).", 
       "type": "double", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_outer_diameter_", 
+      "access": "item", 
       "description": "A number in Rhino model units (eg. Meters, Feet, etc.) for the\ndiameter of the outer pipe surface in meters. (Default: 0.0266 meters).", 
       "type": "double", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_shank_spacing_", 
+      "access": "item", 
       "description": "A number in Rhino model units (eg. Meters, Feet, etc.) for the\nspacing between the U-tube legs, as referenced from outer surface of\nthe pipes in meters. (NOT referenced from each pipe's respective\ncenterline). (Default: 0.0323 meters).", 
       "type": "double", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_conductivity_", 
+      "access": "item", 
       "description": "A number for the conductivity of the pipe material in W/m-K. (Default: 0.4).", 
       "type": "double", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_heat_capacity_", 
+      "access": "item", 
       "description": "A number for the volumetric heat capacity of the pipe\nmaterial in J/m3-K. (Default: 1,542,000).", 
       "type": "double", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_arrangement_", 
+      "access": "item", 
       "description": "Text for the specified pipe arrangement. Choose from the\nfollowing options. (Default: SingleUTube).\n_\n* SingleUTube\n* DoubleUTubeSeries\n* DoubleUTubeParallel", 
       "type": "string", 
       "default": null
     }
   ], 
-  "subcategory": "5 :: District Thermal", 
-  "code": "\ntry:\n    from dragonfly_energy.des.ghe import PipeParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\ninner_diameter = _inner_diameter_ * conversion_to_meters() \\\n    if _inner_diameter_ is not None else 0.0216\nouter_diameter = _outer_diameter_ * conversion_to_meters() \\\n    if _outer_diameter_ is not None else 0.0266\nshank_spacing = _shank_spacing_ * conversion_to_meters() \\\n    if _shank_spacing_ is not None else 0.0323\nconductivity = _conductivity_ if _conductivity_ is not None else 0.4\nheat_capacity = _heat_capacity_ if _heat_capacity_ is not None else 1542000\narrangement = _arrangement_ if _arrangement_ is not None else 'SingleUTube'\n\n\npipe = PipeParameter(\n    inner_diameter=inner_diameter, outer_diameter=outer_diameter, shank_spacing=shank_spacing,\n    conductivity=conductivity, heat_capacity=heat_capacity, arrangement=arrangement)\n", 
-  "category": "Dragonfly", 
   "name": "DF GHE Pipe Parameter", 
-  "description": "Create a PipeParameter object that can be used to customize the pipe properties\nwithin a Ground Heat Exchanger (GHE) sizing simulation.\n_\nThe output of this component can be used with either the \"DF GHE Designer\"\ncomponent or the \"DF GHE Thermal Loop\" component.\n-"
+  "nickname": "GHEPipe", 
+  "category": "Dragonfly"
 }

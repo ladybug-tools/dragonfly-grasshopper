@@ -1,85 +1,106 @@
 {
-  "version": "1.8.3", 
-  "nickname": "GHELoop", 
+  "subcategory": "5 :: District Thermal", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.connector import ThermalConnector\n    from dragonfly_energy.des.ghe import GroundHeatExchanger\n    from dragonfly_energy.des.loop import {{PLGN}}EThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_polyline2d\n    from ladybug_{{cad}}.togeometry import to_face3d\n    from ladybug_{{cad}}.config import angle_tolerance, conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\n\n    # create the Thermal Connectors\n    connectors = []\n    for i, geo in enumerate(_connector_geo):\n        lin = to_polyline2d(geo)\n        try:\n            conn_name = _connect_names_[i]\n            conn_id = clean_ep_string(conn_name)\n        except IndexError:\n            conn_name, conn_id = None, '{}_ThermalConnector_{}'.format(name, i)\n        conn_obj = ThermalConnector(conn_id, lin)\n        if conn_name is not None:\n            conn_obj.display_name = conn_name\n        connectors.append(conn_obj)\n\n    # create the {{PLGN}}E fields\n    ghes, total_area = [], 0\n    for i, geo in enumerate(_ghe_geo):\n        faces = to_face3d(geo)\n        gp = faces[0]\n        total_area += gp.area * conversion_to_meters()\n        try:\n            ghe_name = _ghe_names_[i]\n            ghe_id = clean_ep_string(ghe_name)\n        except IndexError:\n            ghe_name, ghe_id = None, '{}_{{PLGN}}E_{}'.format(name, i)\n        ghe_obj = GroundHeatExchanger(ghe_id, gp)\n        if ghe_name is not None:\n            ghe_obj.display_name = ghe_name\n        ghes.append(ghe_obj)\n\n    # create the loop\n    des_loop = {{PLGN}}EThermalLoop(\n        name, ghes, connectors, _clockwise_,\n        _soil_, _fluid_, _pipe_, _borehole_, _design_, _horiz_pipe_)\n    if _name_ is not None:\n        des_loop.display_name = _name_\n\n    # give a warning about RAM if the size of the borehole field is too large\n    borehole_count = int(total_area / (des_loop.borehole_parameters.min_spacing ** 2))\n    MAX_BOREHOLES = 8000\n    if borehole_count > MAX_BOREHOLES:\n        msg = 'The inputs suggest that there may be as many as {} boreholes in the ' \\\n            '{{PLGN}}E field\\nand this can cause the {{PLGN}}E sizing routine to use ' \\\n            'more than 10GB of memory.\\nA smaller _ghe_geo or a larger '\\\n            '_bore_spacing_ is recommended such that fewer\\nthan {} boreholes are ' \\\n            'generated.'.format(borehole_count, MAX_BOREHOLES)\n        print(msg)\n        give_warning(ghenv.Component, msg)\n", 
   "outputs": [
     [
       {
-        "access": "None", 
         "name": "des_loop", 
+        "access": "None", 
         "description": "A Dragonfly Thermal Loop object possessing all infrastructure for a\nDistrict Energy Simulation (DES) simulation. This should be connected\nto the loop_ input of the \"DF Model to GeoJSON\" component.", 
         "type": null, 
         "default": null
       }
     ]
   ], 
+  "description": "Create an Ground Heat Exchanger Loop for a District Energy Simulation (DES) simulation.\n_\nThis includes a ground heat exchanger and all thermal connectors needed\nto connect these objects to Dragonfly Buildings.\n-", 
+  "version": "1.8.4", 
   "inputs": [
     {
-      "access": "list", 
       "name": "_ghe_geo", 
+      "access": "list", 
       "description": "Horizontal Rhino surfaces representing the footprints of ground heat\nexchangers. These ground heat exchanging fields contain the\nboreholes that supply the loop with thermal capacity. Multiple\nborehole fields can be located along the loop created by the\n_connector_geo.", 
       "type": "Brep", 
       "default": null
     }, 
     {
-      "access": "list", 
       "name": "_connector_geo", 
+      "access": "list", 
       "description": "An array of lines or polylines representing the thermal connectors\nwithin the thermal loop. In order for a given connector to be valid\nwithin the loop, each end of the connector must touch either another\nconnector, a building footprint, or a ground heat exchanger. In\norder for the loop as a whole to be valid, the connectors must form a\nsingle continuous loop when passed through the buildings and the heat\nexchanger field.", 
       "type": "Curve", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_clockwise_", 
+      "access": "item", 
       "description": "A boolean to note whether the direction of flow through the\nloop is clockwise (True) when viewed from above in the GeoJSON or it\nis counterclockwise (False). (Default: False).", 
       "type": "bool", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_borehole_", 
+      "access": "item", 
       "description": "A GHE BoreholeParameter object from the \"DF GHE Borehole Parameters\"\ncomponent, which customizes properties like borehole min/max depth\nand borehole min/max spacing.", 
       "type": "System.Object", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_soil_", 
+      "access": "item", 
       "description": "A GHE SoilParameter object from the \"DF GHE Soil Parameters\" component.\nThis can be used to customize the conductivity and density of the\nsoil as well as the grout that fills the boreholes.", 
       "type": "System.Object", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_fluid_", 
+      "access": "item", 
       "description": "A GHE Fluid object from the \"DF GHE Fluid Parameters\" component.\nThis can be used to customize the fuild used (eg. water, glycol)\nas well as the concentration of the fluid. (Default: 100% Water).", 
       "type": "System.Object", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_pipe_", 
-      "description": "A GHEPipe object from the \"DF GHE Pipe Parameters\" component.\nThis can be used to customize the pipe diameter, conductivty,\nand roughness.", 
+      "access": "item", 
+      "description": "A GHE Pipe object from the \"DF GHE Pipe Parameters\" component.\nThis can be used to customize the pipe diameter, conductivty,\nand roughness.", 
       "type": "System.Object", 
       "default": null
     }, 
     {
+      "name": "_horiz_pipe_", 
       "access": "item", 
+      "description": "A HorizontalPipe object to specify the properties of the\nhorizontal pipes contained within ThermalConnectors. This can be\nused to customize the pipe insulation, pressure loss, etc.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
       "name": "_design_", 
+      "access": "item", 
       "description": "A GHEDesign object from the \"DF GHE Design\" component. This can be\nused to customize the mina and max entering fluid temperatures\nas well as the max boreholes.", 
       "type": "System.Object", 
       "default": null
     }, 
     {
-      "access": "item", 
       "name": "_name_", 
+      "access": "item", 
       "description": "Text to be used for the name and identifier of the Thermal Loop.\nIf no name is provided, it will be \"unnamed\".", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "name": "_ghe_names_", 
+      "access": "list", 
+      "description": "An optional list of names that align with the input _ghe_geo and\nnote the name to be used for each ground heat exchanger in the\nDES loop. If no names are provided, they will be derived from\nthe DES Loop name above.", 
+      "type": "string", 
+      "default": null
+    }, 
+    {
+      "name": "_connect_names_", 
+      "access": "list", 
+      "description": "An optional list of names that align with the input _connector_geo\nand note the name to be used for each thermal connector in the\nDES loop. If no names are provided, they will be derived from\nthe DES Loop name above.", 
       "type": "string", 
       "default": null
     }
   ], 
-  "subcategory": "5 :: District Thermal", 
-  "code": "\nimport math\n\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.connector import ThermalConnector\n    from dragonfly_energy.des.ghe import GroundHeatExchanger\n    from dragonfly_energy.des.loop import {{PLGN}}EThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_polyline2d\n    from ladybug_{{cad}}.togeometry import to_face3d\n    from ladybug_{{cad}}.config import angle_tolerance, conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\n\n    # create the {{PLGN}}E fields and the Thermal Connectors\n    lines = []\n    for geo in _connector_geo:\n        lines.append(to_polyline2d(geo))\n    connectors = []\n    for i, lin in enumerate(lines):\n        connectors.append(ThermalConnector('{}_ThermalConnector_{}'.format(name, i), lin))\n    ghes, total_area = [], 0\n    for i, geo in enumerate(_ghe_geo):\n        faces = to_face3d(geo)\n        for gp in faces:\n            print(gp)\n            total_area += gp.area * conversion_to_meters()\n            ghes.append(GroundHeatExchanger('{}_{{PLGN}}E_{}'.format(name, i), gp))\n\n    # create the loop\n    des_loop = {{PLGN}}EThermalLoop(name, ghes, connectors, _clockwise_,\n                              _soil_, _fluid_, _pipe_, _borehole_, _design_)\n    if _name_ is not None:\n        des_loop.display_name = _name_\n\n    # give a warning about RAM if the size of the borehole field is too large\n    borehole_count = int(total_area / (des_loop.borehole_parameters.min_spacing ** 2))\n    MAX_BOREHOLES = 8000\n    if borehole_count > MAX_BOREHOLES:\n        msg = 'The inputs suggest that there may be as many as {} boreholes in the ' \\\n            '{{PLGN}}E field\\nand this can cause the {{PLGN}}E sizing routine to use ' \\\n            'more than 10GB of memory.\\nA smaller _ghe_geo or a larger '\\\n            '_bore_spacing_ is recommended such that fewer\\nthan {} boreholes are ' \\\n            'generated.'.format(borehole_count, MAX_BOREHOLES)\n        print(msg)\n        give_warning(ghenv.Component, msg)\n", 
-  "category": "Dragonfly", 
   "name": "DF GHE Thermal Loop", 
-  "description": "Create an Ground Heat Exchanger Loop for a District Energy Simulation (DES) simulation.\n_\nThis includes a ground heat exchanger and all thermal connectors needed\nto connect these objects to Dragonfly Buildings.\n-"
+  "nickname": "GHELoop", 
+  "category": "Dragonfly"
 }
