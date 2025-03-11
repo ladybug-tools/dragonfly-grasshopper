@@ -17,8 +17,6 @@ The output of this component can be used with the "DF GHE Thermal Loop" componen
     Args:
         _buried_depth_: The buried depth of the pipes in Rhino model units (eg. Meters,
             Feet, etc.). (Default: 1.5 meters).
-        _hydraulic_diameter_: Hydraulic diameter of the distribution pipe in Rhino
-            model units (eg. Meters, Feet, etc.). (Default: 0.072736 meters).
         _diameter_ratio_: A number for the ratio of pipe outer diameter to pipe
             wall thickness. (Default: 11).
         _pressure_drop_: A number for the pressure drop in pascals per meter of pipe. (Default: 300).
@@ -39,7 +37,7 @@ The output of this component can be used with the "DF GHE Thermal Loop" componen
 
 ghenv.Component.Name = 'DF Horizontal Pipe Parameter'
 ghenv.Component.NickName = 'HorizPipe'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -61,8 +59,6 @@ turn_off_old_tag(ghenv.Component)
 
 buried_depth = _buried_depth_ * conversion_to_meters() \
     if _buried_depth_ is not None else 1.5
-hydraulic_diameter = _hydraulic_diameter_ * conversion_to_meters() \
-    if _hydraulic_diameter_ is not None else 0.072736
 insulation_thickness = _insulation_thick_ * conversion_to_meters() \
     if _insulation_thick_ is not None else 0.2
 diameter_ratio = _diameter_ratio_ if _diameter_ratio_ is not None else 11
@@ -71,7 +67,7 @@ insulation_conductivity = _insulation_conduct_ if _insulation_conduct_ is not No
 
 
 horiz_pipe = HorizontalPipeParameter(
-    buried_depth=buried_depth, hydraulic_diameter=hydraulic_diameter,
-    diameter_ratio=diameter_ratio, pressure_drop_per_meter=pressure_drop_per_meter,
+    buried_depth=buried_depth, diameter_ratio=diameter_ratio,
+    pressure_drop_per_meter=pressure_drop_per_meter,
     insulation_conductivity=insulation_conductivity,
     insulation_thickness=insulation_thickness)
