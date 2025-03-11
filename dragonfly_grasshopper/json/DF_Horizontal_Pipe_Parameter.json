@@ -1,64 +1,57 @@
 {
+  "nickname": "HorizPipe", 
+  "category": "Dragonfly", 
+  "description": "Create a HorizontalPipeParameter object that can be used to customize the properties\nof horizontal pipes contained within ThermalConnectors.\n_\nThe output of this component can be used with the \"DF GHE Thermal Loop\" component.\n-", 
   "subcategory": "5 :: District Thermal", 
-  "code": "\ntry:\n    from dragonfly_energy.des.connector import HorizontalPipeParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nburied_depth = _buried_depth_ * conversion_to_meters() \\\n    if _buried_depth_ is not None else 1.5\nhydraulic_diameter = _hydraulic_diameter_ * conversion_to_meters() \\\n    if _hydraulic_diameter_ is not None else 0.072736\ninsulation_thickness = _insulation_thick_ * conversion_to_meters() \\\n    if _insulation_thick_ is not None else 0.2\ndiameter_ratio = _diameter_ratio_ if _diameter_ratio_ is not None else 11\npressure_drop_per_meter = _pressure_drop_ if _pressure_drop_ is not None else 300\ninsulation_conductivity = _insulation_conduct_ if _insulation_conduct_ is not None else 3.0\n\n\nhoriz_pipe = HorizontalPipeParameter(\n    buried_depth=buried_depth, hydraulic_diameter=hydraulic_diameter,\n    diameter_ratio=diameter_ratio, pressure_drop_per_meter=pressure_drop_per_meter,\n    insulation_conductivity=insulation_conductivity,\n    insulation_thickness=insulation_thickness)\n", 
+  "code": "\ntry:\n    from dragonfly_energy.des.connector import HorizontalPipeParameter\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.config import conversion_to_meters\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\nburied_depth = _buried_depth_ * conversion_to_meters() \\\n    if _buried_depth_ is not None else 1.5\ninsulation_thickness = _insulation_thick_ * conversion_to_meters() \\\n    if _insulation_thick_ is not None else 0.2\ndiameter_ratio = _diameter_ratio_ if _diameter_ratio_ is not None else 11\npressure_drop_per_meter = _pressure_drop_ if _pressure_drop_ is not None else 300\ninsulation_conductivity = _insulation_conduct_ if _insulation_conduct_ is not None else 3.0\n\n\nhoriz_pipe = HorizontalPipeParameter(\n    buried_depth=buried_depth, diameter_ratio=diameter_ratio,\n    pressure_drop_per_meter=pressure_drop_per_meter,\n    insulation_conductivity=insulation_conductivity,\n    insulation_thickness=insulation_thickness)\n", 
   "outputs": [
     [
       {
+        "type": null, 
+        "default": null, 
         "name": "horiz_pipe", 
         "access": "None", 
-        "description": "A HorizontalPipeParameter object that can be plugged into the \"DF GHE \nThermal Loop\" component to customize the properties of horizonal pipes\nin a District Energy System (DES) simulation.", 
-        "type": null, 
-        "default": null
+        "description": "A HorizontalPipeParameter object that can be plugged into the \"DF GHE \nThermal Loop\" component to customize the properties of horizonal pipes\nin a District Energy System (DES) simulation."
       }
     ]
   ], 
-  "description": "Create a HorizontalPipeParameter object that can be used to customize the properties\nof horizontal pipes contained within ThermalConnectors.\n_\nThe output of this component can be used with the \"DF GHE Thermal Loop\" component.\n-", 
-  "version": "1.8.0", 
   "inputs": [
     {
+      "type": "double", 
+      "default": null, 
       "name": "_buried_depth_", 
       "access": "item", 
-      "description": "The buried depth of the pipes in Rhino model units (eg. Meters,\nFeet, etc.). (Default: 1.5 meters).", 
-      "type": "double", 
-      "default": null
+      "description": "The buried depth of the pipes in Rhino model units (eg. Meters,\nFeet, etc.). (Default: 1.5 meters)."
     }, 
     {
-      "name": "_hydraulic_diameter_", 
-      "access": "item", 
-      "description": "Hydraulic diameter of the distribution pipe in Rhino\nmodel units (eg. Meters, Feet, etc.). (Default: 0.072736 meters).", 
       "type": "double", 
-      "default": null
-    }, 
-    {
+      "default": null, 
       "name": "_diameter_ratio_", 
       "access": "item", 
-      "description": "A number for the ratio of pipe outer diameter to pipe\nwall thickness. (Default: 11).", 
-      "type": "double", 
-      "default": null
+      "description": "A number for the ratio of pipe outer diameter to pipe\nwall thickness. (Default: 11)."
     }, 
     {
+      "type": "double", 
+      "default": null, 
       "name": "_pressure_drop_", 
       "access": "item", 
-      "description": "A number for the pressure drop in pascals per meter of pipe. (Default: 300).", 
-      "type": "double", 
-      "default": null
+      "description": "A number for the pressure drop in pascals per meter of pipe. (Default: 300)."
     }, 
     {
+      "type": "double", 
+      "default": null, 
       "name": "_insulation_conduct_", 
       "access": "item", 
-      "description": "A positive number for the conductivity of the pipe insulation\nmaterial in W/m-K. If no insulation exists, this value should be a\nvirtual insulation layer of soil since this value must be greater\nthan zero. (Default: 3.0).", 
-      "type": "double", 
-      "default": null
+      "description": "A positive number for the conductivity of the pipe insulation\nmaterial in W/m-K. If no insulation exists, this value should be a\nvirtual insulation layer of soil since this value must be greater\nthan zero. (Default: 3.0)."
     }, 
     {
+      "type": "double", 
+      "default": null, 
       "name": "_insulation_thick_", 
       "access": "item", 
-      "description": "A positive number for the thickness of pipe insulation in\nRhino model units (eg. Meters, Feet, etc.). If no insulation exists,\nthis value should be a virtual insulation layer of soil since this\nvalue must be greater than zero. (Default: 0.2 meters).", 
-      "type": "double", 
-      "default": null
+      "description": "A positive number for the thickness of pipe insulation in\nRhino model units (eg. Meters, Feet, etc.). If no insulation exists,\nthis value should be a virtual insulation layer of soil since this\nvalue must be greater than zero. (Default: 0.2 meters)."
     }
   ], 
-  "name": "DF Horizontal Pipe Parameter", 
-  "nickname": "HorizPipe", 
-  "category": "Dragonfly"
+  "version": "1.8.1", 
+  "name": "DF Horizontal Pipe Parameter"
 }
