@@ -1,0 +1,43 @@
+{
+  "version": "1.8.0", 
+  "nickname": "MakeBasements", 
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "name": "building", 
+        "description": "The input Dragonfly object with the wall boundary conditions changed.", 
+        "type": null, 
+        "default": null
+      }
+    ]
+  ], 
+  "inputs": [
+    {
+      "access": "item", 
+      "name": "_building", 
+      "description": "A Dragonfly Building that will have some if its stories set\nto be basements. This can also be an entire Dragonfly Model\nin which case all Buildings in the model will have their\nbasements set.", 
+      "type": "System.Object", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "_bsmnt_count_", 
+      "description": "A positive integer for the number of unique Stories\non the Building to make into basements. (Default: 1).", 
+      "type": "int", 
+      "default": null
+    }, 
+    {
+      "access": "item", 
+      "name": "remove_win_", 
+      "description": "Boolean to note whether basement Room2D segments with windows\nshould have their outdoor boundary conditions and windows kept (True)\nor whether the windows should be removed in order to assign a ground\nboundary condition to all walls (False). (Default: False).", 
+      "type": "bool", 
+      "default": null
+    }
+  ], 
+  "subcategory": "0 :: Create", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.units import parse_distance_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.config import units_system\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n# tolerance for computing the pole of inaccessibility\np_tol = parse_distance_string('0.01m', units_system())\n\n\nif all_required_inputs(ghenv.Component):\n    # set defaults and duplicate the initial object\n    basement_count = 1 if _bsmnt_count_ is None else _bsmnt_count_\n    remove_windows = False if remove_win_ is None else remove_win_\n    building = _building.duplicate()\n    buildings = building.buildings if isinstance(building, Model) else [building]\n\n    # loop through the buildings and make the basements\n    for bldg in buildings:\n        assert isinstance(bldg, Building), 'Expected Building. Got {}.'.format(type(bldg))\n        bldg.make_basement_stories(basement_count, remove_windows, p_tol)\n", 
+  "category": "Dragonfly", 
+  "name": "DF Make Basements", 
+  "description": "Make the lowest unique Story(s) of a Building into basements.\n_\nThis involves setting the outdoor walls of the basement stories to have ground\nboundary conditions and setting the is_ground_contact property on all relevant\nRoom2Ds that are a basement or have a basement story below them.\n-"
+}
