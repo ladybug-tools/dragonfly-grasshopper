@@ -30,7 +30,7 @@ Apply a detailed Ironbug HVAC to Dragonfly Buildings, Stories or Room2Ds.
 
 ghenv.Component.Name = "DF Detailed HVAC"
 ghenv.Component.NickName = 'DFDetailedHVAC'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -106,11 +106,11 @@ if all_required_inputs(ghenv.Component):
 
     # apply the HVAC system to the rooms
     hvac_rooms = set(hvac.thermal_zones)
-    hvac_count, rel_rooms = 0, []
+    hvac_count, rel_rooms = 0, set()
     for room in rooms:
-        if room.identifier in hvac_rooms:
+        if room.zone in hvac_rooms:
             room.properties.energy.hvac = hvac
-            rel_rooms.append(room.identifier)
+            rel_rooms.add(room.zone)
             hvac_count += 1
 
     # give a warning if no rooms were assigned the HVAC or if there are missing rooms
@@ -121,11 +121,10 @@ if all_required_inputs(ghenv.Component):
         give_warning(ghenv.Component, msg)
     if len(rel_rooms) != len(hvac_rooms):
         missing_rooms = []
-        found_rooms = set(rel_rooms)
-        for rm_id in hvac_rooms:
-            if rm_id not in found_rooms:
-                missing_rooms.append(rm_id)
-        msg = 'The Ironbug HVAC system contains the following rooms that are not ' \
+        for zone_id in hvac_rooms:
+            if zone_id not in rel_rooms:
+                missing_rooms.append(zone_id)
+        msg = 'The Ironbug HVAC system contains the following zones that are not ' \
             'in the connected _hb_objs.\n{}'.format('\n'.join(missing_rooms))
         print(msg)
         give_warning(ghenv.Component, msg)
