@@ -11,12 +11,28 @@
 """
 Get a validation report that contains a summary of all issues with the Model.
 _
-This includes checks for basic properties like adjacency as well as geometry checks.
+This includes basic properties like adjacency checks and all geometry checks.
+Furthermore, extension attributes for Energy and Radiance can be checked
+to ensure that the model can be simulated correctly in these engines.
 -
 
     Args:
         _model: A Dragonfly Model object to be validated. This can also be the file path
             to a Model DFJSON that will be validated.
+        extension_: Optional text for the name of the dragonfly extension for which
+            validation will occur. The value input here is case-insensitive such
+            that "radiance" and "Radiance" will both result in the model being
+            checked for validity with dragonfly-radiance. This value can also be
+            set to "All" in order to run checks for all installed extensions.
+            Some common dragonfly extension names that can be input here if they
+            are installed include:
+                * Radiance
+                * EnergyPlus
+                * OpenStudio
+                * DesignBuilder
+                * DOE2
+                * IES
+                * IDAICE
         _validate: Set to "True" to validate the the Model and get a report of all
             issues with the model.
 
@@ -30,7 +46,7 @@ This includes checks for basic properties like adjacency as well as geometry che
 
 ghenv.Component.Name = 'DF Validate Model'
 ghenv.Component.NickName = 'DFValidateModel'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.8.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -67,7 +83,8 @@ if all_required_inputs(ghenv.Component) and _validate:
             folders.dragonfly_core_version_str, folders.dragonfly_schema_version_str)
     )
     # perform several checks for geometry rules
-    report = parsed_model.check_all(raise_exception=False)
+    extension_ = 'All' if extension_ is None else extension_
+    report = parsed_model.check_for_extension(extension_, raise_exception=False)
     print('Model checks completed.')
     # check the report and write the summary of errors
     if report == '':
