@@ -1,5 +1,5 @@
 {
-  "version": "1.8.1", 
+  "version": "1.8.2", 
   "nickname": "DFValidateModel", 
   "outputs": [
     []
@@ -15,7 +15,7 @@
     {
       "access": "item", 
       "name": "extension_", 
-      "description": "Optional text for the name of the dragonfly extension for which\nvalidation will occur. The value input here is case-insensitive such\nthat \"radiance\" and \"Radiance\" will both result in the model being\nchecked for validity with dragonfly-radiance. This value can also be\nset to \"All\" in order to run checks for all installed extensions.\nSome common dragonfly extension names that can be input here if they\nare installed include:\n* Radiance\n* EnergyPlus\n* OpenStudio\n* DesignBuilder\n* DOE2\n* IES\n* IDAICE", 
+      "description": "Optional text for the name of the dragonfly extension for which\nvalidation will occur. The value input here is case-insensitive such\nthat \"radiance\" and \"Radiance\" will both result in the model being\nchecked for validity with dragonfly-radiance. This value can also be\nset to \"All\" in order to run checks for all installed extensions.\nSome common dragonfly extension names that can be input here if they\nare installed include:\n* Radiance\n* EnergyPlus\n* OpenStudio\n* DOE2", 
       "type": "string", 
       "default": null
     }, 

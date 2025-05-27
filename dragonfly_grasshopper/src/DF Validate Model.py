@@ -29,10 +29,7 @@ to ensure that the model can be simulated correctly in these engines.
                 * Radiance
                 * EnergyPlus
                 * OpenStudio
-                * DesignBuilder
                 * DOE2
-                * IES
-                * IDAICE
         _validate: Set to "True" to validate the the Model and get a report of all
             issues with the model.
 
@@ -46,7 +43,7 @@ to ensure that the model can be simulated correctly in these engines.
 
 ghenv.Component.Name = 'DF Validate Model'
 ghenv.Component.NickName = 'DFValidateModel'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.8.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
