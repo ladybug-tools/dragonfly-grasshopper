@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2024, Ladybug Tools.
+# Copyright (c) 2025, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -23,7 +23,7 @@ including all stories represented by multipliers
 
 ghenv.Component.Name = 'DF Visualize Floors'
 ghenv.Component.NickName = 'VizFloors'
-ghenv.Component.Message = '1.8.2'
+ghenv.Component.Message = '1.9.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
