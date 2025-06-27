@@ -1,5 +1,5 @@
 {
-  "version": "1.8.2", 
+  "version": "1.9.0", 
   "nickname": "ToGeoJSON", 
   "outputs": [
     [
@@ -64,7 +64,7 @@
     }, 
     {
       "access": "item", 
-      "name": "add_plenum_", 
+      "name": "no_plenum_", 
       "description": "Boolean to indicate whether ceiling/floor plenum depths\nassigned to Room2Ds should be ignored during translation. This\nresults in each Room2D translating to a single Honeybee Room at\nthe full floor-to-ceiling height instead of a base Room with (a)\nplenum Room(s). (Default: False).", 
       "type": "bool", 
       "default": null

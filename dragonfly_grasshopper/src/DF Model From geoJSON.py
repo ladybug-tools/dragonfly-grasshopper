@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2024, Ladybug Tools.
+# Copyright (c) 2025, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -46,7 +46,7 @@ Create a Dragonfly Model from a geoJSON file.
 
 ghenv.Component.Name = 'DF Model From geoJSON'
 ghenv.Component.NickName = 'FromGeoJSON'
-ghenv.Component.Message = '1.8.0'
+ghenv.Component.Message = '1.9.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

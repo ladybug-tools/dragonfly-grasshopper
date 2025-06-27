@@ -1,7 +1,7 @@
 # Honeybee: A Plugin for Environmental Analysis (GPL)
 # This file is part of Honeybee.
 #
-# Copyright (c) 2024, Ladybug Tools.
+# Copyright (c) 2025, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Honeybee; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -92,7 +92,7 @@ https://ghedesigner.readthedocs.io/en/latest/background.html
 
 ghenv.Component.Name = 'DF GHE Designer'
 ghenv.Component.NickName = 'GHEDesigner'
-ghenv.Component.Message = '1.8.2'
+ghenv.Component.Message = '1.9.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -238,4 +238,5 @@ if all_required_inputs(ghenv.Component) and _write:
 
             # load the g-function and the monthly temperatures
             g_function = GroundHeatExchanger.load_g_function(g_func_file)
-            month_temps= GroundHeatExchanger.load_monthly_temperatures(summary_file)
+            g_function = list_to_data_tree(g_function)
+            month_temps = GroundHeatExchanger.load_monthly_temperatures(summary_file)

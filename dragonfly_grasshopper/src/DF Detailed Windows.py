@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2024, Ladybug Tools.
+# Copyright (c) 2025, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -30,7 +30,7 @@ Add detailed window geometries to Dragonfly Room2Ds.
 
 ghenv.Component.Name = "DF Detailed Windows"
 ghenv.Component.NickName = 'DetailedWindows'
-ghenv.Component.Message = '1.8.1'
+ghenv.Component.Message = '1.9.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = "5"
