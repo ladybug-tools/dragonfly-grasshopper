@@ -28,6 +28,12 @@ The output of this component can be used with the "DF GHE Thermal Loop" componen
             Rhino model units (eg. Meters, Feet, etc.). If no insulation exists,
             this value should be a virtual insulation layer of soil since this
             value must be greater than zero. (Default: 0.2 meters).
+        hydraulic_diameter_: A number to specify the size of the hydraulic diameter
+            in meters. If unspecified, the hydraulic diameter will be autosized.
+        pump_head_: A number for the design pressure of the ambient loop pump in Pa.
+            If unspecified, the pump pressure will be autosized.
+        pump_flow_: A number for the design volume flow rate of the ambient loop pump
+            in m3/s. If unspecified, the pump flow rate will be autosized.
 
     Returns:
         horiz_pipe: A HorizontalPipeParameter object that can be plugged into the "DF GHE 
@@ -37,7 +43,7 @@ The output of this component can be used with the "DF GHE Thermal Loop" componen
 
 ghenv.Component.Name = 'DF Horizontal Pipe Parameter'
 ghenv.Component.NickName = 'HorizPipe'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -70,4 +76,8 @@ horiz_pipe = HorizontalPipeParameter(
     buried_depth=buried_depth, diameter_ratio=diameter_ratio,
     pressure_drop_per_meter=pressure_drop_per_meter,
     insulation_conductivity=insulation_conductivity,
-    insulation_thickness=insulation_thickness)
+    insulation_thickness=insulation_thickness,
+    hydraulic_diameter=hydraulic_diameter_,
+    pump_design_head=pump_head_,
+    pump_flow_rate=pump_flow_
+)

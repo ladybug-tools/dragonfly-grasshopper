@@ -92,7 +92,7 @@ https://ghedesigner.readthedocs.io/en/latest/background.html
 
 ghenv.Component.Name = 'DF GHE Designer'
 ghenv.Component.NickName = 'GHEDesigner'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -134,7 +134,7 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-GHE_DESIGNER_VERSION = '1.5'
+GHE_DESIGNER_VERSION = '2.0'
 
 
 if all_required_inputs(ghenv.Component) and _write:
@@ -185,7 +185,6 @@ if all_required_inputs(ghenv.Component) and _write:
     # create the input dict for GHEDesigner
     ghe_dict = GHEThermalLoop.ghe_designer_dict(
         _load, site_faces, _soil_, _fluid_, _pipe_, _borehole_, _design_, tolerance)
-    ghe_dict['version'] = GHE_DESIGNER_VERSION
 
     # write the dict to a JSON in the simulation folder
     sim_folder = os.path.join(folders.default_simulation_folder, 'GHEDesigner')
