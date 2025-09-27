@@ -1,5 +1,5 @@
 {
-  "version": "1.9.0", 
+  "version": "1.9.1", 
   "nickname": "ToHoneybee", 
   "outputs": [
     [
@@ -50,9 +50,9 @@
     }, 
     {
       "access": "item", 
-      "name": "cap_shades_", 
-      "description": "Boolean to note whether building shade representations should be\ncapped with a top face. Usually, this is not necessary to account for\nblocked sun and is only needed when it's important to account for\nreflected sun off of roofs. (Default: False).", 
-      "type": "bool", 
+      "name": "merge_method_", 
+      "description": "An optional text string to describe how the Room2Ds should\nbe merged into individual Rooms during the translation. Specifying a\nvalue here can be an effective way to reduce the number of Room\nvolumes in the resulting 3D Honeybee Model and, ultimately, yield\na faster simulation time in the destination engine with fewer results\nto manage. Note that Room2Ds will only be merged if they form a\ncontinuous volume. Otherwise, there will be multiple Rooms per\nzone or story, each with an integer added at the end of their\nidentifiers and names. Choose from the following options:\n* None - No merging of Room2Ds will occur\n* Zones - Room2Ds in the same zone will be merged\n* PlenumZones - Only plenums in the same zone will be merged\n* Stories - Rooms in the same story will be merged\n* PlenumStories - Only plenums in the same story will be merged", 
+      "type": "string", 
       "default": null
     }, 
     {
@@ -71,7 +71,7 @@
     }
   ], 
   "subcategory": "2 :: Serialize", 
-  "code": "\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_vector2d\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # set default inputs if not specified\n    use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True\n    no_plenum_ = no_plenum_ if no_plenum_ is not None else False\n    _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_\n    ceil_adjacency_ = ceil_adjacency_ if ceil_adjacency_ is not None else False\n\n    # check the _model input\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n\n    # create the model objects\n    hb_models = _model.to_honeybee(\n        _obj_per_model_, shade_dist_, use_multiplier_, no_plenum_, cap_shades_,\n        ceil_adjacency_, tolerance=tolerance)\n", 
+  "code": "\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_vector2d\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _run:\n    # set default inputs if not specified\n    use_multiplier_ = use_multiplier_ if use_multiplier_ is not None else True\n    no_plenum_ = no_plenum_ if no_plenum_ is not None else False\n    _obj_per_model_ = 'Building' if _obj_per_model_ is None else _obj_per_model_\n    ceil_adjacency_ = ceil_adjacency_ if ceil_adjacency_ is not None else False\n\n    # check the _model input\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n\n    # create the model objects\n    hb_models = _model.to_honeybee(\n        object_per_model=_obj_per_model_,\n        shade_distance=shade_dist_,\n        use_multiplier=use_multiplier_,\n        exclude_plenums=no_plenum_,\n        cap=True,\n        solve_ceiling_adjacencies=ceil_adjacency_,\n        merge_method=merge_method_,\n        tolerance=tolerance\n    )\n", 
   "category": "Dragonfly", 
   "name": "DF Model To Honeybee", 
   "description": "Convert a Dragonfly Model into a series of Honeybee Models.\n-"

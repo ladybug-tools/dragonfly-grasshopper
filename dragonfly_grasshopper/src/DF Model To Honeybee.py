@@ -42,10 +42,20 @@ Convert a Dragonfly Model into a series of Honeybee Models.
             their floor plate. This ensures that Surface boundary conditions
             are used instead of Adiabatic ones. Note that this input
             has no effect when the _obj_per_model_ is Story. (Default: False).
-        cap_shades_: Boolean to note whether building shade representations should be
-            capped with a top face. Usually, this is not necessary to account for
-            blocked sun and is only needed when it's important to account for
-            reflected sun off of roofs. (Default: False).
+        merge_method_: An optional text string to describe how the Room2Ds should
+            be merged into individual Rooms during the translation. Specifying a
+            value here can be an effective way to reduce the number of Room
+            volumes in the resulting 3D Honeybee Model and, ultimately, yield
+            a faster simulation time in the destination engine with fewer results
+            to manage. Note that Room2Ds will only be merged if they form a
+            continuous volume. Otherwise, there will be multiple Rooms per
+            zone or story, each with an integer added at the end of their
+            identifiers and names. Choose from the following options:
+                * None - No merging of Room2Ds will occur
+                * Zones - Room2Ds in the same zone will be merged
+                * PlenumZones - Only plenums in the same zone will be merged
+                * Stories - Rooms in the same story will be merged
+                * PlenumStories - Only plenums in the same story will be merged
         shade_dist_: An optional number to note the distance beyond which other
             buildings' shade should not be exported into a given Model. This is
             helpful for reducing the simulation run time of each Model when other
@@ -66,7 +76,7 @@ Convert a Dragonfly Model into a series of Honeybee Models.
 
 ghenv.Component.Name = 'DF Model To Honeybee'
 ghenv.Component.NickName = 'ToHoneybee'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -98,5 +108,12 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # create the model objects
     hb_models = _model.to_honeybee(
-        _obj_per_model_, shade_dist_, use_multiplier_, no_plenum_, cap_shades_,
-        ceil_adjacency_, tolerance=tolerance)
+        object_per_model=_obj_per_model_,
+        shade_distance=shade_dist_,
+        use_multiplier=use_multiplier_,
+        exclude_plenums=no_plenum_,
+        cap=True,
+        solve_ceiling_adjacencies=ceil_adjacency_,
+        merge_method=merge_method_,
+        tolerance=tolerance
+    )
