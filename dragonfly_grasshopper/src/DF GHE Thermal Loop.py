@@ -68,7 +68,7 @@ to connect these objects to Dragonfly Buildings.
 
 ghenv.Component.Name = 'DF GHE Thermal Loop'
 ghenv.Component.NickName = 'GHELoop'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -137,7 +137,7 @@ if all_required_inputs(ghenv.Component):
 
     # give a warning about RAM if the size of the borehole field is too large
     borehole_count = int(total_area / (des_loop.borehole_parameters.min_spacing ** 2))
-    MAX_BOREHOLES = 8000
+    MAX_BOREHOLES = 12000
     if borehole_count > MAX_BOREHOLES:
         msg = 'The inputs suggest that there may be as many as {} boreholes in the ' \
             'GHE field\nand this can cause the GHE sizing routine to use ' \
@@ -145,4 +145,3 @@ if all_required_inputs(ghenv.Component):
             '_bore_spacing_ is recommended such that fewer\nthan {} boreholes are ' \
             'generated.'.format(borehole_count, MAX_BOREHOLES)
         print(msg)
-        give_warning(ghenv.Component, msg)
