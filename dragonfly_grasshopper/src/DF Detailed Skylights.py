@@ -24,7 +24,7 @@ Add detailed skylight geometries to Dragonfly Room2Ds.
 
 ghenv.Component.Name = 'DF Detailed Skylights'
 ghenv.Component.NickName = 'DetailedSkylights'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -45,7 +45,6 @@ except ImportError as e:
 
 try:
     from ladybug_rhino.grasshopper import all_required_inputs
-    from ladybug_rhino.config import tolerance, angle_tolerance
     from ladybug_rhino.togeometry import to_face3d
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))

@@ -32,7 +32,7 @@ may completely remove the small Room2D if it becomes degenerate.
 
 ghenv.Component.Name = 'DF Align'
 ghenv.Component.NickName = 'Align'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -45,11 +45,12 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.config import tolerance, conversion_to_meters
+    from ladybug_rhino.config import current_tolerance, conversion_to_meters
     from ladybug_rhino.togeometry import to_linesegment2d
     from ladybug_rhino.grasshopper import all_required_inputs, give_warning
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+tolerance = current_tolerance()
 
 
 if all_required_inputs(ghenv.Component):

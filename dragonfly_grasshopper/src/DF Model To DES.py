@@ -47,7 +47,7 @@ component to run correctly.
 
 ghenv.Component.Name = 'DF Model To DES'
 ghenv.Component.NickName = 'ToDES'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -64,7 +64,7 @@ except ImportError as e:
 
 try:
     from ladybug_rhino.togeometry import to_point2d
-    from ladybug_rhino.config import tolerance
+    from ladybug_rhino.config import current_tolerance
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -79,4 +79,4 @@ if all_required_inputs(ghenv.Component) and _write:
     # create the geoJSON and honeybee Model JSONs
     geojson, scenario, sys_params = _model.to.urbanopt_des(
         _model, _des_loop, _epw_file, _location_, point,
-        folder=_folder_, tolerance=tolerance)
+        folder=_folder_, tolerance=current_tolerance())

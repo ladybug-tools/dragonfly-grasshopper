@@ -92,7 +92,7 @@ https://ghedesigner.readthedocs.io/en/latest/background.html
 
 ghenv.Component.Name = 'DF GHE Designer'
 ghenv.Component.NickName = 'GHEDesigner'
-ghenv.Component.Message = '1.9.1'
+ghenv.Component.Message = '1.9.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -126,7 +126,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:
-    from ladybug_rhino.config import conversion_to_meters, tolerance
+    from ladybug_rhino.config import conversion_to_meters, current_tolerance
     from ladybug_rhino.togeometry import to_face3d
     from ladybug_rhino.fromgeometry import from_point2d, from_linesegment3d
     from ladybug_rhino.grasshopper import all_required_inputs, give_warning, \
@@ -184,7 +184,8 @@ if all_required_inputs(ghenv.Component) and _write:
 
     # create the input dict for GHEDesigner
     ghe_dict = GHEThermalLoop.ghe_designer_dict(
-        _load, site_faces, _soil_, _fluid_, _pipe_, _borehole_, _design_, tolerance)
+        _load, site_faces, _soil_, _fluid_, _pipe_, _borehole_, _design_,
+        current_tolerance())
 
     # write the dict to a JSON in the simulation folder
     sim_folder = os.path.join(folders.default_simulation_folder, 'GHEDesigner')

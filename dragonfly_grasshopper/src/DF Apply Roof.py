@@ -39,7 +39,7 @@ roof specifications for different Stories of a Dragonfly Building or Model.
 
 ghenv.Component.Name = 'DF Apply Roof'
 ghenv.Component.NickName = 'ApplyRoof'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '7'
@@ -53,7 +53,6 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.config import tolerance
     from ladybug_rhino.togeometry import to_face3d
     from ladybug_rhino.grasshopper import all_required_inputs, give_warning
 except ImportError as e:

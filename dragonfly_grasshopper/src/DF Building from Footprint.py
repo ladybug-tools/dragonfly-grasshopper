@@ -49,7 +49,7 @@ Create Dragonfly Buildings from footprint geometry (horizontal Rhino surfaces).
 
 ghenv.Component.Name = 'DF Building from Footprint'
 ghenv.Component.NickName = 'BuildingFootprint'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -65,7 +65,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:
-    from ladybug_rhino.config import tolerance
+    from ladybug_rhino.config import current_tolerance
     from ladybug_rhino.togeometry import to_face3d
     from ladybug_rhino.grasshopper import all_required_inputs, document_counter, \
         longest_list
@@ -105,7 +105,7 @@ if all_required_inputs(ghenv.Component) and _run:
         # create the Building
         building = Building.from_footprint(
             name, footprint=to_face3d(geo), floor_to_floor_heights=_floor_to_floor,
-            perimeter_offset=perim_offset_, tolerance=tolerance)
+            perimeter_offset=perim_offset_, tolerance=current_tolerance())
         building.display_name = display_name
 
         # assign the program
