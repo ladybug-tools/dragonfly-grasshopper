@@ -1,5 +1,5 @@
 {
-  "version": "1.9.0", 
+  "version": "1.9.1", 
   "nickname": "ToDES", 
   "outputs": [
     [
@@ -71,7 +71,7 @@
     }
   ], 
   "subcategory": "5 :: District Thermal", 
-  "code": "\ntry:  # import the ladybug_geometry dependencies\n    from ladybug_geometry.geometry2d.pointvector import Point2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_point2d\n    from ladybug_{{cad}}.config import tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _write:\n    # check the _model and set default inputs\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n    point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)\n\n    # create the geoJSON and honeybee Model JSONs\n    geojson, scenario, sys_params = _model.to.urbanopt_des(\n        _model, _des_loop, _epw_file, _location_, point,\n        folder=_folder_, tolerance=tolerance)\n", 
+  "code": "\ntry:  # import the ladybug_geometry dependencies\n    from ladybug_geometry.geometry2d.pointvector import Point2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_point2d\n    from ladybug_{{cad}}.config import current_tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _write:\n    # check the _model and set default inputs\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n    point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)\n\n    # create the geoJSON and honeybee Model JSONs\n    geojson, scenario, sys_params = _model.to.urbanopt_des(\n        _model, _des_loop, _epw_file, _location_, point,\n        folder=_folder_, tolerance=current_tolerance())\n", 
   "category": "Dragonfly", 
   "name": "DF Model To DES", 
   "description": "Convert a Dragonfly Model into an URBANopt-compatible geoJSON and DES input files.\n_\nThis component is intended specifically for the case that District Energy\nSystem (DES) simulation is to be performed without using URBANopt to generate\nbuilding energy loads through EnergyPlus. Accordingly, ALL Dragonfly Buildings\nin the Model must have DES loads assigned directly to them in order for this\ncomponent to run correctly.\n-"

@@ -1,5 +1,5 @@
 {
-  "version": "1.9.0", 
+  "version": "1.9.1", 
   "nickname": "Model", 
   "outputs": [
     [
@@ -36,7 +36,7 @@
     }
   ], 
   "subcategory": "0 :: Create", 
-  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_string, clean_and_id_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\n    from ladybug_{{cad}}.config import units_system, tolerance, angle_tolerance\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_string(_name_) if _name_ is not None else clean_and_id_string('unnamed')\n    units = units_system()\n\n    # create the model\n    model = Model(name, _buildings, context_, units=units, tolerance=tolerance,\n                  angle_tolerance=angle_tolerance)\n    model.display_name = _name_ if _name_ is not None else 'unnamed'\n", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_string, clean_and_id_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\n    from ladybug_{{cad}}.config import units_system, current_tolerance, angle_tolerance\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_string(_name_) if _name_ is not None else clean_and_id_string('unnamed')\n    units = units_system()\n\n    # create the model\n    model = Model(name, _buildings, context_, units=units, tolerance=current_tolerance(),\n                  angle_tolerance=angle_tolerance)\n    model.display_name = _name_ if _name_ is not None else 'unnamed'\n", 
   "category": "Dragonfly", 
   "name": "DF Model", 
   "description": "Create a Dragonfly Model, which can be translated to Honeybee model and sent\nfor simulation.\n-"

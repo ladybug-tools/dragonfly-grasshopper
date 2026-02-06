@@ -1,5 +1,5 @@
 {
-  "version": "1.9.0", 
+  "version": "1.9.1", 
   "nickname": "Alleys", 
   "outputs": [
     [
@@ -36,7 +36,7 @@
     }
   ], 
   "subcategory": "0 :: Create", 
-  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import tolerance, conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects and set a default distance\n    buildings = [obj.duplicate() for obj in _buildings]\n    dist = _distance_ if _distance_ is not None else 1 / conversion_to_meters()\n\n    # extract the Buildings from any input Models\n    bldgs = []\n    for obj in buildings:\n        if isinstance(obj, Building):\n            bldgs.append(obj)\n        elif isinstance(obj, Model):\n            bldgs.extend(obj.buildings)\n        else:\n            msg = 'Expected Dragonfly Building or Model. Got {}.'.format(type(obj))\n            raise ValueError(msg)\n\n    # process the alleyways\n    Building.process_alleys(bldgs, dist, adiabatic_, tolerance)\n", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the ladybug_{{cad}} dependencies\n    from ladybug_{{cad}}.config import current_tolerance, conversion_to_meters\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects and set a default distance\n    buildings = [obj.duplicate() for obj in _buildings]\n    dist = _distance_ if _distance_ is not None else 1 / conversion_to_meters()\n\n    # extract the Buildings from any input Models\n    bldgs = []\n    for obj in buildings:\n        if isinstance(obj, Building):\n            bldgs.append(obj)\n        elif isinstance(obj, Model):\n            bldgs.extend(obj.buildings)\n        else:\n            msg = 'Expected Dragonfly Building or Model. Got {}.'.format(type(obj))\n            raise ValueError(msg)\n\n    # process the alleyways\n    Building.process_alleys(bldgs, dist, adiabatic_, tolerance=current_tolerance())\n", 
   "category": "Dragonfly", 
   "name": "DF Process Alleys", 
   "description": "Remove windows from any walls that are within a certain distance of other buildings.\n_\nThe component can also optionally set the boundary conditions of these walls to\nadiabatic. This is helpful when attempting to account for alleys or parti walls\nthat may exist between buildings of a denser urban district.\n-"

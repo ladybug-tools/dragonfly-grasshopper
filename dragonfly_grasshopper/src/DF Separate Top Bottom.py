@@ -42,7 +42,7 @@ heat flow through exposed roofs of middle floors.
 
 ghenv.Component.Name = 'DF Separate Top Bottom'
 ghenv.Component.NickName = 'TopBottom'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -58,11 +58,11 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
-    from ladybug_rhino.config import units_system, tolerance
+    from ladybug_rhino.config import units_system, current_tolerance
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
-
+tolerance = current_tolerance()
 # tolerance for computing the pole of inaccessibility
 p_tol = parse_distance_string('0.01m', units_system())
 

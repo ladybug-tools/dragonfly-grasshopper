@@ -46,7 +46,7 @@ Create a Dragonfly Model from a geoJSON file.
 
 ghenv.Component.Name = 'DF Model From geoJSON'
 ghenv.Component.NickName = 'FromGeoJSON'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -71,8 +71,8 @@ try:
     from ladybug_rhino.togeometry import to_point2d
     from ladybug_rhino.fromgeometry import from_point2d, from_linesegment2d, \
         from_polyline2d
-    from ladybug_rhino.config import tolerance, angle_tolerance, units_system, \
-        conversion_to_meters
+    from ladybug_rhino.config import current_tolerance, angle_tolerance, \
+        units_system, conversion_to_meters
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -90,7 +90,7 @@ if all_required_inputs(ghenv.Component) and _import:
         point=pt,
         all_polygons_to_buildings=all_to_bldg,
         units=model_units,
-        tolerance=tolerance,
+        tolerance=current_tolerance(),
         angle_tolerance=angle_tolerance)
     point = from_point2d(pt)
 

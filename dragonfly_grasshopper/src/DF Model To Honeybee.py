@@ -76,7 +76,7 @@ Convert a Dragonfly Model into a series of Honeybee Models.
 
 ghenv.Component.Name = 'DF Model To Honeybee'
 ghenv.Component.NickName = 'ToHoneybee'
-ghenv.Component.Message = '1.9.1'
+ghenv.Component.Message = '1.9.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -89,7 +89,7 @@ except ImportError as e:
 
 try:
     from ladybug_rhino.togeometry import to_vector2d
-    from ladybug_rhino.config import tolerance
+    from ladybug_rhino.config import current_tolerance
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
@@ -115,5 +115,5 @@ if all_required_inputs(ghenv.Component) and _run:
         cap=True,
         solve_ceiling_adjacencies=ceil_adjacency_,
         merge_method=merge_method_,
-        tolerance=tolerance
+        tolerance=current_tolerance()
     )

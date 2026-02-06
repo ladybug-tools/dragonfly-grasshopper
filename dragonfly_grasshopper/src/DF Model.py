@@ -28,7 +28,7 @@ for simulation.
 
 ghenv.Component.Name = 'DF Model'
 ghenv.Component.NickName = 'Model'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.9.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -45,7 +45,7 @@ except ImportError as e:
 
 try:
     from ladybug_rhino.grasshopper import all_required_inputs
-    from ladybug_rhino.config import units_system, tolerance, angle_tolerance
+    from ladybug_rhino.config import units_system, current_tolerance, angle_tolerance
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -56,6 +56,6 @@ if all_required_inputs(ghenv.Component):
     units = units_system()
 
     # create the model
-    model = Model(name, _buildings, context_, units=units, tolerance=tolerance,
+    model = Model(name, _buildings, context_, units=units, tolerance=current_tolerance(),
                   angle_tolerance=angle_tolerance)
     model.display_name = _name_ if _name_ is not None else 'unnamed'
