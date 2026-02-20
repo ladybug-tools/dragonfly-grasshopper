@@ -1,7 +1,7 @@
 # Honeybee: A Plugin for Environmental Analysis (GPL)
 # This file is part of Honeybee.
 #
-# Copyright (c) 2025, Ladybug Tools.
+# Copyright (c) 2026, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Honeybee; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -35,7 +35,7 @@ after runing this component.
 
 ghenv.Component.Name = "DF Intersect Room2Ds"
 ghenv.Component.NickName = 'IntRoom2D'
-ghenv.Component.Message = '1.9.1'
+ghenv.Component.Message = '1.10.0'
 ghenv.Component.Category = "Dragonfly"
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
