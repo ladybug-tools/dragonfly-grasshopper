@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2025, Ladybug Tools.
+# Copyright (c) 2026, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -30,7 +30,7 @@ Apply a detailed Ironbug HVAC to Dragonfly Buildings, Stories or Room2Ds.
 
 ghenv.Component.Name = "DF Detailed HVAC"
 ghenv.Component.NickName = 'DFDetailedHVAC'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.10.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'

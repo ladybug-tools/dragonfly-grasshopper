@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2025, Ladybug Tools.
+# Copyright (c) 2026, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -35,7 +35,7 @@ Create a Dragonfly Model from a Honeybee Model.
 
 ghenv.Component.Name = 'DF Model From Honeybee'
 ghenv.Component.NickName = 'FromHoneybee'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.10.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '2 :: Serialize'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

@@ -1,7 +1,7 @@
 # Dragonfly: A Plugin for Environmental Analysis (GPL)
 # This file is part of Dragonfly.
 #
-# Copyright (c) 2025, Ladybug Tools.
+# Copyright (c) 2026, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Dragonfly; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -27,7 +27,7 @@ Esimtate sky illuminance from the irradiance contained within a WEA object.
 
 ghenv.Component.Name = "DF Luminous Efficacy"
 ghenv.Component.NickName = 'LumEff'
-ghenv.Component.Message = '1.9.0'
+ghenv.Component.Message = '1.10.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '6 :: AlternativeWeather'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

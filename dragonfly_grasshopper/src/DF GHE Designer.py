@@ -1,7 +1,7 @@
 # Honeybee: A Plugin for Environmental Analysis (GPL)
 # This file is part of Honeybee.
 #
-# Copyright (c) 2025, Ladybug Tools.
+# Copyright (c) 2026, Ladybug Tools.
 # You should have received a copy of the GNU Affero General Public License
 # along with Honeybee; If not, see <http://www.gnu.org/licenses/>.
 # 
@@ -92,7 +92,7 @@ https://ghedesigner.readthedocs.io/en/latest/background.html
 
 ghenv.Component.Name = 'DF GHE Designer'
 ghenv.Component.NickName = 'GHEDesigner'
-ghenv.Component.Message = '1.9.2'
+ghenv.Component.Message = '1.10.0'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
