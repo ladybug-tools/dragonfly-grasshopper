@@ -134,7 +134,7 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-GHE_DESIGNER_VERSION = '2.0'
+GHE_DESIGNER_VERSION = '2.1.0'
 
 
 if all_required_inputs(ghenv.Component) and _write:
