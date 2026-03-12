@@ -92,7 +92,7 @@ https://ghedesigner.readthedocs.io/en/latest/background.html
 
 ghenv.Component.Name = 'DF GHE Designer'
 ghenv.Component.NickName = 'GHEDesigner'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
@@ -120,6 +120,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:
+    from dragonfly_energy.config import folders as df_folders
     from dragonfly_energy.des.ghe import GroundHeatExchanger
     from dragonfly_energy.des.loop import GHEThermalLoop
 except ImportError as e:
@@ -134,7 +135,7 @@ try:
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
-GHE_DESIGNER_VERSION = '2.1.0'
+GHE_DESIGNER_VERSION = '.'.join(str(i) for i in df_folders.GHE_DESIGNER_VERSION)
 
 
 if all_required_inputs(ghenv.Component) and _write:
