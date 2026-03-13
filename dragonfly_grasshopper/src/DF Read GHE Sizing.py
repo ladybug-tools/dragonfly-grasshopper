@@ -61,7 +61,7 @@ properties output from the sizing simulation performed by GHEDesigner.
 
 ghenv.Component.Name = 'DF Read GHE Sizing'
 ghenv.Component.NickName = 'GHESizing'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '4'
@@ -132,31 +132,42 @@ if all_required_inputs(ghenv.Component):
         summary_file = os.path.join(ghe_dir, ghe_id, 'SimulationSummary.json')
         g_func_file = os.path.join(ghe_dir, ghe_id, 'Gfunction.csv')
 
-        # load the borehole positions
-        ghe_bores = matched_ghe.load_boreholes(bore_file, units, ortho_rotation=True)
-        ghe_boreholes = [from_point2d(pt) for pt in ghe_bores]
-        boreholes.append(ghe_boreholes)
-
         # load the summary data
-        props = matched_ghe.load_energyplus_properties(summary_file)
+        is_pre_designed = False
+        try:
+            props = matched_ghe.load_energyplus_properties(summary_file)
+        except:
+            is_pre_designed = True
+            props = []
         properties.append(props)
         zp = zip(matched_ghe.PROPERTY_NAMES, props)
         if ip_:
             zp = [property_to_ip(name, val) for name, val in zp]
         print(ghe_id + '\n' + '\n'.join('  {}: {}'.format(name, val) for name, val in zp))
 
+        # load the borehole positions
+        if not is_pre_designed:
+            ghe_bores = matched_ghe.load_boreholes(bore_file, units, ortho_rotation=True)
+        else:
+            ghe_bores = matched_ghe.borehole_positions
+        ghe_boreholes = [from_point2d(pt) for pt in ghe_bores]
+        boreholes.append(ghe_boreholes)
+
         # create a line segment for each borehole
         z_val = matched_ghe.geometry.min.z if isinstance(matched_ghe.geometry, Face3D) else 0
-        bore_dir = Vector3D(0, 0, -props[0])
+        bore_dir = Vector3D(0, 0, -props[0]) if not is_pre_designed else \
+            Vector3D(0, 0, -_des_loop.borehole_parameters.max_depth)
         ghe_geos = [LineSegment3D(Point3D(pt.x, pt.y, z_val), bore_dir) for pt in ghe_bores]
         ghe_geos = [from_linesegment3d(pt) for pt in ghe_geos]
         bore_geo.append(ghe_geos)
 
         # load the g-function and the monthly temperatures
         g_function.append(matched_ghe.load_g_function(g_func_file))
-        t_ground = matched_ghe.load_monthly_temperatures(summary_file)
-        if ip_:
-            t_ground, _ = ladybug.datatype.temperature.Temperature().to_ip(t_ground, 'C')
+        t_ground = []
+        if not is_pre_designed:
+            t_ground = matched_ghe.load_monthly_temperatures(summary_file)
+            if ip_:
+                t_ground, _ = ladybug.datatype.temperature.Temperature().to_ip(t_ground, 'C')
         month_temps.append(t_ground)
 
     # convert the boreholes to a data tree
