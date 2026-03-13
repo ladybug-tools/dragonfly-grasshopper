@@ -77,11 +77,17 @@ https://docs.urbanopt.net/installation/installation.html
 
 ghenv.Component.Name = 'DF Run URBANopt'
 ghenv.Component.NickName = 'RunURBANopt'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
 
+import subprocess
+
+try:
+    from honeybee.config import folders
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:
     from honeybee_energy.simulation.parameter import SimulationParameter
@@ -150,7 +156,28 @@ if all_required_inputs(ghenv.Component) and _run:
 
     # execute the simulation with URBANopt CLI
     if _run == 1:
-        osm, idf, sql, zsz, rdd, html, err = run_urbanopt(_geojson, scenario)
+        # execute all translation and simulation with a command
+        log_file = os.path.join(directory, 'sim.log')
+        cmds = [
+            folders.python_exe_path, '-m', 'dragonfly_energy', 'simulate', 'urbanopt',
+            _geojson, scenario, '--log-file', log_file
+        ]
+        custom_env = os.environ.copy()
+        custom_env['PYTHONHOME'] = ''
+        process = subprocess.Popen(cmds, env=custom_env)
+        process.communicate()
+
+        # get the result files from the log file
+        with open(log_file, 'r') as fp:
+            log_dict = json.load(fp)
+        osm = log_dict['osm']
+        idf = log_dict['idf']
+        sql = log_dict['sql']
+        zsz = log_dict['zsz']
+        rdd = log_dict['rdd']
+        html = log_dict['html']
+        err = log_dict['err']
+
         if len(sql) == 0:
             msg = 'All of the OpenStudio workflows failed to execute.\n' \
                 'Check the run.log files in the sub-folders of this directory:\n{}'.format(
