@@ -61,14 +61,14 @@ to connect these objects to Dragonfly Buildings.
 
     Returns:
         report: Reports, errors, warnings, etc.
-        loop: A Dragonfly Thermal Loop object possessing all infrastructure for a
+        loop: A Dragonfly Thermal Loop object possessing all properties for a
             District Energy Simulation (DES) simulation. This should be connected
             to the loop_ input of the "DF Model to GeoJSON" component.
 """
 
 ghenv.Component.Name = 'DF GHE Thermal Loop'
 ghenv.Component.NickName = 'GHELoop'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -88,8 +88,7 @@ except ImportError as e:
 try:
     from ladybug_rhino.togeometry import to_polyline2d
     from ladybug_rhino.togeometry import to_face3d
-    from ladybug_rhino.config import angle_tolerance, conversion_to_meters
-    from ladybug_rhino.grasshopper import all_required_inputs, give_warning
+    from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
 
@@ -113,11 +112,10 @@ if all_required_inputs(ghenv.Component):
         connectors.append(conn_obj)
 
     # create the GHE fields
-    ghes, total_area = [], 0
+    ghes = []
     for i, geo in enumerate(_ghe_geo):
         faces = to_face3d(geo)
         gp = faces[0]
-        total_area += gp.area * conversion_to_meters()
         try:
             ghe_name = _ghe_names_[i]
             ghe_id = clean_ep_string(ghe_name)
@@ -134,14 +132,3 @@ if all_required_inputs(ghenv.Component):
         _soil_, _fluid_, _pipe_, _borehole_, _design_, _horiz_pipe_)
     if _name_ is not None:
         des_loop.display_name = _name_
-
-    # give a warning about RAM if the size of the borehole field is too large
-    borehole_count = int(total_area / (des_loop.borehole_parameters.min_spacing ** 2))
-    MAX_BOREHOLES = 12000
-    if borehole_count > MAX_BOREHOLES:
-        msg = 'The inputs suggest that there may be as many as {} boreholes in the ' \
-            'GHE field\nand this can cause the GHE sizing routine to use ' \
-            'more than 10GB of memory.\nA smaller _ghe_geo or a larger '\
-            '_bore_spacing_ is recommended such that fewer\nthan {} boreholes are ' \
-            'generated.'.format(borehole_count, MAX_BOREHOLES)
-        print(msg)

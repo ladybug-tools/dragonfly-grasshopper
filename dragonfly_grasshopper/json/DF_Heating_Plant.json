@@ -1,0 +1,50 @@
+{
+  "subcategory": "5 :: District Thermal", 
+  "name": "DF Heating Plant", 
+  "code": "\ntry:\n    from dragonfly_energy.des.plant import HeatingPlant\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\n_hw_setpoint_ = _hw_setpoint_ if _hw_setpoint_ is not None else 55\n_heating_limit_ = _heating_limit_ if _heating_limit_ is not None else 5000\n_hw_mass_flow_ = _hw_mass_flow_ if _hw_mass_flow_ is not None else 1.0\n_hw_vpress_drop_ = _hw_vpress_drop_ if _hw_vpress_drop_ is not None else 6000\n\nheating = HeatingPlant(\n    hw_setpoint=_hw_setpoint_,\n    heating_limit=_heating_limit_,\n    hw_mass_flow=_hw_mass_flow_,\n    hw_valve_pressure_drop=_hw_vpress_drop_\n)\n", 
+  "inputs": [
+    {
+      "default": null, 
+      "type": "double", 
+      "name": "_hw_setpoint_", 
+      "access": "item", 
+      "description": "A number for the temperature of hot water in the DES in degrees C. (Default: 55)."
+    }, 
+    {
+      "default": null, 
+      "type": "double", 
+      "name": "_heating_limit_", 
+      "access": "item", 
+      "description": "A number for the nominal district heating load in Watts. (Default: 5000)."
+    }, 
+    {
+      "default": null, 
+      "type": "double", 
+      "name": "_hw_mass_flow_", 
+      "access": "item", 
+      "description": "A number for the nominal heating water mass flow rate in kg/s. (Default: 1.0)."
+    }, 
+    {
+      "default": null, 
+      "type": "double", 
+      "name": "_hw_vpress_drop_", 
+      "access": "item", 
+      "description": "A number for the boiler isolation valve pressure drop in Pa. (Default: 6000)."
+    }
+  ], 
+  "description": "Create a HeatingPlant object that can be used in a District Energy System (DES).\n_\nThe output of this component can be used with the \"DF Fourth Generation\nThermal Loop\" component.\n-", 
+  "outputs": [
+    [
+      {
+        "default": null, 
+        "type": null, 
+        "name": "cooling", 
+        "access": "None", 
+        "description": "A BoreholeParameter object that can be plugged into the\n\"DF GHE Designer\" component in order to customize the properties\nof borehole min/max depth and borehole min/max spacing. It can\nalso be plugged into the \"DF GHE Thermal Loop\" component to\nperform a similar role in a District Energy Simulation (DES)\nof a loop with a ground heat exchanger."
+      }
+    ]
+  ], 
+  "nickname": "HeatingPlant", 
+  "category": "Dragonfly", 
+  "version": "1.10.0"
+}

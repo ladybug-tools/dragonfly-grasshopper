@@ -14,10 +14,12 @@ This includes a central hot and chilled water plant for the district.
 -
 
     Args:
-        _chilled_temp_: A number for the temperature of chilled water in the DES
-            in degrees Celsius. (Default: 6).
-        _hot_temp_: A number for the temperature of hot water in the DES in degrees
-            Celsius. (Default: 54).
+        _heating_plant_: Optional HeatingPlant object from the "DF Heating Plant" component
+            to specify the properties of the heating plant in the loop. If unspecified,
+            default heating plant properties will be used.
+        _cooling_plant_: Optional CoolingPlant object from the "DF Cooling Plant" component
+            to specify the properties of the cooling plant in the loop. If unspecified,
+            default cooling plant properties will be used.
         _name_: Text to be used for the name and identifier of the Thermal Loop.
             If no name is provided, it will be "unnamed".
 
@@ -30,7 +32,7 @@ This includes a central hot and chilled water plant for the district.
 
 ghenv.Component.Name = 'DF Fourth Generation Thermal Loop'
 ghenv.Component.NickName = 'Gen4Loop'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -54,10 +56,7 @@ turn_off_old_tag(ghenv.Component)
 
 # set defaults
 name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'
-cwt = 6 if _chilled_temp_ is None else _chilled_temp_
-hwt = 54 if _hot_temp_ is None else _hot_temp_
-
 # create the loop
-des_loop = FourthGenThermalLoop(name, cwt, hwt)
+des_loop = FourthGenThermalLoop(name, _cooling_plant_, _heating_plant_)
 if _name_ is not None:
     des_loop.display_name = _name_
