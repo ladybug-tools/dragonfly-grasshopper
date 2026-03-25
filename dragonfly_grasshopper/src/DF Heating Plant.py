@@ -18,17 +18,16 @@ Thermal Loop" component.
         _hw_setpoint_: A number for the temperature of hot water in the DES in degrees C. (Default: 55).
         _heating_limit_: A number for the nominal district heating load in Watts. (Default: 5000).
         _hw_mass_flow_: A number for the nominal heating water mass flow rate in kg/s. (Default: 1.0).
-        _hw_vpress_drop_: A number for the boiler isolation valve pressure drop in Pa. (Default: 6000).
 
     Returns:
-        borehole: A HeatingPlant object that can be plugged into the "DF Fourth
+        heating: A HeatingPlant object that can be plugged into the "DF Fourth
             Generation Thermal Loop" component to customize the heating plant
             in the District Energy Simulation (DES).
 """
 
 ghenv.Component.Name = 'DF Heating Plant'
 ghenv.Component.NickName = 'HeatingPlant'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -47,11 +46,9 @@ turn_off_old_tag(ghenv.Component)
 _hw_setpoint_ = _hw_setpoint_ if _hw_setpoint_ is not None else 55
 _heating_limit_ = _heating_limit_ if _heating_limit_ is not None else 5000
 _hw_mass_flow_ = _hw_mass_flow_ if _hw_mass_flow_ is not None else 1.0
-_hw_vpress_drop_ = _hw_vpress_drop_ if _hw_vpress_drop_ is not None else 6000
 
 heating = HeatingPlant(
     hw_setpoint=_hw_setpoint_,
     heating_limit=_heating_limit_,
-    hw_mass_flow=_hw_mass_flow_,
-    hw_valve_pressure_drop=_hw_vpress_drop_
+    hw_mass_flow=_hw_mass_flow_
 )
