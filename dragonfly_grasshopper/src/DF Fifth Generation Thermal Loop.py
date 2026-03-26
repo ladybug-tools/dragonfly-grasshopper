@@ -45,7 +45,7 @@ This includes all thermal connectors needed to connect Dragonfly Buildings in a 
 
 ghenv.Component.Name = 'DF Fifth Generation Thermal Loop'
 ghenv.Component.NickName = 'Gen5Loop'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

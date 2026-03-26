@@ -32,7 +32,7 @@ This includes a central hot and chilled water plant for the district.
 
 ghenv.Component.Name = 'DF Fourth Generation Thermal Loop'
 ghenv.Component.NickName = 'Gen4Loop'
-ghenv.Component.Message = '1.10.1'
+ghenv.Component.Message = '1.10.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

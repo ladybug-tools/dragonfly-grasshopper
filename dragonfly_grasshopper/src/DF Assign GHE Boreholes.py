@@ -35,7 +35,7 @@ it will be autosized with a grid of boreholes like usual.
 
 ghenv.Component.Name = 'DF Assign GHE Boreholes'
 ghenv.Component.NickName = 'GHELoop'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'

@@ -17,8 +17,8 @@ energy loads through EnergyPlus.
 -
 
     Args:
-        _building: A Dragonfly Building, Story or Room2D which is to have its energy
-            properties re-assigned. This can also be an entire Dragonfly Model.
+        _building: A Dragonfly Building which is to have its heating and cooling loads
+            set for simulation of a District Energy System (DES).
         _cooling_: An annual hourly data collection for building cooling loads
             for simulation with a DES. Note that this data collection must have
             a data type of Power.
@@ -39,7 +39,7 @@ energy loads through EnergyPlus.
 
 ghenv.Component.Name = 'DF Assign DES Building Loads'
 ghenv.Component.NickName = 'AssignBldgLoad'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'

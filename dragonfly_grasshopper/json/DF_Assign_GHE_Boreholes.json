@@ -1,41 +1,41 @@
 {
-  "name": "DF Assign GHE Boreholes", 
   "code": "\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.loop import {{PLGN}}EThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_point3d\n    from ladybug_{{cad}}.fromgeometry import from_point3d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # process the inputs\n    assert isinstance(_des_loop, {{PLGN}}EThermalLoop), \\\n        'Expected {{PLGN}}EThermalLoop for _des_loop. Got {}.'.format(type(_des_loop))\n    des_loop = _des_loop.duplicate()\n    boreholes = [to_point3d(pt) for pt in _boreholes]\n\n    # assign the borehole positions to the loop\n    unassigned = des_loop.assign_borehole_positions(boreholes)\n\n    # give a warning about any aunassigned boreholes\n    if len(unassigned) != 0:\n        unassigned = [from_point3d(pt) for pt in unassigned]\n        msg = 'A total of {} boreholes could not be associated with any {{PLGN}}E '\\\n            'geometry in the loop.'.format(len(unassigned))\n        print(msg)\n        give_warning(ghenv.Component, msg)\n", 
-  "nickname": "GHELoop", 
-  "description": "Assign borehole positions to the GHEs of a GHE Thermal Loop.\n_\nThese borehole positions override the grid of auto-generated positions that\ntypically result from the GHE autosizing calculation and ensure that boreholes\ncan only be placed at the specified locations.\n_\nIf a given GHE in the loop does not have any input boreholes associated with it,\nit will be autosized with a grid of boreholes like usual.\n-", 
+  "name": "DF Assign GHE Boreholes", 
   "category": "Dragonfly", 
+  "description": "Assign borehole positions to the GHEs of a GHE Thermal Loop.\n_\nThese borehole positions override the grid of auto-generated positions that\ntypically result from the GHE autosizing calculation and ensure that boreholes\ncan only be placed at the specified locations.\n_\nIf a given GHE in the loop does not have any input boreholes associated with it,\nit will be autosized with a grid of boreholes like usual.\n-", 
   "inputs": [
     {
-      "type": "System.Object", 
-      "name": "_des_loop", 
+      "default": null, 
       "access": "item", 
+      "type": "System.Object", 
       "description": "The GHE Thermal Loop object output by the \"DF GHE Thermal Loop\",\nwhich contains the geometry of the district energy system.", 
-      "default": null
+      "name": "_des_loop"
     }, 
     {
-      "type": "Point3d", 
-      "name": "_boreholes", 
+      "default": null, 
       "access": "list", 
+      "type": "Point3d", 
       "description": "A list of points to be assigned to the GHEs of the loop in\norder to specify the exact locations of boreholes within each\nborehole field. Each input point will be evaluated against the\nloop's GHE geometry to determine if the borehole position lies\nwithin a given field.", 
-      "default": null
+      "name": "_boreholes"
     }
   ], 
-  "version": "1.10.0", 
+  "version": "1.10.1", 
+  "nickname": "GHELoop", 
   "outputs": [
     [
       {
-        "type": null, 
-        "name": "des_loop", 
+        "default": null, 
         "access": "None", 
+        "type": null, 
         "description": "The input GHE Thermal Loop with the borehole positions assigned to it.", 
-        "default": null
+        "name": "des_loop"
       }, 
       {
-        "type": null, 
-        "name": "unassigned", 
+        "default": null, 
         "access": "None", 
+        "type": null, 
         "description": "Points that were not assigned to any GHEs within the Thermal Loop.", 
-        "default": null
+        "name": "unassigned"
       }
     ]
   ], 

@@ -1,0 +1,78 @@
+{
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly-energy dependencies\n    from dragonfly_energy.des.ets import HeatPumpETS\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:  # import ladybug-{{cad}}\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # check the inputs\n    assert isinstance(_building, Building), 'Expected Dragonfly Building. ' \\\n        'Got {}.'.format(type(_building))\n    building = _building.duplicate()\n    cooling_supply_temp = 5 if _cooling_temp_ is None else _cooling_temp_\n    heating_supply_temp = 50 if _heating_temp_ is None else _heating_temp_\n    shw_supply_temp = 50 if _shw_temp_ is None else _shw_temp_\n    cop_cooling = 3.5 if _cop_cooling_ is None else _cop_cooling_\n    cop_heating = 2.5 if _cop_heating_ is None else _cop_heating_\n    cop_shw = 2.5 if _cop_shw_ is None else _cop_shw_\n    pump_head = 10000 if _pump_head_ is None else _pump_head_\n\n    # create the HeatPumpETS and assign it to the building\n    ets = HeatPumpETS(\n        cooling_supply_temp=cooling_supply_temp,\n        heating_supply_temp=heating_supply_temp,\n        shw_supply_temp=shw_supply_temp,\n        cop_cooling=cop_cooling,\n        cop_heating=cop_heating,\n        cop_shw=cop_shw,\n        pump_head=pump_head\n    )\n    building.properties.energy.heat_pump_ets = ets\n", 
+  "name": "DF Building Heat Pump ETS", 
+  "category": "Dragonfly", 
+  "description": "Assign an Energy Transfer Station (ETS) with a heat pump to a dragonfly Building\nto be used within a District Energy System (DES) simulation.\n_\nThis type of ETS is used for fifth generation district energy systems, including\nboth the \"DF Fifth Generation Thermal Loop\" and the \"DF GHE Thermal Loop\".\n-", 
+  "inputs": [
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "System.Object", 
+      "description": "A Dragonfly Building to which a heat pump Energy Transfer\nStation (ETS) will be asigned.", 
+      "name": "_building"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the building's chilled water supply\ntemperature in Celsius. (Default: 5C).", 
+      "name": "_cooling_temp_"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the building's heating water supply\ntemperature in Celsius. (Default: 50C).", 
+      "name": "_heating_temp_"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the building's service hot water supply\ntemperature in Celsius. (Default: 50C).", 
+      "name": "_shw_temp_"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the coefficient of performance (COP) of the\nheat pump producing chilled water. (Default: 3.5).", 
+      "name": "_cop_cooling_"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the coefficient of performance (COP) of the\nheat pump producing hot water for space heating. (Default: 2.5).", 
+      "name": "_cop_heating_"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the coefficient of performance (COP) of the\nheat pump producing service hot water. (Default: 2.5).", 
+      "name": "_cop_shw_"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the design head pressure of the ETS pump\nin pascals. (Default: 10000).", 
+      "name": "_pump_head_"
+    }
+  ], 
+  "version": "1.10.0", 
+  "nickname": "HeatPumpETS", 
+  "outputs": [
+    [
+      {
+        "default": null, 
+        "access": "None", 
+        "type": null, 
+        "description": "The input Dragonfly Building with a heat pump Energy Transfer\nStation (ETS) assigned to it. The ETS parameters specified here\nwill be assigned whenever the Building is used with the \"DF Fifth\nGeneration Thermal Loop\" or the \"DF GHE Thermal Loop.\"", 
+        "name": "building"
+      }
+    ]
+  ], 
+  "subcategory": "5 :: District Thermal"
+}

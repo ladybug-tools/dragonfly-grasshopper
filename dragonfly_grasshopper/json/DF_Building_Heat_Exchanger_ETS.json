@@ -1,0 +1,64 @@
+{
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.building import Building\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly-energy dependencies\n    from dragonfly_energy.des.ets import HeatExchangerETS\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:  # import ladybug-{{cad}}\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # check the inputs\n    assert isinstance(_building, Building), 'Expected Dragonfly Building. ' \\\n        'Got {}.'.format(type(_building))\n    building = _building.duplicate()\n    cooling_supply_temp = 7 if _cooling_temp_ is None else _cooling_temp_\n    heating_supply_temp = 50 if _heating_temp_ is None else _heating_temp_\n    efficiency = 0.8 if _exchanger_efficiency_ is None else _exchanger_efficiency_\n    ppd = 500 if _primary_press_drop_ is None else _primary_press_drop_\n    spd = 500 if _secondary_press_drop_ is None else _secondary_press_drop_\n\n    # create the HeatExchangerETS and assign it to the building\n    ets = HeatExchangerETS(\n        cooling_supply_temp=cooling_supply_temp,\n        heating_supply_temp=heating_supply_temp,\n        exchanger_efficiency=efficiency,\n        primary_pressure_drop=ppd,\n        secondary_pressure_drop=spd\n    )\n    building.properties.energy.heat_exchanger_ets = ets\n", 
+  "name": "DF Building Heat Exchanger ETS", 
+  "category": "Dragonfly", 
+  "description": "Assign an Energy Transfer Station (ETS) with a heat exchanger to a dragonfly Building\nto be used within a District Energy System (DES) simulation.\n_\nThis type of ETS is used for fourth generation district energy systems and is\nspecifically intended to be used in conjunction with the \"DF Fourth Generation\nThermal Loop\" component.\n-", 
+  "inputs": [
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "System.Object", 
+      "description": "A Dragonfly Building to which a heat exchanger Energy Transfer\nStation (ETS) will be asigned.", 
+      "name": "_building"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the building's chilled water supply\ntemperature in Celsius. (Default: 7C).", 
+      "name": "_cooling_temp_"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the building's heating water supply\ntemperature in Celsius. (Default: 50C).", 
+      "name": "_heating_temp_"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number between 0 and 1 for the heat exchanger\nefficiency. (Default: 0.8).", 
+      "name": "_exchanger_efficiency_"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the heat exchanger primary side\npressure drop in pascals. (Default: 500).", 
+      "name": "_primary_press_drop_"
+    }, 
+    {
+      "default": null, 
+      "access": "item", 
+      "type": "double", 
+      "description": "A number for the heat exchanger secondary side\npressure drop in pascals. (Default: 500).", 
+      "name": "_secondary_press_drop_"
+    }
+  ], 
+  "version": "1.10.0", 
+  "nickname": "HeatExchangerETS", 
+  "outputs": [
+    [
+      {
+        "default": null, 
+        "access": "None", 
+        "type": null, 
+        "description": "The input Dragonfly Building with a heat exchanger Energy Transfer\nStation (ETS) assigned to it. The ETS parameters specified here\nwill be assigned whenever the Building is used with the \"DF Fourth\nGeneration Thermal Loopp\" component.", 
+        "name": "building"
+      }
+    ]
+  ], 
+  "subcategory": "5 :: District Thermal"
+}

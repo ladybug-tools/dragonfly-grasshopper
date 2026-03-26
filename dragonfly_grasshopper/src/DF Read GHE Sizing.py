@@ -61,10 +61,10 @@ properties output from the sizing simulation performed by GHEDesigner.
 
 ghenv.Component.Name = 'DF Read GHE Sizing'
 ghenv.Component.NickName = 'GHESizing'
-ghenv.Component.Message = '1.10.1'
+ghenv.Component.Message = '1.10.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
-ghenv.Component.AdditionalHelpFromDocStrings = '4'
+ghenv.Component.AdditionalHelpFromDocStrings = '5'
 
 import os
 import re
@@ -78,6 +78,11 @@ try:
     import ladybug.datatype
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
+
+try:
+    from dragonfly_energy.des.loop import GHEThermalLoop
+except ImportError as e:
+    raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
     from ladybug_rhino.config import units_system
@@ -108,10 +113,13 @@ def property_to_ip(name, val):
 
 if all_required_inputs(ghenv.Component):
     # get the folder where all of the sizing results live
+    assert isinstance(_des_loop, GHEThermalLoop), \
+        'Connected _des_loop is not a GHEThermalLoop. Got {}.'.format(type(_des_loop))
     proj_folder = os.path.dirname(_sys_param)
     ghe_dir = os.path.join(proj_folder, 'run', 'honeybee_scenario', 'ghe_dir')
     assert os.path.isdir(ghe_dir), \
-        'No GHE sizing results were found at" {}.'.format(ghe_dir)
+        '\nNo GHE sizing results were found at\n{}.\n' \
+        'The DES in the sys_params likely does not have a GHE.'.format(ghe_dir)
 
     # parse the borehole geometry
     units = units_system()
