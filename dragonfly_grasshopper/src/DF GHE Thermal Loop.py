@@ -48,27 +48,41 @@ to connect these objects to Dragonfly Buildings.
         _design_: A GHEDesign object from the "DF GHE Design" component. This can be
             used to customize the mina and max entering fluid temperatures
             as well as the max boreholes.
+        _heat_rejection_: Text for the equipment used to cool the ambient
+            loop when it overheats. Note that choosing None will usually cause a
+            simulation failure unless there is a very large ground heat exchanger
+            on the loop. Choose from the options below. (Default: CoolingTower).
+            * CoolingTower
+            * FluidCooler
+            * EvaporativeFluidCooler
+            * DistrictCooling
+            * None
+        _supplement_heat_: Text for the equipment used to heat the ambient loop
+            when it requires supplemental heating. Note that choosing None will
+            usually cause a simulation failure unless there is a very large
+            ground heat exchanger on the loop. Choose from the options below.
+            Choose from the options below. (Default: Electricity).
+            * Electricity
+            * NaturalGas
+            * DistrictHeating
+            * None
         _name_: Text to be used for the name and identifier of the Thermal Loop.
             If no name is provided, it will be "unnamed".
         _ghe_names_: An optional list of names that align with the input _ghe_geo and
             note the name to be used for each ground heat exchanger in the
             DES loop. If no names are provided, they will be derived from
             the DES Loop name above.
-        _connect_names_: An optional list of names that align with the input _connector_geo
-            and note the name to be used for each thermal connector in the
-            DES loop. If no names are provided, they will be derived from
-            the DES Loop name above.
 
     Returns:
         report: Reports, errors, warnings, etc.
-        loop: A Dragonfly Thermal Loop object possessing all properties for a
+        des_loop: A Dragonfly Thermal Loop object possessing all properties for a
             District Energy Simulation (DES) simulation. This should be connected
-            to the loop_ input of the "DF Model to GeoJSON" component.
+            to the des_loop_ input of the "DF Model to GeoJSON" component.
 """
 
 ghenv.Component.Name = 'DF GHE Thermal Loop'
 ghenv.Component.NickName = 'GHELoop'
-ghenv.Component.Message = '1.10.2'
+ghenv.Component.Message = '1.10.3'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -101,14 +115,8 @@ if all_required_inputs(ghenv.Component):
     connectors = []
     for i, geo in enumerate(_connector_geo):
         lin = to_polyline2d(geo)
-        try:
-            conn_name = _connect_names_[i]
-            conn_id = clean_ep_string(conn_name)
-        except IndexError:
-            conn_name, conn_id = None, '{}_ThermalConnector_{}'.format(name, i)
+        conn_id = '{}_ThermalConnector_{}'.format(name, i)
         conn_obj = ThermalConnector(conn_id, lin)
-        if conn_name is not None:
-            conn_obj.display_name = conn_name
         connectors.append(conn_obj)
 
     # create the GHE fields
@@ -127,8 +135,14 @@ if all_required_inputs(ghenv.Component):
         ghes.append(ghe_obj)
 
     # create the loop
+    heat_rejection = _heat_rejection_ \
+        if _heat_rejection_ is not None else 'CoolingTower'
+    supplement_heat = _supplement_heat_ \
+        if _supplement_heat_ is not None else 'Electricity'
     des_loop = GHEThermalLoop(
         name, ghes, connectors, _clockwise_,
-        _soil_, _fluid_, _pipe_, _borehole_, _design_, _horiz_pipe_)
+        _soil_, _fluid_, _pipe_, _borehole_, _design_, _horiz_pipe_,
+        heat_rejection, supplement_heat
+    )
     if _name_ is not None:
         des_loop.display_name = _name_

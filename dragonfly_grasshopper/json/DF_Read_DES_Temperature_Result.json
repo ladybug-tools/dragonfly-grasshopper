@@ -1,0 +1,50 @@
+{
+  "outputs": [
+    [
+      {
+        "access": "None", 
+        "type": null, 
+        "name": "chilled_water", 
+        "default": null, 
+        "description": "DataCollections for the temperature of chilled water of\nplant loops in C."
+      }, 
+      {
+        "access": "None", 
+        "type": null, 
+        "name": "hot_water", 
+        "default": null, 
+        "description": "DataCollections for the temperature of hot water of plant\nloops in C."
+      }, 
+      {
+        "access": "None", 
+        "type": null, 
+        "name": "condenser", 
+        "default": null, 
+        "description": "DataCollections for the temperature of condenser plant loops in C.\nThis includes both traditional condenser loops that cool central\nchillers as well as fifth generation loops aimed at load sharing\nand ground heat exchange."
+      }, 
+      {
+        "access": "None", 
+        "type": null, 
+        "name": "ground", 
+        "default": null, 
+        "description": "DataCollections for the temperature of Ground Heat Exchanger (GHE)\nboreholes in C. This also includes the \"far field\" ground\ntemeprature with which the boreholes interact."
+      }
+    ]
+  ], 
+  "description": "Parse the plant loop temperature results for a District Energy System (DES).\n-", 
+  "code": "\nimport os\nimport subprocess\nimport json\n\ntry:\n    from ladybug.sql import SQLiteResult\n    from ladybug.datacollection import HourlyContinuousCollection, \\\n        MonthlyCollection, DailyCollection\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from honeybee.config import folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef serialize_data(data_dicts):\n    \"\"\"Reserialize a list of collection dictionaries.\"\"\"\n    if len(data_dicts) == 0:\n        return []\n    elif data_dicts[0]['type'] == 'HourlyContinuous':\n        return [HourlyContinuousCollection.from_dict(data) for data in data_dicts]\n    elif data_dicts[0]['type'] == 'Monthly':\n        return [MonthlyCollection.from_dict(data) for data in data_dicts]\n    elif data_dicts[0]['type'] == 'Daily':\n        return [DailyCollection.from_dict(data) for data in data_dicts]\n\n\n# List of all the output strings that will be requested\nplant_outputs = 'Plant Supply Side Inlet Temperature'\nground_outputs = (\n    'Ground Heat Exchanger Average Borehole Temperature',\n    'Ground Heat Exchanger Farfield Ground Temperature'\n)\nall_output = [plant_outputs, ground_outputs]\n\n\nif all_required_inputs(ghenv.Component):\n    # check the size of the SQL file to see if we should use the CLI\n    assert os.path.isfile(_sql), 'No sql file found at: {}.'.format(_sql)\n    if os.name == 'nt' and os.path.getsize(_sql) < 1e8:\n        # small file on windows; use IronPython like usual\n        # create the SQL result parsing object\n        sql_obj = SQLiteResult(_sql)\n\n        # get all of the results relevant for energy use\n        condenser = sql_obj.data_collections_by_output_name(plant_outputs)\n        ground = sql_obj.data_collections_by_output_name(ground_outputs)\n\n    else:  # we are on Mac; sqlite3 module doesn't work in Mac IronPython\n        # Execute the honybee CLI to obtain the results via CPython\n        cmds = [folders.python_exe_path, '-m', 'honeybee_energy', 'result',\n                'data-by-outputs', _sql]\n        for outp in all_output:\n            out_str = json.dumps(outp) if isinstance(outp, tuple) else '[\"{}\"]'.format(outp)\n            cmds.append(out_str)\n        use_shell = True if os.name == 'nt' else False\n        custom_env = os.environ.copy()\n        custom_env['PYTHONHOME'] = ''\n        process = subprocess.Popen(\n            cmds, stdout=subprocess.PIPE, shell=use_shell, env=custom_env)\n        stdout = process.communicate()\n        data_coll_dicts = json.loads(stdout[0])\n\n        # get all of the results relevant for energy use\n        condenser = serialize_data(data_coll_dicts[0])\n        ground = serialize_data(data_coll_dicts[1])\n\n    # spearate the plant loops into cooling, heating and condenser\n    chilled_water, hot_water = [], []\n    for i in range(len(condenser) - 1, -1, -1):\n        if 'CHILLED WATER' in condenser[i].header.metadata['System']:\n            chilled_water.append(condenser.pop(i))\n        elif 'HEATING' in condenser[i].header.metadata['System'] or \\\n                'SHW' in condenser[i].header.metadata['System'] or \\\n                'HOT WATER' in condenser[i].header.metadata['System']:\n            hot_water.append(condenser.pop(i))\n    chilled_water = reversed(chilled_water)  # reverse to match other components\n    hot_water = reversed(hot_water)  # reverse to match other components\n", 
+  "category": "Dragonfly", 
+  "inputs": [
+    {
+      "access": "item", 
+      "type": "string", 
+      "name": "_sql", 
+      "default": null, 
+      "description": "The path of an SQL result file that has been generated from an\nEnergyPlus simulation with the \"DF Export District Energy System\"\ncomponent."
+    }
+  ], 
+  "version": "1.10.0", 
+  "nickname": "DESTemperatureResult", 
+  "subcategory": "5 :: District Thermal", 
+  "name": "DF Read DES Temperature Result"
+}

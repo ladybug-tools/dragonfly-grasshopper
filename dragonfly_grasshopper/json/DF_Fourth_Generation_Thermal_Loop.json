@@ -1,43 +1,57 @@
 {
-  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.loop import FourthGenThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\n# set defaults\nname = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\n# create the loop\ndes_loop = FourthGenThermalLoop(name, _cooling_plant_, _heating_plant_)\nif _name_ is not None:\n    des_loop.display_name = _name_\n", 
-  "name": "DF Fourth Generation Thermal Loop", 
-  "category": "Dragonfly", 
-  "description": "Create an Fourth Generation Loop for a District Energy Simulation (DES) simulation.\n_\nThis includes a central hot and chilled water plant for the district.\n-", 
-  "inputs": [
-    {
-      "default": null, 
-      "access": "item", 
-      "type": "System.Object", 
-      "description": "Optional HeatingPlant object from the \"DF Heating Plant\" component\nto specify the properties of the heating plant in the loop. If unspecified,\ndefault heating plant properties will be used.", 
-      "name": "_heating_plant_"
-    }, 
-    {
-      "default": null, 
-      "access": "item", 
-      "type": "System.Object", 
-      "description": "Optional CoolingPlant object from the \"DF Cooling Plant\" component\nto specify the properties of the cooling plant in the loop. If unspecified,\ndefault cooling plant properties will be used.", 
-      "name": "_cooling_plant_"
-    }, 
-    {
-      "default": null, 
-      "access": "item", 
-      "type": "string", 
-      "description": "Text to be used for the name and identifier of the Thermal Loop.\nIf no name is provided, it will be \"unnamed\".", 
-      "name": "_name_"
-    }
-  ], 
-  "version": "1.10.2", 
-  "nickname": "Gen4Loop", 
   "outputs": [
     [
       {
-        "default": null, 
         "access": "None", 
         "type": null, 
-        "description": "A Dragonfly Thermal Loop object possessing all infrastructure for a\nDistrict Energy Simulation (DES) simulation. This should be connected\nto the loop_ input of the \"DF Model to GeoJSON\" component.", 
-        "name": "des_loop"
+        "name": "des_loop", 
+        "default": null, 
+        "description": "A Dragonfly Thermal Loop object possessing all infrastructure for a\nDistrict Energy Simulation (DES) simulation. This should be connected\nto the loop_ input of the \"DF Model to GeoJSON\" component."
       }
     ]
   ], 
-  "subcategory": "5 :: District Thermal"
+  "description": "Create an Fourth Generation Loop for a District Energy Simulation (DES) simulation.\n_\nThis includes a central hot and chilled water plant for the district.\n-", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.loop import FourthGenThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import turn_off_old_tag\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\nturn_off_old_tag(ghenv.Component)\n\n\n# set defaults\nname = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\neconomizer_type = _economizer_type_ if _economizer_type_ is not None else 'None'\nheating_type = _heating_type_ if _heating_type_ is not None else 'NaturalGas'\n\n# create the loop\ndes_loop = FourthGenThermalLoop(\n    name, _cooling_plant_, _heating_plant_, economizer_type, heating_type\n)\nif _name_ is not None:\n    des_loop.display_name = _name_\n", 
+  "category": "Dragonfly", 
+  "inputs": [
+    {
+      "access": "item", 
+      "type": "System.Object", 
+      "name": "_cooling_plant_", 
+      "default": null, 
+      "description": "Optional CoolingPlant object from the \"DF Cooling Plant\" component\nto specify the properties of the cooling plant in the loop. If unspecified,\ndefault cooling plant properties will be used."
+    }, 
+    {
+      "access": "item", 
+      "type": "System.Object", 
+      "name": "_heating_plant_", 
+      "default": null, 
+      "description": "Optional HeatingPlant object from the \"DF Heating Plant\" component\nto specify the properties of the heating plant in the loop. If unspecified,\ndefault heating plant properties will be used."
+    }, 
+    {
+      "access": "item", 
+      "type": "string", 
+      "name": "_economizer_type_", 
+      "default": null, 
+      "description": "Text for the type of waterside economizer to be used within\nthe cooling plant. Integrated will pre-cool the inlet supply water\nto the chiller using the cooling tower whenever outdoor wetbulb\ntemperatures are cold enough. NonIntegrated will bypass the chiller\ncompletely to create chilled water via the cooling tower whenever\noutdoor wetbulb temperatures are cold enough. Choose from the\noptions below. (Default: None).\n* None\n* Integrated\n* NonIntegrated"
+    }, 
+    {
+      "access": "item", 
+      "type": "string", 
+      "name": "_heating_type_", 
+      "default": null, 
+      "description": "Text for the source of heat within the heating plant.\nChoose from the options below. (Default: NaturalGas).\n* NaturalGas\n* Electricity\n* AirSourceHeatPump\n* DistrictHeating"
+    }, 
+    {
+      "access": "item", 
+      "type": "string", 
+      "name": "_name_", 
+      "default": null, 
+      "description": "Text to be used for the name and identifier of the Thermal Loop.\nIf no name is provided, it will be \"unnamed\"."
+    }
+  ], 
+  "version": "1.10.3", 
+  "nickname": "Gen4Loop", 
+  "subcategory": "5 :: District Thermal", 
+  "name": "DF Fourth Generation Thermal Loop"
 }

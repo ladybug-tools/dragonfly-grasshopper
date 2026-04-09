@@ -1,64 +1,71 @@
 {
-  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.connector import ThermalConnector\n    from dragonfly_energy.des.loop import FifthGenThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_polyline2d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\n\n    # create the Thermal Connectors\n    connectors = []\n    for i, geo in enumerate(_connector_geo):\n        lin = to_polyline2d(geo)\n        try:\n            conn_name = _connect_names_[i]\n            conn_id = clean_ep_string(conn_name)\n        except IndexError:\n            conn_name, conn_id = None, '{}_ThermalConnector_{}'.format(name, i)\n        conn_obj = ThermalConnector(conn_id, lin)\n        if conn_name is not None:\n            conn_obj.display_name = conn_name\n        connectors.append(conn_obj)\n\n    # create the loop\n    des_loop = FifthGenThermalLoop(name, connectors, _clockwise_, _soil_, _horiz_pipe_)\n    if _name_ is not None:\n        des_loop.display_name = _name_\n", 
-  "name": "DF Fifth Generation Thermal Loop", 
-  "category": "Dragonfly", 
-  "description": "Create an Fifth Generation Loop for a District Energy Simulation (DES) simulation.\n_\nThis includes all thermal connectors needed to connect Dragonfly Buildings in a loop.\n-", 
-  "inputs": [
-    {
-      "default": null, 
-      "access": "list", 
-      "type": "Curve", 
-      "description": "An array of lines or polylines representing the thermal connectors\nwithin the thermal loop. In order for a given connector to be\nvalid within the loop, each end of the connector must touch either\nanother connector or a building footprint. In order for the loop\nas a whole to be valid, the connectors must form a single continuous\nloop when passed through the building footprints.", 
-      "name": "_connector_geo"
-    }, 
-    {
-      "default": null, 
-      "access": "item", 
-      "type": "bool", 
-      "description": "A boolean to note whether the direction of flow through the\nloop is clockwise (True) when viewed from above or it is\ncounterclockwise (False). (Default: False).", 
-      "name": "_clockwise_"
-    }, 
-    {
-      "default": null, 
-      "access": "item", 
-      "type": "System.Object", 
-      "description": "A GHE SoilParameter object from the \"DF GHE Soil Parameters\" component.\nThis can be used to customize the conductivity and density of the\nsoil surrounding the horizontal pipes of the DES loop.", 
-      "name": "_soil_"
-    }, 
-    {
-      "default": null, 
-      "access": "item", 
-      "type": "System.Object", 
-      "description": "A HorizontalPipe object to specify the properties of the\nhorizontal pipes contained within ThermalConnectors. This can be\nused to customize the pipe insulation, pressure loss, etc.", 
-      "name": "_horiz_pipe_"
-    }, 
-    {
-      "default": null, 
-      "access": "item", 
-      "type": "string", 
-      "description": "Text to be used for the name and identifier of the Thermal Loop.\nIf no name is provided, it will be \"unnamed\".", 
-      "name": "_name_"
-    }, 
-    {
-      "default": null, 
-      "access": "list", 
-      "type": "string", 
-      "description": "An optional list of names that align with the input _connector_geo\nand note the name to be used for each thermal connector in the\nDES loop. If no names are provided, they will be derived from\nthe DES Loop name above.", 
-      "name": "_connect_names_"
-    }
-  ], 
-  "version": "1.10.1", 
-  "nickname": "Gen5Loop", 
   "outputs": [
     [
       {
-        "default": null, 
         "access": "None", 
         "type": null, 
-        "description": "A Dragonfly Thermal Loop object possessing all infrastructure for a\nDistrict Energy Simulation (DES) simulation. This should be connected\nto the loop_ input of the \"DF Model to GeoJSON\" component.", 
-        "name": "des_loop"
+        "name": "des_loop", 
+        "default": null, 
+        "description": "A Dragonfly Thermal Loop object possessing all infrastructure for a\nDistrict Energy Simulation (DES) simulation. This should be connected\nto the loop_ input of the \"DF Model to GeoJSON\" component."
       }
     ]
   ], 
-  "subcategory": "5 :: District Thermal"
+  "description": "Create an Fifth Generation Loop for a District Energy Simulation (DES) simulation.\n_\nThis includes all thermal connectors needed to connect Dragonfly Buildings in a loop.\n-", 
+  "code": "\ntry:  # import the core honeybee dependencies\n    from honeybee.typing import clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly_energy dependencies\n    from dragonfly_energy.des.connector import ThermalConnector\n    from dragonfly_energy.des.loop import FifthGenThermalLoop\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_polyline2d\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    # set a default name\n    name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'\n\n    # create the Thermal Connectors\n    connectors = []\n    for i, geo in enumerate(_connector_geo):\n        lin = to_polyline2d(geo)\n        conn_id = '{}_ThermalConnector_{}'.format(name, i)\n        conn_obj = ThermalConnector(conn_id, lin)\n        connectors.append(conn_obj)\n\n    # create the loop\n    heat_rejection = _heat_rejection_ \\\n        if _heat_rejection_ is not None else 'CoolingTower'\n    supplement_heat = _supplement_heat_ \\\n        if _supplement_heat_ is not None else 'Electricity'\n    des_loop = FifthGenThermalLoop(\n        name, connectors, _clockwise_, _soil_, _horiz_pipe_,\n        heat_rejection, supplement_heat\n    )\n    if _name_ is not None:\n        des_loop.display_name = _name_\n", 
+  "category": "Dragonfly", 
+  "inputs": [
+    {
+      "access": "list", 
+      "type": "Curve", 
+      "name": "_connector_geo", 
+      "default": null, 
+      "description": "An array of lines or polylines representing the thermal connectors\nwithin the thermal loop. In order for a given connector to be\nvalid within the loop, each end of the connector must touch either\nanother connector or a building footprint. In order for the loop\nas a whole to be valid, the connectors must form a single continuous\nloop when passed through the building footprints."
+    }, 
+    {
+      "access": "item", 
+      "type": "bool", 
+      "name": "_clockwise_", 
+      "default": null, 
+      "description": "A boolean to note whether the direction of flow through the\nloop is clockwise (True) when viewed from above or it is\ncounterclockwise (False). (Default: False)."
+    }, 
+    {
+      "access": "item", 
+      "type": "System.Object", 
+      "name": "_soil_", 
+      "default": null, 
+      "description": "A GHE SoilParameter object from the \"DF GHE Soil Parameters\" component.\nThis can be used to customize the conductivity and density of the\nsoil surrounding the horizontal pipes of the DES loop."
+    }, 
+    {
+      "access": "item", 
+      "type": "System.Object", 
+      "name": "_horiz_pipe_", 
+      "default": null, 
+      "description": "A HorizontalPipe object to specify the properties of the\nhorizontal pipes contained within ThermalConnectors. This can be\nused to customize the pipe insulation, pressure loss, etc."
+    }, 
+    {
+      "access": "item", 
+      "type": "string", 
+      "name": "_heat_rejection_", 
+      "default": null, 
+      "description": "Text for the equipment used to cool the ambient loop when\nit overheats. Note that choosing None will usually cause a simulation\nfailure unless a sufficiently large building with constant heatiing\ndemand exists on the loop.\nChoose from the options below. (Default: CoolingTower).\n* CoolingTower\n* FluidCooler\n* EvaporativeFluidCooler\n* DistrictCooling\n* None"
+    }, 
+    {
+      "access": "item", 
+      "type": "string", 
+      "name": "_supplement_heat_", 
+      "default": null, 
+      "description": "Text for the equipment used to heat the ambient loop\nwhen it requires supplemental heating. Note that choosing None will\nusually cause a simulation failure unless a sufficiently large\nbuilding with constant cooling needs exists on the loop.\nChoose from the options below. (Default: Electricity).\n* Electricity\n* NaturalGas\n* DistrictHeating\n* None"
+    }, 
+    {
+      "access": "item", 
+      "type": "string", 
+      "name": "_name_", 
+      "default": null, 
+      "description": "Text to be used for the name and identifier of the Thermal Loop.\nIf no name is provided, it will be \"unnamed\"."
+    }
+  ], 
+  "version": "1.10.2", 
+  "nickname": "Gen5Loop", 
+  "subcategory": "5 :: District Thermal", 
+  "name": "DF Fifth Generation Thermal Loop"
 }

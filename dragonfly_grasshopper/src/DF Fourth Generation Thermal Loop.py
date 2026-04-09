@@ -14,12 +14,28 @@ This includes a central hot and chilled water plant for the district.
 -
 
     Args:
-        _heating_plant_: Optional HeatingPlant object from the "DF Heating Plant" component
-            to specify the properties of the heating plant in the loop. If unspecified,
-            default heating plant properties will be used.
         _cooling_plant_: Optional CoolingPlant object from the "DF Cooling Plant" component
             to specify the properties of the cooling plant in the loop. If unspecified,
             default cooling plant properties will be used.
+        _heating_plant_: Optional HeatingPlant object from the "DF Heating Plant" component
+            to specify the properties of the heating plant in the loop. If unspecified,
+            default heating plant properties will be used.
+        _economizer_type_: Text for the type of waterside economizer to be used within
+            the cooling plant. Integrated will pre-cool the inlet supply water
+            to the chiller using the cooling tower whenever outdoor wetbulb
+            temperatures are cold enough. NonIntegrated will bypass the chiller
+            completely to create chilled water via the cooling tower whenever
+            outdoor wetbulb temperatures are cold enough. Choose from the
+            options below. (Default: None).
+            * None
+            * Integrated
+            * NonIntegrated
+        _heating_type_: Text for the source of heat within the heating plant.
+            Choose from the options below. (Default: NaturalGas).
+            * NaturalGas
+            * Electricity
+            * AirSourceHeatPump
+            * DistrictHeating
         _name_: Text to be used for the name and identifier of the Thermal Loop.
             If no name is provided, it will be "unnamed".
 
@@ -32,7 +48,7 @@ This includes a central hot and chilled water plant for the district.
 
 ghenv.Component.Name = 'DF Fourth Generation Thermal Loop'
 ghenv.Component.NickName = 'Gen4Loop'
-ghenv.Component.Message = '1.10.2'
+ghenv.Component.Message = '1.10.3'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -56,7 +72,12 @@ turn_off_old_tag(ghenv.Component)
 
 # set defaults
 name = clean_ep_string(_name_) if _name_ is not None else 'unnamed'
+economizer_type = _economizer_type_ if _economizer_type_ is not None else 'None'
+heating_type = _heating_type_ if _heating_type_ is not None else 'NaturalGas'
+
 # create the loop
-des_loop = FourthGenThermalLoop(name, _cooling_plant_, _heating_plant_)
+des_loop = FourthGenThermalLoop(
+    name, _cooling_plant_, _heating_plant_, economizer_type, heating_type
+)
 if _name_ is not None:
     des_loop.display_name = _name_
