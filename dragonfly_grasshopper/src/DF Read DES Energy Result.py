@@ -27,7 +27,7 @@ Parse the typical energy use results for a District Energy System (DES).
 
 ghenv.Component.Name = 'DF Read DES Energy Result'
 ghenv.Component.NickName = 'DESEnergyResult'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '5'
@@ -131,9 +131,9 @@ if all_required_inputs(ghenv.Component):
     shw = []
     for i in range(len(cooling) - 1, -1, -1):
         sys_id = cooling[i].header.metadata['System']
-        if sys_id.endswith('HEATING HEAT PUMP'):
+        if 'HEATING HEAT PUMP' in sys_id:
             heating.append(cooling.pop(i))
-        elif sys_id.endswith('SHW HEAT PUMP'):
+        elif 'SHW HEAT PUMP' in sys_id:
             shw.append(cooling.pop(i))
     heating = reversed(heating)  # reverse to match the cooling list
     shw = reversed(shw)  # reverse to match the cooling list

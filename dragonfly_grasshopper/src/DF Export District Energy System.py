@@ -69,7 +69,7 @@ https://simulationresearch.lbl.gov/modelica/
 
 ghenv.Component.Name = 'DF Export District Energy System'
 ghenv.Component.NickName = 'ExportDES'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -97,7 +97,8 @@ except ImportError as e:
 
 try:  # import the dragonfly_energy dependencies
     from dragonfly_energy.config import folders as df_folders
-    from dragonfly_energy.run import run_des_sys_param, run_des_modelica
+    from dragonfly_energy.run import check_des_compatibility, set_building_district_loads, \
+        run_des_sys_param, run_des_modelica
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly_energy:\n\t{}'.format(e))
 
@@ -189,6 +190,7 @@ if all_required_inputs(ghenv.Component) and _write:
         stderr = process.communicate()
 
     # check the various files in the project folder
+    check_des_compatibility(_geojson)
     proj_dir = os.path.dirname(_geojson)
     scn_name = os.path.basename(_scenario).replace('.csv', '')
     des_dir = os.path.join(proj_dir, 'run', scn_name, 'des_modelica')
@@ -196,6 +198,11 @@ if all_required_inputs(ghenv.Component) and _write:
 
     # add the building loads to the system parameters and autosize any GHEs
     if not os.path.isdir(des_dir):
+        # set the building loads to district chilled/hot water
+        warnings = set_building_district_loads(_geojson, _scenario)
+        for warn in warnings:
+            give_warning(ghenv.Component, warn)
+        # size the GHE
         sys_param = run_des_sys_param(_geojson, _scenario)
 
     # run the command that generates the modelica model
