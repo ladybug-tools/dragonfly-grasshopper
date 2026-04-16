@@ -26,7 +26,7 @@ buildings in a District Energy System (DES) simulation.
 
 ghenv.Component.Name = 'DF Read DES Building Load'
 ghenv.Component.NickName = 'DESLoadResult'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '5'
@@ -128,6 +128,13 @@ if all_required_inputs(ghenv.Component):
     backup_demand, backup_shw = [], []
     if len(demand) == 0 and (len(cooling) == 0 or len(heating) == 0 or len(shw) == 0):
         backup_demand, backup_shw = get_outputs(backup_output)
+    elif len(demand) == 0:
+        if len(cooling) > 1:
+            cooling = [sum(cooling)]
+        if len(heating) > 1:
+            heating = [sum(heating)]
+        if len(shw) > 1:
+            shw = [sum(shw)]
 
     # use sensible cooling load if there is no district cooling
     if len(cooling) == 0 and len(backup_demand) != 0:
