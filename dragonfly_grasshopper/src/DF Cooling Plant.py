@@ -19,8 +19,8 @@ Thermal Loop" component.
         _cooling_limit_: A number for the nominal district cooling load in Watts. (Default: 8000).
         _chw_mass_flow_: A number for the nominal chilled water mass flow rate in kg/s. (Default: 10.0).
         _cw_mass_flow_: A number for the nominal condenser water mass flow rate in kg/s. (Default: 1.0).
-        _chw_pump_head_: A number for the chilled water pump head in Pa. (Default: 300000).
-        _cw_pump_head_: A number for the condenser water pump head in Pa. (Default: 200000).
+        _chw_pump_head_: A number for the chilled water pump head in Pa. (Default: 250000).
+        _cw_pump_head_: A number for the condenser water pump head in Pa. (Default: 175000).
         _chw_press_drop_: A number for the nominal chilled water (evaporator) side pressure drop in Pa. (Default: 55000).
         _cw_press_drop_: A number for the nominal cooling water (condenser) side pressure drop in Pa. (Default: 80000).
         _tower_fan_power_: A number for the cooling tower fan power in Watts. (Default: 5000).
@@ -36,7 +36,7 @@ Thermal Loop" component.
 
 ghenv.Component.Name = 'DF Cooling Plant'
 ghenv.Component.NickName = 'CoolingPlant'
-ghenv.Component.Message = '1.10.1'
+ghenv.Component.Message = '1.10.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -56,8 +56,8 @@ _chw_setpoint_ = _chw_setpoint_ if _chw_setpoint_ is not None else 6
 _cooling_limit_ = _cooling_limit_ if _cooling_limit_ is not None else 8000
 _chw_mass_flow_ = _chw_mass_flow_ if _chw_mass_flow_ is not None else 10
 _cw_mass_flow_ = _cw_mass_flow_ if _cw_mass_flow_ is not None else 10
-_chw_pump_head_ = _chw_pump_head_ if _chw_pump_head_ is not None else 300000
-_cw_pump_head_ = _cw_pump_head_ if _cw_pump_head_ is not None else 200000
+_chw_pump_head_ = _chw_pump_head_ if _chw_pump_head_ is not None else 250000
+_cw_pump_head_ = _cw_pump_head_ if _cw_pump_head_ is not None else 175000
 _chw_press_drop_ = _chw_press_drop_ if _chw_press_drop_ is not None else 55000
 _cw_press_drop_ = _cw_press_drop_ if _cw_press_drop_ is not None else 80000
 _tower_fan_power_ = _tower_fan_power_ if _tower_fan_power_ is not None else 5000
