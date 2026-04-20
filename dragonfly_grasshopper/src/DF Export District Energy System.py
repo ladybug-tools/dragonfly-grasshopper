@@ -69,7 +69,7 @@ https://simulationresearch.lbl.gov/modelica/
 
 ghenv.Component.Name = 'DF Export District Energy System'
 ghenv.Component.NickName = 'ExportDES'
-ghenv.Component.Message = '1.10.1'
+ghenv.Component.Message = '1.10.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -199,7 +199,14 @@ if all_required_inputs(ghenv.Component) and _write:
     # add the building loads to the system parameters and autosize any GHEs
     if not os.path.isdir(des_dir):
         # set the building loads to district chilled/hot water
-        warnings = set_building_district_loads(_geojson, _scenario)
+        if os.name == 'nt':
+            warnings = set_building_district_loads(_geojson, _scenario)
+        else:  # on Mac, the SQLite module does not work
+            cmds = [folders.python_exe_path, '-m', 'dragonfly_energy', 'translate',
+                    'building-district-loads', _geojson, _scenario]
+            process = subprocess.Popen(cmds, stdout=subprocess.PIPE, env=custom_env)
+            stdout = process.communicate()
+            warnings = json.loads(stdout[0])
         for warn in warnings:
             give_warning(ghenv.Component, warn)
         # size the GHE

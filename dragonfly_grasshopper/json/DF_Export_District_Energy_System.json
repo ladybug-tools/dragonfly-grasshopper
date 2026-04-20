@@ -1,99 +1,99 @@
 {
-  "name": "DF Export District Energy System", 
-  "code": "\nimport os\nimport subprocess\nimport json\n\ntry:\n    from ladybug.futil import nukedir\n    from ladybug.config import folders as lb_folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from honeybee.config import folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:\n    from honeybee_energy.run import output_energyplus_files\n    from honeybee_energy.result.err import Err\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee_energy:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.config import folders as df_folders\n    from dragonfly_energy.run import check_des_compatibility, set_building_district_loads, \\\n        run_des_sys_param, run_des_modelica\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.download import download_file_by_name\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\nUO_GMT_VERSION = '.'.join(str(i) for i in df_folders.UO_GMT_VERSION)\nUO_TN_VERSION = '.'.join(str(i) for i in df_folders.UO_TN_VERSION)\nMBL_VERSION = '.'.join(str(i) for i in df_folders.MBL_VERSION)\n\n\nif all_required_inputs(ghenv.Component) and _write:\n    # set up the custom python environment\n    custom_env = os.environ.copy()\n    custom_env['PYTHONHOME'] = ''\n\n    # set global values\n    ext = '.exe' if os.name == 'nt' else ''\n    executor_path = os.path.join(\n        lb_folders.ladybug_tools_folder, '{{plugin}}',\n        'ladybug_{{plugin}}_dotnet', 'Ladybug.Executor.exe')\n\n    # check to see if the geojson-modelica-translator is installed\n    uo_gmt = '{}/uo_des{}'.format(folders.python_scripts_path, ext)\n    uo_gmt_pack = '{}/geojson_modelica_translator-{}.dist-info'.format(\n        folders.python_package_path, UO_GMT_VERSION)\n    if not os.path.isfile(uo_gmt) or not os.path.isdir(uo_gmt_pack):\n        install_cmd = 'pip install geojson-modelica-translator=={}'.format(UO_GMT_VERSION)\n        if os.name == 'nt' and os.path.isfile(executor_path) and \\\n                'Program Files' in executor_path:\n            pip_cmd = [\n                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)\n            ]\n        else:\n            pip_cmd = '\"{py_exe}\" -m {uo_cmd}'.format(\n                py_exe=folders.python_exe_path, uo_cmd=install_cmd)\n        shell = True if os.name == 'nt' else False\n        process = subprocess.Popen(\n            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)\n        stderr = process.communicate()\n\n    # check to see if the ThermalNetwork package is installed\n    uo_tn = '{}/thermalnetwork{}'.format(folders.python_scripts_path, ext)\n    uo_tn_pack = '{}/ThermalNetwork-{}.dist-info'.format(\n        folders.python_package_path, UO_TN_VERSION)\n    if not os.path.isfile(uo_tn) or not os.path.isdir(uo_tn_pack):\n        install_cmd = 'pip install thermalnetwork=={}'.format(UO_TN_VERSION)\n        if os.name == 'nt' and os.path.isfile(executor_path) and \\\n                'Program Files' in executor_path:\n            pip_cmd = [\n                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)\n            ]\n        else:\n            pip_cmd = '\"{py_exe}\" -m {uo_cmd}'.format(\n                py_exe=folders.python_exe_path, uo_cmd=install_cmd)\n        shell = True if os.name == 'nt' else False\n        process = subprocess.Popen(\n            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)\n        stderr = process.communicate()\n\n    # check to see if the Modelica Buildings Library is installed\n    install_directory = os.path.join(lb_folders.ladybug_tools_folder, 'resources')\n    final_dir = os.path.join(install_directory, 'mbl')\n    version_file = os.path.join(final_dir, 'version.txt')\n    already_installed = False\n    if os.path.isdir(final_dir) and os.path.isfile(version_file):\n        with open(version_file, 'r') as vf:\n            install_version = vf.read()\n        if install_version == MBL_VERSION:\n            already_installed = True\n        else:\n            nukedir(final_dir, True)\n    if not already_installed:\n        install_cmd = 'dragonfly_energy install mbl --version {}'.format(MBL_VERSION)\n        if os.name == 'nt' and os.path.isfile(executor_path) and \\\n                'Program Files' in executor_path:\n            pip_cmd = [\n                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)\n            ]\n        else:\n            pip_cmd = '\"{py_exe}\" -m {uo_cmd}'.format(\n                py_exe=folders.python_exe_path, uo_cmd=install_cmd)\n        shell = True if os.name == 'nt' else False\n        process = subprocess.Popen(\n            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)\n        stderr = process.communicate()\n\n    # check the various files in the project folder\n    check_des_compatibility(_geojson)\n    proj_dir = os.path.dirname(_geojson)\n    scn_name = os.path.basename(_scenario).replace('.csv', '')\n    des_dir = os.path.join(proj_dir, 'run', scn_name, 'des_modelica')\n    sys_param = os.path.join(proj_dir, 'system_params.json')\n\n    # add the building loads to the system parameters and autosize any {{PLGN}}Es\n    if not os.path.isdir(des_dir):\n        # set the building loads to district chilled/hot water\n        warnings = set_building_district_loads(_geojson, _scenario)\n        for warn in warnings:\n            give_warning(ghenv.Component, warn)\n        # size the {{PLGN}}E\n        sys_param = run_des_sys_param(_geojson, _scenario)\n\n    # run the command that generates the modelica model\n    modelica = run_des_modelica(sys_param, _geojson, _scenario)\n\n    # translate the system to OSM/IDF and optionally simualte it\n    ep_dir = os.path.join(proj_dir, 'run', 'honeybee_scenario', 'des_energyplus')\n    nukedir(ep_dir, True)\n    if not os.path.isdir(ep_dir):\n        os.makedirs(ep_dir)\n    osm = os.path.join(ep_dir, 'in.osm')\n    idf = os.path.join(ep_dir, 'in.idf')\n    # put together the arguments for the command to be run\n    if run_:  # use the simulate command\n        cmds = [\n            '\"{}\"'.format(folders.python_exe_path), '-m', 'dragonfly_openstudio',\n            'simulate', 'system', '\"{}\"'.format(sys_param),\n            '--geojson', '\"{}\"'.format(_geojson),\n            '--folder', '\"{}\"'.format(ep_dir)\n        ]\n    else:  # use the translate command\n        cmds = [\n            '\"{}\"'.format(folders.python_exe_path), '-m', 'dragonfly_openstudio',\n            'translate', 'system-to-osm', '\"{}\"'.format(sys_param),\n            '--geojson', '\"{}\"'.format(_geojson),\n            '--osm-file', '\"{}\"'.format(osm), '--idf-file', '\"{}\"'.format(idf)\n        ]\n    if _sim_par_ is not None:\n        sim_par_json = os.path.join(ep_dir, 'simulation_parameter.json')\n        with open(sim_par_json, 'w') as fp:\n            json.dump(_sim_par_.to_dict(), fp)\n        cmds.append('--sim-par-json')\n        cmds.append('\"{}\"'.format(sim_par_json))\n\n    # execute the command\n    cmds = ' '.join(cmds)\n    if os.name == 'nt':\n        shell = False if run_ == 1 else True\n    else:\n        shell = True\n    process = subprocess.Popen(cmds, shell=shell, env=custom_env)\n    result = process.communicate()  # freeze the canvas while running\n\n    # get the output files and error log\n    if run_:\n        if not os.path.isfile(idf):\n            print(cmds)\n            raise ValueError('Failed to translate Model to EnergyPlus.')\n        sql, zsz, rdd, html, err = output_energyplus_files(os.path.dirname(idf))\n        # parse the error log and report any warnings\n        if err is not None and os.path.getsize(err) < 500000000:\n            err_obj = Err(err)\n            err_content = err_obj.file_contents\n            clean_contents = []\n            for line in err_content.split('\\n'):\n                if 'Heat Transfer Pipe' not in line:  # remove recurring warning\n                    clean_contents.append(line)\n            print('\\n'.join(clean_contents))\n            for warn in err_obj.severe_errors:\n                give_warning(ghenv.Component, warn)\n            for error in err_obj.fatal_errors:\n                raise Exception(error)\n", 
   "category": "Dragonfly", 
+  "name": "DF Export District Energy System", 
   "inputs": [
     {
-      "default": null, 
-      "access": "item", 
       "description": "The path to an URBANopt-compatible geoJSON file. This geoJSON\nfile can be obtained form the \"DF Model to geoJSON\" component.\nNote that the geoJSON must have a valid District Energy System\n(DES) Loop assigned to it in order to run correctly with this\ncomponent.", 
       "type": "string", 
+      "access": "item", 
+      "default": null, 
       "name": "_geojson"
     }, 
     {
-      "default": null, 
-      "access": "item", 
       "description": "The path to an URBANopt .csv file for the scenario. This CSV\nfile can be obtained form the \"DF Run URBANopt\" component.", 
       "type": "string", 
+      "access": "item", 
+      "default": null, 
       "name": "_scenario"
     }, 
     {
-      "default": null, 
-      "access": "item", 
       "description": "Optional parameters from the \"HB Simulation Parameter\" component,\nwhich describes all of the setting for the simulation. If unspecified,\ndefault simulation parameters will be used.", 
       "type": "System.Object", 
+      "access": "item", 
+      "default": null, 
       "name": "_sim_par_"
     }, 
     {
-      "default": null, 
-      "access": "item", 
       "description": "Set to \"True\" to install any missing dependencies, perform autosizing\nof the DES, and export the DES to OSM/IDF files as well as a\nModelica model.", 
       "type": "bool", 
+      "access": "item", 
+      "default": null, 
       "name": "_write"
     }, 
     {
-      "default": null, 
-      "access": "item", 
       "description": "Set to \"True\" to simulate the IDF of the DES in EnergyPlus after it is written.\nThis will ensure that all result files appear in their respective\noutputs from this component.", 
       "type": "int", 
+      "access": "item", 
+      "default": null, 
       "name": "run_"
     }
   ], 
-  "subcategory": "5 :: District Thermal", 
+  "nickname": "ExportDES", 
   "outputs": [
     [
       {
-        "default": null, 
-        "access": "None", 
         "description": "A JSON file containing all of the specifications of the District\nEnergy System, including the detailed Building load profiles,\nequipment specifications, borehole field characteristics\n(if applicable), etc.", 
         "type": null, 
+        "access": "None", 
+        "default": null, 
         "name": "sys_param"
       }, 
       {
-        "default": null, 
-        "access": "None", 
         "description": "The file path to the OpenStudio Model (OSM) that has been generated\non this computer.", 
         "type": null, 
+        "access": "None", 
+        "default": null, 
         "name": "osm"
       }, 
       {
-        "default": null, 
-        "access": "None", 
         "description": "The file path of the EnergyPlus Input Data File (IDF) that has been\ngenerated on this computer.", 
         "type": null, 
+        "access": "None", 
+        "default": null, 
         "name": "idf"
       }, 
       {
-        "default": null, 
-        "access": "None", 
         "description": "The file path of the SQL result file that has been generated on this\ncomputer. This will be None unless run_ is set to True.", 
         "type": null, 
+        "access": "None", 
+        "default": null, 
         "name": "sql"
       }, 
       {
-        "default": null, 
-        "access": "None", 
         "description": "The file path of the Result Data Dictionary (.rdd) file that is\ngenerated after running the file through EnergyPlus.  This file\ncontains all possible outputs that can be requested from the EnergyPlus\nmodel. Use the \"HB Read Result Dictionary\" component to see what outputs\ncan be requested.", 
         "type": null, 
+        "access": "None", 
+        "default": null, 
         "name": "rdd"
       }, 
       {
-        "default": null, 
-        "access": "None", 
         "description": "The HTML file path containing all requested Summary Reports.", 
         "type": null, 
+        "access": "None", 
+        "default": null, 
         "name": "html"
       }, 
       {
-        "default": null, 
-        "access": "None", 
         "description": "A folder where all of the Modelica files of the District Energy\nSystem (DES) are written.", 
         "type": null, 
+        "access": "None", 
+        "default": null, 
         "name": "modelica"
       }
     ]
   ], 
   "description": "Epxport an URBANopt GeoJSON with an assigned Distric Energy System (DES)\nto an OSM file (OpenStudio Model), which can then be translated to an IDF file\nand then simualted through EnergyPlus.\n_\nThis component also exports a Modelica model of the DES, can be opened and\nedited in any of the standard Modelica interfaces (eg. Dymola, OMEdit) or it\ncan be simulated with OpenModelica inside a Docker image using the \"DF Run\nModelica\" component.\n_\nThe DES models exported by this component have no building geometry in them and\nare purely models of the DES plant loops. Buildings are replaced by load\nprofile objects with cooling, heating, and service hot water loads pulled\nfrom the input scenario.\n_\nThe Modelica model uses the modules of the Modelica Buildings Library (MBL).\nMore information on the MBL can be found here:\nhttps://simulationresearch.lbl.gov/modelica/\n-", 
-  "version": "1.10.1", 
-  "nickname": "ExportDES"
+  "subcategory": "5 :: District Thermal", 
+  "version": "1.10.2", 
+  "code": "\nimport os\nimport subprocess\nimport json\n\ntry:\n    from ladybug.futil import nukedir\n    from ladybug.config import folders as lb_folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug:\\n\\t{}'.format(e))\n\ntry:\n    from honeybee.config import folders\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:\n    from honeybee_energy.run import output_energyplus_files\n    from honeybee_energy.result.err import Err\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee_energy:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly_energy dependencies\n    from dragonfly_energy.config import folders as df_folders\n    from dragonfly_energy.run import check_des_compatibility, set_building_district_loads, \\\n        run_des_sys_param, run_des_modelica\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.download import download_file_by_name\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\nUO_GMT_VERSION = '.'.join(str(i) for i in df_folders.UO_GMT_VERSION)\nUO_TN_VERSION = '.'.join(str(i) for i in df_folders.UO_TN_VERSION)\nMBL_VERSION = '.'.join(str(i) for i in df_folders.MBL_VERSION)\n\n\nif all_required_inputs(ghenv.Component) and _write:\n    # set up the custom python environment\n    custom_env = os.environ.copy()\n    custom_env['PYTHONHOME'] = ''\n\n    # set global values\n    ext = '.exe' if os.name == 'nt' else ''\n    executor_path = os.path.join(\n        lb_folders.ladybug_tools_folder, '{{plugin}}',\n        'ladybug_{{plugin}}_dotnet', 'Ladybug.Executor.exe')\n\n    # check to see if the geojson-modelica-translator is installed\n    uo_gmt = '{}/uo_des{}'.format(folders.python_scripts_path, ext)\n    uo_gmt_pack = '{}/geojson_modelica_translator-{}.dist-info'.format(\n        folders.python_package_path, UO_GMT_VERSION)\n    if not os.path.isfile(uo_gmt) or not os.path.isdir(uo_gmt_pack):\n        install_cmd = 'pip install geojson-modelica-translator=={}'.format(UO_GMT_VERSION)\n        if os.name == 'nt' and os.path.isfile(executor_path) and \\\n                'Program Files' in executor_path:\n            pip_cmd = [\n                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)\n            ]\n        else:\n            pip_cmd = '\"{py_exe}\" -m {uo_cmd}'.format(\n                py_exe=folders.python_exe_path, uo_cmd=install_cmd)\n        shell = True if os.name == 'nt' else False\n        process = subprocess.Popen(\n            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)\n        stderr = process.communicate()\n\n    # check to see if the ThermalNetwork package is installed\n    uo_tn = '{}/thermalnetwork{}'.format(folders.python_scripts_path, ext)\n    uo_tn_pack = '{}/ThermalNetwork-{}.dist-info'.format(\n        folders.python_package_path, UO_TN_VERSION)\n    if not os.path.isfile(uo_tn) or not os.path.isdir(uo_tn_pack):\n        install_cmd = 'pip install thermalnetwork=={}'.format(UO_TN_VERSION)\n        if os.name == 'nt' and os.path.isfile(executor_path) and \\\n                'Program Files' in executor_path:\n            pip_cmd = [\n                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)\n            ]\n        else:\n            pip_cmd = '\"{py_exe}\" -m {uo_cmd}'.format(\n                py_exe=folders.python_exe_path, uo_cmd=install_cmd)\n        shell = True if os.name == 'nt' else False\n        process = subprocess.Popen(\n            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)\n        stderr = process.communicate()\n\n    # check to see if the Modelica Buildings Library is installed\n    install_directory = os.path.join(lb_folders.ladybug_tools_folder, 'resources')\n    final_dir = os.path.join(install_directory, 'mbl')\n    version_file = os.path.join(final_dir, 'version.txt')\n    already_installed = False\n    if os.path.isdir(final_dir) and os.path.isfile(version_file):\n        with open(version_file, 'r') as vf:\n            install_version = vf.read()\n        if install_version == MBL_VERSION:\n            already_installed = True\n        else:\n            nukedir(final_dir, True)\n    if not already_installed:\n        install_cmd = 'dragonfly_energy install mbl --version {}'.format(MBL_VERSION)\n        if os.name == 'nt' and os.path.isfile(executor_path) and \\\n                'Program Files' in executor_path:\n            pip_cmd = [\n                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)\n            ]\n        else:\n            pip_cmd = '\"{py_exe}\" -m {uo_cmd}'.format(\n                py_exe=folders.python_exe_path, uo_cmd=install_cmd)\n        shell = True if os.name == 'nt' else False\n        process = subprocess.Popen(\n            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)\n        stderr = process.communicate()\n\n    # check the various files in the project folder\n    check_des_compatibility(_geojson)\n    proj_dir = os.path.dirname(_geojson)\n    scn_name = os.path.basename(_scenario).replace('.csv', '')\n    des_dir = os.path.join(proj_dir, 'run', scn_name, 'des_modelica')\n    sys_param = os.path.join(proj_dir, 'system_params.json')\n\n    # add the building loads to the system parameters and autosize any {{PLGN}}Es\n    if not os.path.isdir(des_dir):\n        # set the building loads to district chilled/hot water\n        if os.name == 'nt':\n            warnings = set_building_district_loads(_geojson, _scenario)\n        else:  # on Mac, the SQLite module does not work\n            cmds = [folders.python_exe_path, '-m', 'dragonfly_energy', 'translate',\n                    'building-district-loads', _geojson, _scenario]\n            process = subprocess.Popen(cmds, stdout=subprocess.PIPE, env=custom_env)\n            stdout = process.communicate()\n            warnings = json.loads(stdout[0])\n        for warn in warnings:\n            give_warning(ghenv.Component, warn)\n        # size the {{PLGN}}E\n        sys_param = run_des_sys_param(_geojson, _scenario)\n\n    # run the command that generates the modelica model\n    modelica = run_des_modelica(sys_param, _geojson, _scenario)\n\n    # translate the system to OSM/IDF and optionally simualte it\n    ep_dir = os.path.join(proj_dir, 'run', 'honeybee_scenario', 'des_energyplus')\n    nukedir(ep_dir, True)\n    if not os.path.isdir(ep_dir):\n        os.makedirs(ep_dir)\n    osm = os.path.join(ep_dir, 'in.osm')\n    idf = os.path.join(ep_dir, 'in.idf')\n    # put together the arguments for the command to be run\n    if run_:  # use the simulate command\n        cmds = [\n            '\"{}\"'.format(folders.python_exe_path), '-m', 'dragonfly_openstudio',\n            'simulate', 'system', '\"{}\"'.format(sys_param),\n            '--geojson', '\"{}\"'.format(_geojson),\n            '--folder', '\"{}\"'.format(ep_dir)\n        ]\n    else:  # use the translate command\n        cmds = [\n            '\"{}\"'.format(folders.python_exe_path), '-m', 'dragonfly_openstudio',\n            'translate', 'system-to-osm', '\"{}\"'.format(sys_param),\n            '--geojson', '\"{}\"'.format(_geojson),\n            '--osm-file', '\"{}\"'.format(osm), '--idf-file', '\"{}\"'.format(idf)\n        ]\n    if _sim_par_ is not None:\n        sim_par_json = os.path.join(ep_dir, 'simulation_parameter.json')\n        with open(sim_par_json, 'w') as fp:\n            json.dump(_sim_par_.to_dict(), fp)\n        cmds.append('--sim-par-json')\n        cmds.append('\"{}\"'.format(sim_par_json))\n\n    # execute the command\n    cmds = ' '.join(cmds)\n    if os.name == 'nt':\n        shell = False if run_ == 1 else True\n    else:\n        shell = True\n    process = subprocess.Popen(cmds, shell=shell, env=custom_env)\n    result = process.communicate()  # freeze the canvas while running\n\n    # get the output files and error log\n    if run_:\n        if not os.path.isfile(idf):\n            print(cmds)\n            raise ValueError('Failed to translate Model to EnergyPlus.')\n        sql, zsz, rdd, html, err = output_energyplus_files(os.path.dirname(idf))\n        # parse the error log and report any warnings\n        if err is not None and os.path.getsize(err) < 500000000:\n            err_obj = Err(err)\n            err_content = err_obj.file_contents\n            clean_contents = []\n            for line in err_content.split('\\n'):\n                if 'Heat Transfer Pipe' not in line:  # remove recurring warning\n                    clean_contents.append(line)\n            print('\\n'.join(clean_contents))\n            for warn in err_obj.severe_errors:\n                give_warning(ghenv.Component, warn)\n            for error in err_obj.fatal_errors:\n                raise Exception(error)\n"
 }
