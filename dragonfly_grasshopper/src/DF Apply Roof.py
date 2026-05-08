@@ -32,6 +32,14 @@ roof specifications for different Stories of a Dragonfly Building or Model.
         _story_i_: An optional integer to set the index of the Story to which the Roof
             should be assigned. If unspecified, the roof geometry will be added
             to the top floor of any connected Building or Model.
+        _windows: A list of Breps that will be added to the roofs as clearstory
+            windows. This can also be a list of orphaned Honeybee Apertures and/or
+            Doors to be added to the Dragonfly objects. In the case of Doors, they
+            will be assigned to the Dragonfly object as such.
+        project_dist_: An optional number to be used to project the Aperture/Door geometry
+            onto parent Faces. If specified, then sub-faces within this distance
+            of the parent Face will be projected and added. Otherwise,
+            Apertures/Doors will only be added if they are coplanar with a parent Face.
 
     Returns:
         df_obj: The input Dragonfly objects with the roof geometry assigned to them.
@@ -39,7 +47,7 @@ roof specifications for different Stories of a Dragonfly Building or Model.
 
 ghenv.Component.Name = 'DF Apply Roof'
 ghenv.Component.NickName = 'ApplyRoof'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '7'
@@ -52,11 +60,19 @@ try:  # import the core dragonfly dependencies
 except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
+try:  # import the core honeybee dependencies
+    from honeybee.aperture import Aperture
+    from honeybee.door import Door
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
+
 try:  # import the ladybug_rhino dependencies
     from ladybug_rhino.togeometry import to_face3d
-    from ladybug_rhino.grasshopper import all_required_inputs, give_warning
+    from ladybug_rhino.config import current_tolerance, angle_tolerance
+    from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+tolerance = current_tolerance()
 
 
 if all_required_inputs(ghenv.Component):
@@ -68,6 +84,19 @@ if all_required_inputs(ghenv.Component):
     for geo_obj in _roof_geo:
         face3ds.extend(to_face3d(geo_obj))
     roof = RoofSpecification(face3ds)
+
+    # assign clearstory geometry if it is present
+    if len(clearstory_geo_) != 0:
+        win_geo = []
+        for geo in clearstory_geo_:
+            if isinstance(geo, (Aperture, Door)):
+                win_geo.append(geo)
+            else:
+                for f in to_face3d(geo):
+                    win_geo.append(Aperture('Dummy_Ap', f))
+        project_dist = 0 if project_dist_ is None else project_dist_
+        roof.assign_sub_faces(win_geo, project_dist, tolerance=tolerance,
+                              angle_tolerance=angle_tolerance)
 
     # duplicate the input object and assign the roof to it
     df_obj = _df_obj.duplicate()
