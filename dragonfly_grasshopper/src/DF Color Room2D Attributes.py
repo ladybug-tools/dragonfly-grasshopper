@@ -38,7 +38,7 @@ different Room2Ds.
 
 ghenv.Component.Name = 'DF Color Room2D Attributes'
 ghenv.Component.NickName = 'ColorRoom2DAttr'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -78,6 +78,9 @@ if all_required_inputs(ghenv.Component):
 
     # create the ColorRoom visualization object and output geometry
     color_obj = ColorRoom2D(rooms, _attribute, legend_par_)
+    if _attribute.endswith('_si'):
+        color_obj.legend_parameters.title = \
+            color_obj.attr_name_end.replace('_', ' ').title()[:-3]
     graphic = color_obj.graphic_container
     mesh = [from_face3ds_to_colored_mesh([flrs], col) for flrs, col in
             zip(color_obj.floor_faces, graphic.value_colors)]
