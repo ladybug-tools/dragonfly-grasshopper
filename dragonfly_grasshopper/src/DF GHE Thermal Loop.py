@@ -63,6 +63,7 @@ to connect these objects to Dragonfly Buildings.
             ground heat exchanger on the loop. Choose from the options below.
             Choose from the options below. (Default: Electricity).
             * Electricity
+            * AirSourceHeatPump
             * NaturalGas
             * DistrictHeating
             * None
@@ -82,7 +83,7 @@ to connect these objects to Dragonfly Buildings.
 
 ghenv.Component.Name = 'DF GHE Thermal Loop'
 ghenv.Component.NickName = 'GHELoop'
-ghenv.Component.Message = '1.10.3'
+ghenv.Component.Message = '1.10.4'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
