@@ -20,6 +20,11 @@ This includes a central hot and chilled water plant for the district.
         _heating_plant_: Optional HeatingPlant object from the "DF Heating Plant" component
             to specify the properties of the heating plant in the loop. If unspecified,
             default heating plant properties will be used.
+        heat_recovery_chiller_: Set to "True" to include a heat recovery chiller within the
+            central plant that simultaneously produces hot and chilled water.
+            This chiller will be sized to meet the annual peak overlap in building
+            heating and cooling loads and will be added on a heat recovery
+            loop in between the central chilled and hot water loops. (Default: False).
         _economizer_type_: Text for the type of waterside economizer to be used within
             the cooling plant. Integrated will pre-cool the inlet supply water
             to the chiller using the cooling tower whenever outdoor wetbulb
@@ -48,7 +53,7 @@ This includes a central hot and chilled water plant for the district.
 
 ghenv.Component.Name = 'DF Fourth Generation Thermal Loop'
 ghenv.Component.NickName = 'Gen4Loop'
-ghenv.Component.Message = '1.10.3'
+ghenv.Component.Message = '1.10.4'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '2'
@@ -77,7 +82,8 @@ heating_type = _heating_type_ if _heating_type_ is not None else 'NaturalGas'
 
 # create the loop
 des_loop = FourthGenThermalLoop(
-    name, _cooling_plant_, _heating_plant_, economizer_type, heating_type
+    name, _cooling_plant_, _heating_plant_, economizer_type=economizer_type,
+    heating_type=heating_type, heat_recovery_chiller=heat_recovery_chiller_
 )
 if _name_ is not None:
     des_loop.display_name = _name_

@@ -27,7 +27,7 @@ Parse the typical energy use results for a District Energy System (DES).
 
 ghenv.Component.Name = 'DF Read DES Energy Result'
 ghenv.Component.NickName = 'DESEnergyResult'
-ghenv.Component.Message = '1.10.1'
+ghenv.Component.Message = '1.10.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '5'
@@ -75,6 +75,7 @@ heating_outputs = (
     'Boiler Electricity Energy',
     'Boiler NaturalGas Energy',
     'Hot_Water_Loop_Central_Air_Source_Heat_Pump Electricity Consumption',
+    'Hot_Water_Loop_Supplemental_Air_Source_Heat_Pump Electricity Consumption',
     'Water Heater NaturalGas Energy',
     'Water Heater Electricity Energy'
 )
@@ -125,6 +126,9 @@ if all_required_inputs(ghenv.Component):
     supplement_heat = []
     for i in range(len(heating) - 1, -1, -1):
         if 'SUPPLEMENTAL' in heating[i].header.metadata['System']:
+            supplement_heat.append(heating.pop(i))
+        elif 'EMS' in heating[i].header.metadata['System'] and \
+                'Supplemental' in heating[i].header.metadata['type']:
             supplement_heat.append(heating.pop(i))
 
     # spearate any heating heat pump values into their correct lists

@@ -69,7 +69,7 @@ https://simulationresearch.lbl.gov/modelica/
 
 ghenv.Component.Name = 'DF Export District Energy System'
 ghenv.Component.NickName = 'ExportDES'
-ghenv.Component.Message = '1.10.2'
+ghenv.Component.Message = '1.10.3'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -268,7 +268,10 @@ if all_required_inputs(ghenv.Component) and _write:
                 if 'Heat Transfer Pipe' not in line:  # remove recurring warning
                     clean_contents.append(line)
             print('\n'.join(clean_contents))
+            ignore = 'Water heater tank set point temperature is greater than ' \
+                'the maximum tank temperature limit.'
             for warn in err_obj.severe_errors:
-                give_warning(ghenv.Component, warn)
+                if ignore not in warn:
+                    give_warning(ghenv.Component, warn)
             for error in err_obj.fatal_errors:
                 raise Exception(error)
