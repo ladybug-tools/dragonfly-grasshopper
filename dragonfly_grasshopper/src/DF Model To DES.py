@@ -8,17 +8,28 @@
 # @license AGPL-3.0-or-later <https://spdx.org/licenses/AGPL-3.0-or-later>
 
 """
-Convert a Dragonfly Model into an URBANopt-compatible geoJSON and DES input files.
+Convert a Dragonfly Model into an URBANopt-compatible GeoJSON and DES input files.
 _
-This component is intended specifically for the case that District Energy
-System (DES) simulation is to be performed without using URBANopt to generate
-building energy loads through EnergyPlus. Accordingly, ALL Dragonfly Buildings
-in the Model must have DES loads assigned directly to them in order for this
-component to run correctly.
+This component is intended for the case that District Energy System (DES) simulation
+is to be performed without using URBANopt to generate building energy loads through
+EnergyPlus (eg. the loads were derived using other software). It can also be used
+for workflows where several variants of a DES are to be simulated and so it's
+desirable to avoid re-running the URBANopt/EnergyPlus simulation of the building
+loads as different systems are assigned and run.
+_
+To function propperly, this component requires that the Buildings in the input
+Model have DES loads assigned directly to them. This assignment can be done
+either with the "DF Assign DES Building Loads" component (when using building
+loads from other software) or with the "DF Bind DES Loads To Model" to bind
+existing URBANopt building loads to the model.
 -
 
     Args:
-        _model: A Dragonfly Model object.
+        _model: A Dragonfly Model object. The Buildings in the of this Model must have
+            DES loads assigned directly to them. This assignment can be done
+            either with the "DF Assign DES Building Loads" component (when
+            using building loads from other software) or with the "DF Bind DES
+            Loads To Model" to bind existing URBANopt building loads to the model.
         _des_loop: A District Energy System (DES) ThermalLoop that is associated
             with the dragonfly Model.
         _epw_file: The file path to an EPW that should be associated with the
@@ -41,13 +52,13 @@ component to run correctly.
             Buildings within the dragonfly model along with any geometry of
             the District Energy System (DES).
         scenario: File path to the URBANopt scenario CSV that points to the building
-            loads for DES simulation. This can be plugged into the "DF Write
-            Modelica DES" component to create a full Modelica model of the DES.
+            loads for DES simulation. This can be plugged into the "DF Export
+            District Energy System" component to run a simulation of the DES.
 """
 
 ghenv.Component.Name = 'DF Model To DES'
 ghenv.Component.NickName = 'ToDES'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
