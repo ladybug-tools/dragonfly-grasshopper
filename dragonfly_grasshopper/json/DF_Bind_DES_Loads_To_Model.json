@@ -1,0 +1,36 @@
+{
+  "description": "Bind the cooling, heating and hot water loads derived from an URBANopt simulation\nto the Buildings of a dragonfly Model.\n_\nDoing so avoids the need to re-run the URBANopt/EnergyPlus simulation of the\nbuilding loads as different District Energy Systems (DES) are assigned and run.\nFor this workflow, the model and any customized des_loop can be re-exported using\nthe \"DF Model To DES\" component and then the plant can be simulated with the\n\"DF Export District Energy System\" component.\n_\nBinding the loads also means that the cooling, heating and hot water values are\nsaved within the dragonfly Model if it is written to a DFJSON and opened in another\nsoftware interface.\n-", 
+  "subcategory": "5 :: District Thermal", 
+  "outputs": [
+    [
+      {
+        "type": null, 
+        "name": "model", 
+        "default": null, 
+        "description": "The input Dragonfly Model with DES loads assigned to it. The Model\nand any customized des_loop can be exported using the \"DF Model To DES\"\ncomponent and then the plant can be simulated with the \"DF Export\nDistrict Energy System\" component.", 
+        "access": "None"
+      }
+    ]
+  ], 
+  "nickname": "BindDESLoads", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import ladybug-{{cad}}\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, give_warning\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component):\n    assert isinstance(_model, Model), 'Expected Dragonfly Model. ' \\\n        'Got {}.'.format(type(_model))\n    model = _model.duplicate()\n    warnings = model.properties.energy.bind_des_loads_to_buildings(_scenario)\n    for warn in warnings:\n        give_warning(ghenv.Component, warn)\n", 
+  "category": "Dragonfly", 
+  "version": "1.10.0", 
+  "inputs": [
+    {
+      "type": "System.Object", 
+      "name": "_model", 
+      "default": null, 
+      "description": "A Dragonfly Model which has been simulated with the \"DF Run URBANopt\"\ncomponent and is to have the resulting heating and cooling loads\nbound to it for simulation of a District Energy System (DES).", 
+      "access": "item"
+    }, 
+    {
+      "type": "string", 
+      "name": "_scenario", 
+      "default": null, 
+      "description": "The path to the URBANopt .csv file for the scenario. This CSV\nfile can be obtained form the \"DF Run URBANopt\" component.", 
+      "access": "item"
+    }
+  ], 
+  "name": "DF Bind DES Loads To Model"
+}

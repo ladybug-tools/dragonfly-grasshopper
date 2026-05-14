@@ -69,7 +69,7 @@ https://simulationresearch.lbl.gov/modelica/
 
 ghenv.Component.Name = 'DF Export District Energy System'
 ghenv.Component.NickName = 'ExportDES'
-ghenv.Component.Message = '1.10.3'
+ghenv.Component.Message = '1.10.4'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -200,10 +200,10 @@ if all_required_inputs(ghenv.Component) and _write:
     if not os.path.isdir(des_dir):
         # set the building loads to district chilled/hot water
         if os.name == 'nt':
-            warnings = set_building_district_loads(_geojson, _scenario)
+            warnings = set_building_district_loads(_scenario)
         else:  # on Mac, the SQLite module does not work
             cmds = [folders.python_exe_path, '-m', 'dragonfly_energy', 'translate',
-                    'building-district-loads', _geojson, _scenario]
+                    'building-district-loads', _scenario]
             process = subprocess.Popen(cmds, stdout=subprocess.PIPE, env=custom_env)
             stdout = process.communicate()
             warnings = json.loads(stdout[0])

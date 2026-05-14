@@ -1,78 +1,78 @@
 {
-  "version": "1.10.0", 
-  "nickname": "ToDES", 
+  "description": "Convert a Dragonfly Model into an URBANopt-compatible GeoJSON and DES input files.\n_\nThis component is intended for the case that District Energy System (DES) simulation\nis to be performed without using URBANopt to generate building energy loads through\nEnergyPlus (eg. the loads were derived using other software). It can also be used\nfor workflows where several variants of a DES are to be simulated and so it's\ndesirable to avoid re-running the URBANopt/EnergyPlus simulation of the building\nloads as different systems are assigned and run.\n_\nTo function propperly, this component requires that the Buildings in the input\nModel have DES loads assigned directly to them. This assignment can be done\neither with the \"DF Assign DES Building Loads\" component (when using building\nloads from other software) or with the \"DF Bind DES Loads To Model\" to bind\nexisting URBANopt building loads to the model.\n-", 
+  "subcategory": "5 :: District Thermal", 
   "outputs": [
     [
       {
-        "access": "None", 
-        "name": "geojson", 
-        "description": "The path to a geoJSON file that contains polygons for all of the\nBuildings within the dragonfly model along with any geometry of\nthe District Energy System (DES).", 
         "type": null, 
-        "default": null
+        "name": "geojson", 
+        "default": null, 
+        "description": "The path to a geoJSON file that contains polygons for all of the\nBuildings within the dragonfly model along with any geometry of\nthe District Energy System (DES).", 
+        "access": "None"
       }, 
       {
-        "access": "None", 
-        "name": "scenario", 
-        "description": "File path to the URBANopt scenario CSV that points to the building\nloads for DES simulation. This can be plugged into the \"DF Write\nModelica DES\" component to create a full Modelica model of the DES.", 
         "type": null, 
-        "default": null
+        "name": "scenario", 
+        "default": null, 
+        "description": "File path to the URBANopt scenario CSV that points to the building\nloads for DES simulation. This can be plugged into the \"DF Export\nDistrict Energy System\" component to run a simulation of the DES.", 
+        "access": "None"
       }
     ]
   ], 
-  "inputs": [
-    {
-      "access": "item", 
-      "name": "_model", 
-      "description": "A Dragonfly Model object.", 
-      "type": "System.Object", 
-      "default": null
-    }, 
-    {
-      "access": "item", 
-      "name": "_des_loop", 
-      "description": "A District Energy System (DES) ThermalLoop that is associated\nwith the dragonfly Model.", 
-      "type": "System.Object", 
-      "default": null
-    }, 
-    {
-      "access": "item", 
-      "name": "_epw_file", 
-      "description": "The file path to an EPW that should be associated with the\noutput energy model.", 
-      "type": "string", 
-      "default": null
-    }, 
-    {
-      "access": "item", 
-      "name": "_location_", 
-      "description": "A ladybug Location object possessing longitude and lattiude data\nused to position geoJSON file on the globe.", 
-      "type": "System.Object", 
-      "default": null
-    }, 
-    {
-      "access": "item", 
-      "name": "_point_", 
-      "description": "A Point for where the _location object exists within the space of\nthe Rhino scene. This is used to posistion the geoJSON file on the\nglobe. (Default: Rhino origin (0, 0, 0)).", 
-      "type": "Point3d", 
-      "default": null
-    }, 
-    {
-      "access": "item", 
-      "name": "_folder_", 
-      "description": "An optional folder to be used as the root of the URBANopt project\nfolder. If None, the files will be written into a sub-directory\nof the default simulation folder.", 
-      "type": "System.Object", 
-      "default": null
-    }, 
-    {
-      "access": "item", 
-      "name": "_write", 
-      "description": "Set to \"True\" to have the Dragonfly Model translated to a geoJSON\nand other project folder files for District Energy System (DES)\nsimulation.", 
-      "type": "bool", 
-      "default": null
-    }
-  ], 
-  "subcategory": "5 :: District Thermal", 
+  "nickname": "ToDES", 
   "code": "\ntry:  # import the ladybug_geometry dependencies\n    from ladybug_geometry.geometry2d.pointvector import Point2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_geometry:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.togeometry import to_point2d\n    from ladybug_{{cad}}.config import current_tolerance\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\nif all_required_inputs(ghenv.Component) and _write:\n    # check the _model and set default inputs\n    assert isinstance(_model, Model), \\\n        'Expected Dragonfly Model object. Got {}.'.format(type(_model))\n    point = to_point2d(_point_) if _point_ is not None else Point2D(0, 0)\n\n    # create the geoJSON and honeybee Model JSONs\n    geojson, scenario, sys_params = _model.to.urbanopt_des(\n        _model, _des_loop, _epw_file, _location_, point,\n        folder=_folder_, tolerance=current_tolerance())\n", 
   "category": "Dragonfly", 
-  "name": "DF Model To DES", 
-  "description": "Convert a Dragonfly Model into an URBANopt-compatible geoJSON and DES input files.\n_\nThis component is intended specifically for the case that District Energy\nSystem (DES) simulation is to be performed without using URBANopt to generate\nbuilding energy loads through EnergyPlus. Accordingly, ALL Dragonfly Buildings\nin the Model must have DES loads assigned directly to them in order for this\ncomponent to run correctly.\n-"
+  "version": "1.10.1", 
+  "inputs": [
+    {
+      "type": "System.Object", 
+      "name": "_model", 
+      "default": null, 
+      "description": "A Dragonfly Model object. The Buildings in the of this Model must have\nDES loads assigned directly to them. This assignment can be done\neither with the \"DF Assign DES Building Loads\" component (when\nusing building loads from other software) or with the \"DF Bind DES\nLoads To Model\" to bind existing URBANopt building loads to the model.", 
+      "access": "item"
+    }, 
+    {
+      "type": "System.Object", 
+      "name": "_des_loop", 
+      "default": null, 
+      "description": "A District Energy System (DES) ThermalLoop that is associated\nwith the dragonfly Model.", 
+      "access": "item"
+    }, 
+    {
+      "type": "string", 
+      "name": "_epw_file", 
+      "default": null, 
+      "description": "The file path to an EPW that should be associated with the\noutput energy model.", 
+      "access": "item"
+    }, 
+    {
+      "type": "System.Object", 
+      "name": "_location_", 
+      "default": null, 
+      "description": "A ladybug Location object possessing longitude and lattiude data\nused to position geoJSON file on the globe.", 
+      "access": "item"
+    }, 
+    {
+      "type": "Point3d", 
+      "name": "_point_", 
+      "default": null, 
+      "description": "A Point for where the _location object exists within the space of\nthe Rhino scene. This is used to posistion the geoJSON file on the\nglobe. (Default: Rhino origin (0, 0, 0)).", 
+      "access": "item"
+    }, 
+    {
+      "type": "System.Object", 
+      "name": "_folder_", 
+      "default": null, 
+      "description": "An optional folder to be used as the root of the URBANopt project\nfolder. If None, the files will be written into a sub-directory\nof the default simulation folder.", 
+      "access": "item"
+    }, 
+    {
+      "type": "bool", 
+      "name": "_write", 
+      "default": null, 
+      "description": "Set to \"True\" to have the Dragonfly Model translated to a geoJSON\nand other project folder files for District Energy System (DES)\nsimulation.", 
+      "access": "item"
+    }
+  ], 
+  "name": "DF Model To DES"
 }
