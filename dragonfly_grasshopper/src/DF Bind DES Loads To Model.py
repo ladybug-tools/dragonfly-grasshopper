@@ -38,10 +38,24 @@ software interface.
 
 ghenv.Component.Name = 'DF Bind DES Loads To Model'
 ghenv.Component.NickName = 'BindDESLoads'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '0'
+
+import os
+import subprocess
+import json
+
+try:
+    from ladybug.datacollection import HourlyContinuousCollection
+except ImportError as e:
+    raise ImportError('\nFailed to import ladybug:\n\t{}'.format(e))
+
+try:
+    from honeybee.config import folders
+except ImportError as e:
+    raise ImportError('\nFailed to import honeybee:\n\t{}'.format(e))
 
 try:  # import the core dragonfly dependencies
     from dragonfly.model import Model
@@ -55,9 +69,38 @@ except ImportError as e:
 
 
 if all_required_inputs(ghenv.Component):
+    # duplicate the input model
     assert isinstance(_model, Model), 'Expected Dragonfly Model. ' \
         'Got {}.'.format(type(_model))
     model = _model.duplicate()
-    warnings = model.properties.energy.bind_des_loads_to_buildings(_scenario)
+
+    # get the building loads
+    if os.name == 'nt':  # we are on windows; use IronPython like usual
+        warnings = model.properties.energy.bind_des_loads_to_buildings(_scenario)
+
+    else:  # we are on Mac; sqlite3 module doesn't work in Mac IronPython
+        # Execute the honybee CLI to obtain the results via CPython
+        cmds = [folders.python_exe_path, '-m', 'dragonfly_energy', 'translate',
+                'building-district-loads', _scenario, '--loads-to-log']
+        custom_env = os.environ.copy()
+        custom_env['PYTHONHOME'] = ''
+        process = subprocess.Popen(cmds, stdout=subprocess.PIPE, env=custom_env)
+        stdout = process.communicate()
+        res_dict = json.loads(stdout[0])
+        warnings = res_dict['warnings']
+        building_loads = res_dict['building_loads']
+        for building in model.buildings:
+            try:
+                bldg_dict = building_loads[building.identifier]
+                building.properties.energy.des_cooling_load = \
+                    -HourlyContinuousCollection.from_dict(bldg_dict['cooling'])
+                building.properties.energy.des_heating_load = \
+                    HourlyContinuousCollection.from_dict(bldg_dict['heating'])
+                building.properties.energy.des_hot_water_load = \
+                    HourlyContinuousCollection.from_dict(bldg_dict['shw'])
+            except KeyError:
+                pass  # not a building where loads were found
+
+    # output any warnings
     for warn in warnings:
         give_warning(ghenv.Component, warn)
