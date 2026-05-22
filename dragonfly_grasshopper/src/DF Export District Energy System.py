@@ -69,7 +69,7 @@ https://simulationresearch.lbl.gov/modelica/
 
 ghenv.Component.Name = 'DF Export District Energy System'
 ghenv.Component.NickName = 'ExportDES'
-ghenv.Component.Message = '1.10.4'
+ghenv.Component.Message = '1.10.5'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '5 :: District Thermal'
 ghenv.Component.AdditionalHelpFromDocStrings = '1'
@@ -114,55 +114,21 @@ MBL_VERSION = '.'.join(str(i) for i in df_folders.MBL_VERSION)
 
 
 if all_required_inputs(ghenv.Component) and _write:
-    # set up the custom python environment
+    # set up the custom python environment and get the path to the executor
     custom_env = os.environ.copy()
     custom_env['PYTHONHOME'] = ''
-
-    # set global values
     ext = '.exe' if os.name == 'nt' else ''
     executor_path = os.path.join(
         lb_folders.ladybug_tools_folder, 'grasshopper',
         'ladybug_grasshopper_dotnet', 'Ladybug.Executor.exe')
 
-    # check to see if the geojson-modelica-translator is installed
+    # check to see if the dependencies are already installed
     uo_gmt = '{}/uo_des{}'.format(folders.python_scripts_path, ext)
     uo_gmt_pack = '{}/geojson_modelica_translator-{}.dist-info'.format(
         folders.python_package_path, UO_GMT_VERSION)
-    if not os.path.isfile(uo_gmt) or not os.path.isdir(uo_gmt_pack):
-        install_cmd = 'pip install geojson-modelica-translator=={}'.format(UO_GMT_VERSION)
-        if os.name == 'nt' and os.path.isfile(executor_path) and \
-                'Program Files' in executor_path:
-            pip_cmd = [
-                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)
-            ]
-        else:
-            pip_cmd = '"{py_exe}" -m {uo_cmd}'.format(
-                py_exe=folders.python_exe_path, uo_cmd=install_cmd)
-        shell = True if os.name == 'nt' else False
-        process = subprocess.Popen(
-            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
-        stderr = process.communicate()
-
-    # check to see if the ThermalNetwork package is installed
     uo_tn = '{}/thermalnetwork{}'.format(folders.python_scripts_path, ext)
     uo_tn_pack = '{}/ThermalNetwork-{}.dist-info'.format(
         folders.python_package_path, UO_TN_VERSION)
-    if not os.path.isfile(uo_tn) or not os.path.isdir(uo_tn_pack):
-        install_cmd = 'pip install thermalnetwork=={}'.format(UO_TN_VERSION)
-        if os.name == 'nt' and os.path.isfile(executor_path) and \
-                'Program Files' in executor_path:
-            pip_cmd = [
-                executor_path, folders.python_exe_path, '-m {}'.format(install_cmd)
-            ]
-        else:
-            pip_cmd = '"{py_exe}" -m {uo_cmd}'.format(
-                py_exe=folders.python_exe_path, uo_cmd=install_cmd)
-        shell = True if os.name == 'nt' else False
-        process = subprocess.Popen(
-            pip_cmd, stderr=subprocess.PIPE, shell=shell, env=custom_env)
-        stderr = process.communicate()
-
-    # check to see if the Modelica Buildings Library is installed
     install_directory = os.path.join(lb_folders.ladybug_tools_folder, 'resources')
     final_dir = os.path.join(install_directory, 'mbl')
     version_file = os.path.join(final_dir, 'version.txt')
@@ -174,8 +140,10 @@ if all_required_inputs(ghenv.Component) and _write:
             already_installed = True
         else:
             nukedir(final_dir, True)
-    if not already_installed:
-        install_cmd = 'dragonfly_energy install mbl --version {}'.format(MBL_VERSION)
+    # if the dependencies are not there, install them
+    if not already_installed or not os.path.isfile(uo_tn) or not os.path.isdir(uo_tn_pack) or \
+            not os.path.isfile(uo_gmt) or not os.path.isdir(uo_gmt_pack):
+        install_cmd = 'dragonfly_energy install all-des'
         if os.name == 'nt' and os.path.isfile(executor_path) and \
                 'Program Files' in executor_path:
             pip_cmd = [
