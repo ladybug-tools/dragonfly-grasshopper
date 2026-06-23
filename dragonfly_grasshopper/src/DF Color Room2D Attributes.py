@@ -38,7 +38,7 @@ different Room2Ds.
 
 ghenv.Component.Name = 'DF Color Room2D Attributes'
 ghenv.Component.NickName = 'ColorRoom2DAttr'
-ghenv.Component.Message = '1.10.1'
+ghenv.Component.Message = '1.10.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -53,6 +53,7 @@ except ImportError as e:
     raise ImportError('\nFailed to import dragonfly:\n\t{}'.format(e))
 
 try:  # import the ladybug_rhino dependencies
+    from ladybug_rhino.config import units_system
     from ladybug_rhino.fromgeometry import from_face3ds_to_colored_mesh, \
         from_face3d_to_wireframe
     from ladybug_rhino.fromobjects import legend_objects
@@ -60,6 +61,7 @@ try:  # import the ladybug_rhino dependencies
     from ladybug_rhino.grasshopper import all_required_inputs
 except ImportError as e:
     raise ImportError('\nFailed to import ladybug_rhino:\n\t{}'.format(e))
+units = units_system()
 
 
 if all_required_inputs(ghenv.Component):
@@ -75,6 +77,13 @@ if all_required_inputs(ghenv.Component):
             rooms.extend(df_obj.room_2ds)
         elif isinstance(df_obj, Room2D):
             rooms.extend([df_obj])
+
+    # assign attributes in meters so that absolute loads can be computed.
+    for room in rooms:
+        try:
+            room.properties.energy.set_areas_by_unit_system(units)
+        except AttributeError:
+            pass  # dragonfly-energy is not installed
 
     # create the ColorRoom visualization object and output geometry
     color_obj = ColorRoom2D(rooms, _attribute, legend_par_)
