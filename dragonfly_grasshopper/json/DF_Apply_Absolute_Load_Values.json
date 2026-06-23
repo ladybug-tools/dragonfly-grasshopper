@@ -1,0 +1,71 @@
+{
+  "version": "1.10.0", 
+  "description": "Apply absolute load values to dragonfly Room2Ds.\n_\nNote that, while the assigned load values are absolute, this component will convert\nthem to the \"normalized\" value for each room (eg. lighting per floor area) in\norder to apply them to the rooms. So any existing specification of load intensity\nis overwritten with the absolute load here.\n_\nThis also means that, if a room has no floors (or exterior walls for infiltration),\nthe resulting load values will be equal to 0 regardless of the input here. The\nonly exception is the vent_flow_, which will be applied regardless of the room\nproperties.\n_\nThis component will not edit any of the schedules or other properties associated\nwith each load value. If no schedule currently exists to describe how the load\nvaries over the simulation, the \"Always On\" schedule will be used as a default.\n-", 
+  "nickname": "AbsoluteLoadVals", 
+  "category": "Dragonfly", 
+  "inputs": [
+    {
+      "default": null, 
+      "access": "list", 
+      "description": "Dragonfly Buildings, Stories or Room2Ds to which the input load\nvalues will be assigned. This can also be an etire dragonfly Model.", 
+      "type": "System.Object", 
+      "name": "_df_objs"
+    }, 
+    {
+      "default": null, 
+      "access": "list", 
+      "description": "A number for the quantity of people in the room.", 
+      "type": "double", 
+      "name": "person_count_"
+    }, 
+    {
+      "default": null, 
+      "access": "list", 
+      "description": "A number for the installed wattage of lighting in the room (W).", 
+      "type": "double", 
+      "name": "lighting_watts_"
+    }, 
+    {
+      "default": null, 
+      "access": "list", 
+      "description": "A number for the installed wattage of electric equipment\nin the room (W).", 
+      "type": "double", 
+      "name": "electric_watts_"
+    }, 
+    {
+      "default": null, 
+      "access": "list", 
+      "description": "A number for the installed wattage of gas equipment in the room (W).", 
+      "type": "double", 
+      "name": "gas_watts_"
+    }, 
+    {
+      "default": null, 
+      "access": "list", 
+      "description": "Number for the peak flow rate of service hot water in the\nroom in liters per hour (L/h).", 
+      "type": "double", 
+      "name": "hot_wtr_flow_"
+    }, 
+    {
+      "default": null, 
+      "access": "list", 
+      "description": "A number for the infiltration flow rate in air changes per hour.", 
+      "type": "double", 
+      "name": "infiltration_ach_"
+    }
+  ], 
+  "outputs": [
+    [
+      {
+        "default": null, 
+        "access": "None", 
+        "description": "The input Dragonfly objects with their load values modified.", 
+        "type": null, 
+        "name": "df_objs"
+      }
+    ]
+  ], 
+  "name": "DF Apply Absolute Load Values", 
+  "code": "\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs, longest_list\n    from ladybug_{{cad}}.config import conversion_to_meters\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef extract_room2ds(obj):\n    \"\"\"Get all of the Room2Ds assinged to a given dragonfly object.\"\"\"\n    if isinstance(obj, Building):\n        return obj.unique_room_2ds\n    elif isinstance(obj, Story):\n        return obj.room_2ds\n    elif isinstance(obj, Room2D):\n        return [obj]\n    elif isinstance(obj, Model):\n        return [room for bldg in obj.buildings for room in bldg.unique_room_2ds]\n    else:\n        raise ValueError(\n            'Expected Dragonfly Room2D, Story, Building, or Model. '\n            'Got {}.'.format(type(hb_obj)))\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    df_objs = [obj.duplicate() for obj in _df_objs]\n\n    # loop through the rooms and assign absolute loads\n    for i, df_obj in enumerate(df_objs):\n        for room in extract_room2ds(df_obj):\n            # assign the person_count_\n            if len(person_count_) != 0:\n                room.properties.energy.person_count = longest_list(person_count_, i)\n            # assign the lighting_watts_\n            if len(lighting_watts_) != 0:\n                room.properties.energy.lighting_watts = longest_list(lighting_watts_, i)\n            # assign the electric_watts_\n            if len(electric_watts_) != 0:\n                room.properties.energy.electric_equipment_watts = longest_list(electric_watts_, i)\n            # assign the gas_watts_\n            if len(gas_watts_) != 0:\n                room.properties.energy.gas_equipment_watts = longest_list(gas_watts_, i)\n            # assign the hot_wtr_flow_\n            if len(hot_wtr_flow_) != 0:\n                room.properties.energy.hot_water_flow = longest_list(hot_wtr_flow_, i)\n            # assign the infiltration_ach_\n            if len(infiltration_ach_) != 0:\n                room.properties.energy.infiltration_ach = longest_list(infiltration_ach_, i)\n", 
+  "subcategory": "3 :: Energy"
+}
