@@ -32,7 +32,7 @@ roof specifications for different Stories of a Dragonfly Building or Model.
         _story_i_: An optional integer to set the index of the Story to which the Roof
             should be assigned. If unspecified, the roof geometry will be added
             to the top floor of any connected Building or Model.
-        _windows: A list of Breps that will be added to the roofs as clearstory
+        clerestory_geo_: A list of Breps that will be added to the roofs as clerestory
             windows. This can also be a list of orphaned Honeybee Apertures and/or
             Doors to be added to the Dragonfly objects. In the case of Doors, they
             will be assigned to the Dragonfly object as such.
@@ -47,7 +47,7 @@ roof specifications for different Stories of a Dragonfly Building or Model.
 
 ghenv.Component.Name = 'DF Apply Roof'
 ghenv.Component.NickName = 'ApplyRoof'
-ghenv.Component.Message = '1.10.1'
+ghenv.Component.Message = '1.10.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '0 :: Create'
 ghenv.Component.AdditionalHelpFromDocStrings = '7'
@@ -85,10 +85,10 @@ if all_required_inputs(ghenv.Component):
         face3ds.extend(to_face3d(geo_obj))
     roof = RoofSpecification(face3ds)
 
-    # assign clearstory geometry if it is present
-    if len(clearstory_geo_) != 0:
+    # assign clerestory geometry if it is present
+    if len(clerestory_geo_) != 0:
         win_geo = []
-        for geo in clearstory_geo_:
+        for geo in clerestory_geo_:
             if isinstance(geo, (Aperture, Door)):
                 win_geo.append(geo)
             else:
