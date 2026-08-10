@@ -19,17 +19,22 @@ This can be used to group Room2Ds by program, whether rooms are conditioned, etc
         _attribute: Text for the name of the Room2D attribute by which the Room2Ds
             should be separated. The "DF Room2D Attributes" component lists
             all of the attributes of the Room2D.
+        value_: An optional value of the attribute that can be used to filter
+            the output room2ds. For example, if the input attribute is "Program"
+            a value for the name of a program can be plugged in here
+            (eg. "2019::LargeOffice::OpenOffice") in order to get only the
+            room2ds that have this program assigned.
 
     Returns:
         values: A list of values with one attribute value for each branch of the
-            output rooms.
-         room2ds: A data tree of honeybee rooms with each branch of the tree
+            output room2ds.
+         room2ds: A data tree of dragonfly room2ds with each branch of the tree
             representing a different attribute value.
 """
 
 ghenv.Component.Name = 'DF Room2Ds by Attribute'
 ghenv.Component.NickName = 'Room2DsByAttr'
-ghenv.Component.Message = '1.10.0'
+ghenv.Component.Message = '1.10.1'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '1 :: Visualize'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -65,11 +70,24 @@ if all_required_inputs(ghenv.Component):
 
     # use the ColorRoom object to get a set of attributes assigned to the rooms
     color_obj = ColorRoom2D(in_rooms, _attribute)
-    values = color_obj.attributes_unique
 
     # loop through each of the room_2ds and get the attributes
-    room2ds = [[] for val in values]
-    for atr, room in zip(color_obj.attributes, in_rooms):
-        atr_i = values.index(atr)
-        room2ds[atr_i].append(room)
+    if len(value_) == 0:
+        values = color_obj.attributes_unique
+        room2ds = [[] for val in values]
+        for atr, room in zip(color_obj.attributes, in_rooms):
+            atr_i = values.index(atr)
+            room2ds[atr_i].append(room)
+    else:
+        values = []
+        for unique_atr in color_obj.attributes_unique:
+            for kw in value_:
+                if kw.lower() in str(unique_atr).lower():
+                    values.append(unique_atr)
+                    break
+        room2ds = [[] for val in values]
+        for atr, room in zip(color_obj.attributes, in_rooms):
+            if atr in values:
+                atr_i = values.index(atr)
+                room2ds[atr_i].append(room)
     room2ds = list_to_data_tree(room2ds)
