@@ -49,7 +49,7 @@ or Room2Ds.
 
 ghenv.Component.Name = "DF SHW System"
 ghenv.Component.NickName = 'SHW'
-ghenv.Component.Message = '1.10.1'
+ghenv.Component.Message = '1.10.2'
 ghenv.Component.Category = 'Dragonfly'
 ghenv.Component.SubCategory = '3 :: Energy'
 ghenv.Component.AdditionalHelpFromDocStrings = '3'
@@ -142,7 +142,9 @@ if all_required_inputs(ghenv.Component):
                 shw_count += 1
             else:
                 obj.properties.energy.set_all_room_2d_shw(shw)
-        elif isinstance(obj, Room2D) and obj.properties.energy.is_conditioned:
+        elif isinstance(obj, Room2D):
+            assert obj.properties.energy.is_conditioned, \
+                'Room2D must be conditioned to place a water heater within it.'
             obj.properties.energy.shw = shw
         elif isinstance(obj, Model):
             for bldg in obj.buildings:
@@ -154,4 +156,4 @@ if all_required_inputs(ghenv.Component):
         else:
             raise ValueError(
                 'Expected Dragonfly Room2D, Story, Building, or Model. '
-                'Got {}.'.format(type(hb_obj)))
+                'Got {}.'.format(type(obj)))

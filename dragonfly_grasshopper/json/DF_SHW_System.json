@@ -1,71 +1,71 @@
 {
-  "nickname": "SHW", 
-  "subcategory": "3 :: Energy", 
-  "description": "Apply a template Service Hot Water (SHW) system to Dragonfly Buildings, Stories\nor Room2Ds.\n-", 
   "outputs": [
     [
       {
-        "default": null, 
         "name": "report", 
-        "description": "Script variable OSHVACSystems", 
+        "default": null, 
         "access": "None", 
+        "description": "Script variable OSHVACSystems", 
         "type": null
       }, 
       {
-        "default": null, 
         "name": "df_objs", 
-        "description": "The input Rooms with a Service Hot Water system applied.", 
+        "default": null, 
         "access": "None", 
+        "description": "The input Rooms with a Service Hot Water system applied.", 
         "type": null
       }
     ]
   ], 
+  "version": "1.10.2", 
+  "description": "Apply a template Service Hot Water (SHW) system to Dragonfly Buildings, Stories\nor Room2Ds.\n-", 
+  "name": "DF SHW System", 
+  "nickname": "SHW", 
+  "code": "\ntry:  # import the honeybee extension\n    from honeybee.typing import clean_and_id_ep_string, clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the honeybee-energy extension\n    from honeybee_energy.shw import SHWSystem\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee_energy:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly-energy extension\n    import dragonfly_energy\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef best_room_for_heater(building):\n    \"\"\"Get the ID of the Room2D that is best suited for a water heater in a Building.\"\"\"\n    try:\n        lowest_floor = building.unique_stories[0]\n    except IndexError:  # Building of 3D rooms\n        return sorted(building.room_3ds, key=lambda x: x.floor_area)[-1].identifier\n    return sorted(lowest_floor.room_2ds, key=lambda x: x.floor_area)[-1].identifier\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    df_objs = [obj.duplicate() for obj in _df_objs]\n\n    # set default value for the inputs\n    name = clean_and_id_ep_string('SHW System') if _name_ is None \\\n        else clean_ep_string(_name_)\n    _loss_coeff_ = 6 if _loss_coeff_ is None else _loss_coeff_\n    if _condition_ is None:\n        if _system_type == 'HeatPump_WaterHeater' and \\\n                all(isinstance(dfo, (Building, Model)) for dfo in df_objs):\n            _condition_ = []\n            for obj in df_objs:\n                if isinstance(obj, Building):\n                    _condition_.append(best_room_for_heater(obj))\n                else:\n                    for bldg in obj.buildings:\n                        _condition_.append(best_room_for_heater(bldg))\n        else:\n            _condition_ = 22\n    elif isinstance(_condition_, Room2D):\n        _condition_ = _condition_.identifier\n    else:\n        try:\n            _condition_ = float(_condition_)\n        except Exception:\n            raise ValueError(\n                'Input _condition_ must be a Room2D in which the system is located '\n                'or a number\\nfor the ambient temperature in which the hot water '\n                'tank is located [C].\\nGot {}.'.format(type(_condition_))\n            )\n\n    # create the SHW System\n    if isinstance(_condition_, list):\n        shw = [SHWSystem(name, _system_type, _efficiency_, con, _loss_coeff_)\n               for con in _condition_]\n    else:\n        shw = SHWSystem(name, _system_type, _efficiency_, _condition_, _loss_coeff_)\n    if _name_ is not None:\n        shw.display_name = _name_\n\n    # apply the HVAC system to the objects\n    shw_count = 0\n    for obj in df_objs:\n        if isinstance(obj, (Building, Story)):\n            if isinstance(shw, list):\n                obj.properties.energy.set_all_room_2d_shw(shw[shw_count])\n                shw_count += 1\n            else:\n                obj.properties.energy.set_all_room_2d_shw(shw)\n        elif isinstance(obj, Room2D):\n            assert obj.properties.energy.is_conditioned, \\\n                'Room2D must be conditioned to place a water heater within it.'\n            obj.properties.energy.shw = shw\n        elif isinstance(obj, Model):\n            for bldg in obj.buildings:\n                if isinstance(shw, list):\n                    bldg.properties.energy.set_all_room_2d_shw(shw[shw_count])\n                    shw_count += 1\n                else:\n                    bldg.properties.energy.set_all_room_2d_shw(shw)\n        else:\n            raise ValueError(\n                'Expected Dragonfly Room2D, Story, Building, or Model. '\n                'Got {}.'.format(type(obj)))\n", 
+  "category": "Dragonfly", 
+  "subcategory": "3 :: Energy", 
   "inputs": [
     {
-      "default": null, 
       "name": "_df_objs", 
-      "description": "Dragonfly Buildings, Stories or Room2Ds to which the input template\nsystem will be assigned. This can also be a Honeybee Model for\nwhich all Rooms will be assigned the SHW system.", 
+      "default": null, 
       "access": "list", 
+      "description": "Dragonfly Buildings, Stories or Room2Ds to which the input template\nsystem will be assigned. This can also be a Honeybee Model for\nwhich all Rooms will be assigned the SHW system.", 
       "type": "System.Object"
     }, 
     {
-      "default": null, 
       "name": "_system_type", 
+      "default": null, 
+      "access": "item", 
       "description": "Text for the specific type of service hot water system and equipment.\nThe \"HB SHW Templates\" component has a full list of the supported\nsystem templates.", 
-      "access": "item", 
       "type": "string"
     }, 
     {
-      "default": null, 
       "name": "_name_", 
-      "description": "Text to set the name for the Service Hot Water system and to be\nincorporated into unique system identifier. If the name is not\nprovided, a random name will be assigned.", 
+      "default": null, 
       "access": "item", 
+      "description": "Text to set the name for the Service Hot Water system and to be\nincorporated into unique system identifier. If the name is not\nprovided, a random name will be assigned.", 
       "type": "string"
     }, 
     {
-      "default": null, 
       "name": "_efficiency_", 
-      "description": "A number for the efficiency of the heater within the system.\nFor Gas systems, this is the efficiency of the burner. For HeatPump\nsystems, this is the rated COP of the system. For electric systems,\nthis should usually be set to 1. If unspecified this value will\nautomatically be set based on the equipment_type. See below for\nthe default value for each equipment type:\n* Gas_WaterHeater - 0.8\n* Electric_WaterHeater - 1.0\n* HeatPump_WaterHeater - 3.5\n* Gas_TanklessHeater - 0.8\n* Electric_TanklessHeater - 1.0\n* District_WaterHeater - 1.0\n* District_TanklessHeater - 1.0", 
+      "default": null, 
       "access": "item", 
+      "description": "A number for the efficiency of the heater within the system.\nFor Gas systems, this is the efficiency of the burner. For HeatPump\nsystems, this is the rated COP of the system. For electric systems,\nthis should usually be set to 1. If unspecified this value will\nautomatically be set based on the equipment_type. See below for\nthe default value for each equipment type:\n* Gas_WaterHeater - 0.8\n* Electric_WaterHeater - 1.0\n* HeatPump_WaterHeater - 3.5\n* Gas_TanklessHeater - 0.8\n* Electric_TanklessHeater - 1.0\n* District_WaterHeater - 1.0\n* District_TanklessHeater - 1.0", 
       "type": "double"
     }, 
     {
-      "default": null, 
       "name": "_condition_", 
-      "description": "A number for the ambient temperature in which the hot water tank\nis located [C]. This can also be a Room2D in which the tank is\nlocated. (Default: 22, unless the _system_type is HeatPump_WaterHeater\nand the input _df_objs are Buildings or a Model, in which case the\ntank is placed in the largest room on the first floor of the Building).", 
+      "default": null, 
       "access": "item", 
+      "description": "A number for the ambient temperature in which the hot water tank\nis located [C]. This can also be a Room2D in which the tank is\nlocated. (Default: 22, unless the _system_type is HeatPump_WaterHeater\nand the input _df_objs are Buildings or a Model, in which case the\ntank is placed in the largest room on the first floor of the Building).", 
       "type": "System.Object"
     }, 
     {
-      "default": null, 
       "name": "_loss_coeff_", 
-      "description": "A number for the loss of heat from the water heater tank to the\nsurrounding ambient conditions [W/K]. (Default: 6 W/K).", 
+      "default": null, 
       "access": "item", 
+      "description": "A number for the loss of heat from the water heater tank to the\nsurrounding ambient conditions [W/K]. (Default: 6 W/K).", 
       "type": "double"
     }
-  ], 
-  "name": "DF SHW System", 
-  "code": "\ntry:  # import the honeybee extension\n    from honeybee.typing import clean_and_id_ep_string, clean_ep_string\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee:\\n\\t{}'.format(e))\n\ntry:  # import the honeybee-energy extension\n    from honeybee_energy.shw import SHWSystem\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import honeybee_energy:\\n\\t{}'.format(e))\n\ntry:  # import the core dragonfly dependencies\n    from dragonfly.model import Model\n    from dragonfly.building import Building\n    from dragonfly.story import Story\n    from dragonfly.room2d import Room2D\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly:\\n\\t{}'.format(e))\n\ntry:  # import the dragonfly-energy extension\n    import dragonfly_energy\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import dragonfly_energy energy:\\n\\t{}'.format(e))\n\ntry:\n    from ladybug_{{cad}}.{{plugin}} import all_required_inputs\nexcept ImportError as e:\n    raise ImportError('\\nFailed to import ladybug_{{cad}}:\\n\\t{}'.format(e))\n\n\ndef best_room_for_heater(building):\n    \"\"\"Get the ID of the Room2D that is best suited for a water heater in a Building.\"\"\"\n    try:\n        lowest_floor = building.unique_stories[0]\n    except IndexError:  # Building of 3D rooms\n        return sorted(building.room_3ds, key=lambda x: x.floor_area)[-1].identifier\n    return sorted(lowest_floor.room_2ds, key=lambda x: x.floor_area)[-1].identifier\n\n\nif all_required_inputs(ghenv.Component):\n    # duplicate the initial objects\n    df_objs = [obj.duplicate() for obj in _df_objs]\n\n    # set default value for the inputs\n    name = clean_and_id_ep_string('SHW System') if _name_ is None \\\n        else clean_ep_string(_name_)\n    _loss_coeff_ = 6 if _loss_coeff_ is None else _loss_coeff_\n    if _condition_ is None:\n        if _system_type == 'HeatPump_WaterHeater' and \\\n                all(isinstance(dfo, (Building, Model)) for dfo in df_objs):\n            _condition_ = []\n            for obj in df_objs:\n                if isinstance(obj, Building):\n                    _condition_.append(best_room_for_heater(obj))\n                else:\n                    for bldg in obj.buildings:\n                        _condition_.append(best_room_for_heater(bldg))\n        else:\n            _condition_ = 22\n    elif isinstance(_condition_, Room2D):\n        _condition_ = _condition_.identifier\n    else:\n        try:\n            _condition_ = float(_condition_)\n        except Exception:\n            raise ValueError(\n                'Input _condition_ must be a Room2D in which the system is located '\n                'or a number\\nfor the ambient temperature in which the hot water '\n                'tank is located [C].\\nGot {}.'.format(type(_condition_))\n            )\n\n    # create the SHW System\n    if isinstance(_condition_, list):\n        shw = [SHWSystem(name, _system_type, _efficiency_, con, _loss_coeff_)\n               for con in _condition_]\n    else:\n        shw = SHWSystem(name, _system_type, _efficiency_, _condition_, _loss_coeff_)\n    if _name_ is not None:\n        shw.display_name = _name_\n\n    # apply the HVAC system to the objects\n    shw_count = 0\n    for obj in df_objs:\n        if isinstance(obj, (Building, Story)):\n            if isinstance(shw, list):\n                obj.properties.energy.set_all_room_2d_shw(shw[shw_count])\n                shw_count += 1\n            else:\n                obj.properties.energy.set_all_room_2d_shw(shw)\n        elif isinstance(obj, Room2D) and obj.properties.energy.is_conditioned:\n            obj.properties.energy.shw = shw\n        elif isinstance(obj, Model):\n            for bldg in obj.buildings:\n                if isinstance(shw, list):\n                    bldg.properties.energy.set_all_room_2d_shw(shw[shw_count])\n                    shw_count += 1\n                else:\n                    bldg.properties.energy.set_all_room_2d_shw(shw)\n        else:\n            raise ValueError(\n                'Expected Dragonfly Room2D, Story, Building, or Model. '\n                'Got {}.'.format(type(hb_obj)))\n", 
-  "version": "1.10.1", 
-  "category": "Dragonfly"
+  ]
 }
